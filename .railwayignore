@@ -1,0 +1,10 @@
+# Railway ignore file
+node_modules/
+.git/
+.next/
+.turbo/
+*.log
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
