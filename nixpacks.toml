@@ -2,7 +2,7 @@
 nixPkgs = ["nodejs_20"]
 
 [phases.build]
-cmds = ["cd apps/instructor", "npm ci", "npm run build"]
+cmds = ["cd apps/instructor && npm ci && npm run build"]
 
 [start]
 cmd = "cd apps/instructor && node server.js"
