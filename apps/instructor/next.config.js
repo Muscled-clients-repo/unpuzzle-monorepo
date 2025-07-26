@@ -19,10 +19,23 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   typescript: {
-    // Temporarily ignore TypeScript errors to test deployment
+    // Ignore TypeScript errors for Railway deployment
     ignoreBuildErrors: true,
   },
   output: 'standalone',
+  transpilePackages: ['@tailwindcss/postcss'],
+  webpack: (config, { isServer }) => {
+    // Ignore certain modules that cause issues
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
+      };
+    }
+    return config;
+  },
 };
 
 module.exports = nextConfig;
