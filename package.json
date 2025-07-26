@@ -7,7 +7,7 @@
     "start": "cd apps/instructor && npm start",
     "build:client": "cd apps/client && npm ci && npm run build",
     "start:client": "cd apps/client && npm start",
-    "build:student": "cd apps/student && npm ci && npm run build", 
+    "build:student": "cd apps/student && npm ci && npm run build",
     "start:student": "cd apps/student && npm start",
     "dev": "echo 'Use individual app dev commands'",
     "lint": "echo 'Use individual app lint commands'",
