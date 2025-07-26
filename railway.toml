@@ -1,18 +1,8 @@
 [[services]]
 name = "unpuzzle-client"
-builder = "DOCKERFILE"
-dockerfilePath = "./Dockerfile.client"
-
-[services.unpuzzle-client.build]
-args = { BUILDKIT_INLINE_CACHE = "1" }
 
 [[services]]
 name = "unpuzzle-instructor"
-builder = "DOCKERFILE"
-dockerfilePath = "./Dockerfile.instructor"
-
-[services.unpuzzle-instructor.build]
-args = { BUILDKIT_INLINE_CACHE = "1" }
 
 [services.unpuzzle-instructor.variables]
 NEXT_PUBLIC_APP_SERVER_URL = "https://dev.nazmulcodes.org"
@@ -27,5 +17,3 @@ NEXT_PUBLIC_BASE_PATH = "/instructor"
 
 [[services]]
 name = "unpuzzle-student"
-builder = "DOCKERFILE"
-dockerfilePath = "./Dockerfile.student"
