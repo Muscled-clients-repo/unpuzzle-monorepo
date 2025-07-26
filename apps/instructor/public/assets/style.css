@@ -1,0 +1,77 @@
+.TabsTrigger[data-state='active'] {
+  color: white;
+  background: #00AFF0;
+}
+
+.TabsTriggerSettings[data-state='active'] {
+  color: #1D1D1D;
+  background: rgba(0, 175, 240, 0.10);
+}
+
+.truncate-lines {
+  display: -webkit-box;
+  /* Necessary for line clamp */
+  -webkit-box-orient: vertical;
+  /* Necessary for line clamp */
+  -webkit-line-clamp: 4;
+  /* Limit to 3 lines (for webkit browsers) */
+  -moz-box-orient: vertical;
+  /* Necessary for line clamp (for Firefox) */
+  -ms-box-orient: vertical;
+  /* Necessary for line clamp (for older IE versions) */
+  box-orient: vertical;
+  /* Standard */
+  line-clamp: 4;
+  /* Standard */
+  overflow: hidden;
+  /* Hide overflow text */
+  text-overflow: ellipsis;
+  /* Display ellipsis for overflow */
+}
+.truncate-2-lines {
+  display: -webkit-box;
+  /* Necessary for line clamp */
+  -webkit-box-orient: vertical;
+  /* Necessary for line clamp */
+  -webkit-line-clamp: 2;
+  /* Limit to 3 lines (for webkit browsers) */
+  -moz-box-orient: vertical;
+  /* Necessary for line clamp (for Firefox) */
+  -ms-box-orient: vertical;
+  /* Necessary for line clamp (for older IE versions) */
+  box-orient: vertical;
+  /* Standard */
+  line-clamp: 4;
+  /* Standard */
+  overflow: hidden;
+  /* Hide overflow text */
+  text-overflow: ellipsis;
+  /* Display ellipsis for overflow */
+}
+
+
+  .countdown-animation {
+    animation: countdownEffect 1s ease-in-out forwards;
+  }
+
+  @keyframes countdownEffect {
+    0% {
+      opacity: 0.5;
+      transform: scale(0.5);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.5);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  .bg-custom-gradient{
+    background: linear-gradient(215deg, #5B5BF0 2.4%, #00AFF0 102.51%), #F5F4F6;
+
+
+
+  }
+  

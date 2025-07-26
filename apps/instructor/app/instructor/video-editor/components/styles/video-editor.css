@@ -1,0 +1,450 @@
+/* Video Editor Specific Styles */
+
+/* Hide all scrollbars globally while maintaining scroll functionality */
+* {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+*::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+/* Ensure scroll functionality is preserved */
+.overflow-y-auto,
+.overflow-auto,
+.overflow-x-auto,
+.overflow-scroll {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.overflow-y-auto::-webkit-scrollbar,
+.overflow-auto::-webkit-scrollbar,
+.overflow-x-auto::-webkit-scrollbar,
+.overflow-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* Video Controls Slider */
+.slider-thumb::-webkit-slider-thumb {
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #fff;
+  cursor: pointer;
+  border: 2px solid #3b82f6;
+}
+
+.slider-thumb::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #fff;
+  cursor: pointer;
+  border: 2px solid #3b82f6;
+}
+
+/* Timeline Scrollbar */
+.timeline-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #6b7280 #374151;
+}
+
+.timeline-scrollbar::-webkit-scrollbar {
+  height: 8px;
+}
+
+.timeline-scrollbar::-webkit-scrollbar-track {
+  background: #374151;
+  border-radius: 4px;
+}
+
+.timeline-scrollbar::-webkit-scrollbar-thumb {
+  background: #6b7280;
+  border-radius: 4px;
+}
+
+.timeline-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* Track Resize Handles */
+.resize-handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 8px;
+  cursor: ew-resize;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.resize-handle:hover,
+.track-clip:hover .resize-handle {
+  opacity: 1;
+}
+
+.resize-handle::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 2px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 1px;
+}
+
+.resize-handle.left {
+  left: 0;
+}
+
+.resize-handle.right {
+  right: 0;
+}
+
+/* Video Player Overlay */
+.video-player-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.8) 0%,
+    rgba(0, 0, 0, 0.4) 30%,
+    rgba(0, 0, 0, 0) 70%
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.video-player-container:hover .video-player-overlay {
+  opacity: 1;
+}
+
+/* Waveform Styles */
+.waveform-container {
+  position: relative;
+  overflow: hidden;
+  border-radius: 4px;
+}
+
+.waveform-container canvas {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Recording Pulse Animation */
+@keyframes record-pulse {
+  0%, 50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.3;
+  }
+}
+
+.record-indicator {
+  animation: record-pulse 1s infinite;
+}
+
+/* Timeline Playhead - Now handled inline for better control */
+
+/* Tracks Container */
+.tracks-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* Track Row Click Handling */
+.track-row {
+  position: relative;
+  cursor: pointer;
+}
+
+/* Track Headers */
+.track-header {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  background: rgba(243, 244, 246, 1);
+  border-radius: 6px;
+  min-width: 120px;
+  color: #374151;
+}
+
+.track-header svg {
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+/* Clip Tooltips */
+.clip-tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 8px;
+  padding: 4px 8px;
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  font-size: 11px;
+  border-radius: 4px;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
+  z-index: 100;
+}
+
+.track-clip:hover .clip-tooltip {
+  opacity: 1;
+}
+
+/* AI Voice Processing Indicator */
+.ai-processing {
+  position: relative;
+  overflow: hidden;
+}
+
+.ai-processing::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* Light Theme Enhancements */
+.video-editor-light {
+  color-scheme: light;
+}
+
+/* Custom Scrollbars for Light Theme */
+.light-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #d1d5db #f3f4f6;
+}
+
+.light-scrollbar::-webkit-scrollbar {
+  width: 10px;
+  height: 12px;
+}
+
+.light-scrollbar::-webkit-scrollbar-track {
+  background: #f3f4f6;
+  border-radius: 6px;
+  margin: 0 4px;
+}
+
+.light-scrollbar::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #e5e7eb 0%, #d1d5db 100%);
+  border-radius: 6px;
+  border: 2px solid #f3f4f6;
+  box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.1);
+}
+
+.light-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #d1d5db 0%, #9ca3af 100%);
+  box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.15);
+}
+
+.light-scrollbar::-webkit-scrollbar-thumb:active {
+  background: linear-gradient(180deg, #9ca3af 0%, #6b7280 100%);
+}
+
+/* Horizontal scrollbar specific styling */
+.light-scrollbar::-webkit-scrollbar:horizontal {
+  height: 14px;
+}
+
+.light-scrollbar::-webkit-scrollbar-track:horizontal {
+  margin: 0 160px 0 4px; /* Account for track labels on the left */
+}
+
+/* Firefox scrollbar styling */
+@supports (scrollbar-width: thin) {
+  .light-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: #d1d5db #f3f4f6;
+  }
+  
+  .light-scrollbar:hover {
+    scrollbar-color: #9ca3af #f3f4f6;
+  }
+}
+
+/* Timeline Range Slider Styling */
+input[type="range"] {
+  -webkit-appearance: none;
+  background: transparent;
+}
+
+input[type="range"]::-webkit-slider-track {
+  background: #e5e7eb;
+  height: 4px;
+  border-radius: 2px;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #3b82f6;
+  cursor: pointer;
+  margin-top: -6px;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+  transition: all 0.2s ease;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  background: #2563eb;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3);
+}
+
+input[type="range"]::-moz-range-track {
+  background: #e5e7eb;
+  height: 4px;
+  border-radius: 2px;
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #3b82f6;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+  transition: all 0.2s ease;
+}
+
+/* Professional Button Styles */
+.editor-tool-btn {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.editor-tool-btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  transform: translate(-50%, -50%);
+  transition: width 0.3s, height 0.3s;
+}
+
+.editor-tool-btn:hover::before {
+  width: 100%;
+  height: 100%;
+}
+
+/* Tab Styles for Dark Theme */
+.dark-tab {
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.dark-tab::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #3b82f6;
+  transform: scaleX(0);
+  transition: transform 0.2s ease;
+}
+
+.dark-tab.active::after {
+  transform: scaleX(1);
+}
+
+/* Timeline Grid Background - Dark */
+.timeline-grid {
+  background-image: 
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 49px,
+      rgba(75, 85, 99, 0.3) 49px,
+      rgba(75, 85, 99, 0.3) 50px
+    );
+  background-size: 50px 100%;
+}
+
+/* Timeline Grid Background - Light */
+.timeline-grid-light {
+  background-image: 
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 49px,
+      rgba(209, 213, 219, 0.5) 49px,
+      rgba(209, 213, 219, 0.5) 50px
+    );
+  background-size: 50px 100%;
+}
+
+/* Clip Selection Outline */
+.track-clip.selected {
+  outline: 2px solid #3b82f6;
+  outline-offset: -2px;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+}
+
+/* Drag Ghost */
+.drag-ghost {
+  opacity: 0.5;
+  cursor: grabbing;
+}
+
+/* Drop Zone Indicator */
+.drop-zone-active {
+  background: rgba(59, 130, 246, 0.1);
+  border: 2px dashed #3b82f6;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  .video-editor-container {
+    flex-direction: column;
+  }
+  
+  .video-editor-sidebar {
+    width: 100%;
+    max-height: 300px;
+  }
+  
+  .video-editor-main {
+    width: 100%;
+  }
+}

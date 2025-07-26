@@ -1,0 +1,190 @@
+/* Timeline Snapping Styles */
+
+/* Alignment Guides */
+.alignment-guide {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  pointer-events: none;
+  z-index: 30;
+  transition: opacity 0.2s ease;
+}
+
+.alignment-guide::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 6px solid currentColor;
+}
+
+.alignment-guide.playhead {
+  background-color: #ef4444;
+  box-shadow: 0 0 4px rgba(239, 68, 68, 0.5);
+}
+
+.alignment-guide.clip-start,
+.alignment-guide.clip-end {
+  background-color: #3b82f6;
+  box-shadow: 0 0 4px rgba(59, 130, 246, 0.5);
+}
+
+.alignment-guide.marker {
+  background-color: #eab308;
+  box-shadow: 0 0 4px rgba(234, 179, 8, 0.5);
+}
+
+/* Snap Zones */
+.snap-zone {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 20px;
+  margin-left: -10px;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(34, 197, 94, 0.1) 50%, 
+    transparent 100%
+  );
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.snap-zone.active {
+  opacity: 1;
+}
+
+/* Magnetic Effect */
+@keyframes magneticPull {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.clip-snapping {
+  animation: magneticPull 0.3s ease;
+}
+
+/* Marker Styles */
+.timeline-marker {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background-color: #eab308;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.timeline-marker:hover {
+  width: 4px;
+  margin-left: -1px;
+  background-color: #f59e0b;
+}
+
+.timeline-marker::after {
+  content: '';
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 6px 10px 6px;
+  border-color: transparent transparent #eab308 transparent;
+}
+
+/* Snap Indicator Tooltip */
+.snap-tooltip {
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.snap-tooltip.visible {
+  opacity: 1;
+}
+
+/* Grid Lines for Snapping */
+.timeline-grid {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+  opacity: 0.1;
+}
+
+.timeline-grid.visible {
+  opacity: 0.3;
+}
+
+.timeline-grid-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background-color: #9ca3af;
+}
+
+/* Snap Controls */
+.snap-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.snap-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.snap-toggle.active {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.snap-toggle:not(.active) {
+  background-color: #f3f4f6;
+  color: #4b5563;
+}
+
+.snap-toggle:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}

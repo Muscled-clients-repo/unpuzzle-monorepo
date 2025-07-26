@@ -1,0 +1,14 @@
+{
+  "name": "@unpuzzle/config",
+  "version": "0.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "files": [
+    "eslint-preset.js",
+    "tsconfig"
+  ],
+  "devDependencies": {
+    "eslint": "^8.57.0",
+    "typescript": "^5.3.3"
+  }
+}
