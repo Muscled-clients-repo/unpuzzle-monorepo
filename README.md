@@ -7,9 +7,9 @@ This is a monorepo containing multiple Next.js applications for the Unpuzzle pla
 ```
 unpuzzle-mono-repo-frontend/
 ├── apps/
-│   ├── client/         # Main landing page (unpuzzle.com)
-│   ├── instructor/     # Instructor portal (unpuzzle.com/instructor)
-│   └── student/        # Student portal (unpuzzle.com/student)
+│   ├── client/         # Main landing page
+│   ├── instructor/     # Instructor portal
+│   └── student/        # Student portal
 ├── packages/
 │   ├── ui/            # Shared UI components
 │   ├── config/        # Shared configurations
@@ -18,93 +18,81 @@ unpuzzle-mono-repo-frontend/
 └── docs/              # Documentation
 ```
 
-## Getting Started
+## Local Development
 
 ### Prerequisites
+- Node.js 20+
+- npm
 
-- Node.js 18+
-- pnpm 8+
-
-### Installation
-
-```bash
-# Install dependencies
-pnpm install
-```
-
-### Development
-
-Run all apps in development mode:
+### Installation & Running
 
 ```bash
-pnpm dev
-```
+# Install and run client app
+cd apps/client
+npm install
+npm run dev
 
-Or run specific apps:
+# Install and run instructor app
+cd apps/instructor
+npm install
+npm run dev
 
-```bash
-# Run only the instructor app
-pnpm dev --filter=@unpuzzle/instructor
-
-# Run only the client app
-pnpm dev --filter=@unpuzzle/client
+# Install and run student app
+cd apps/student
+npm install
+npm run dev
 ```
 
 ### Access URLs
-
-- Client App: http://localhost:3001
+- Client App: http://localhost:3004
 - Instructor App: http://localhost:3002/instructor
 - Student App: http://localhost:3003/student
 
-### Using Nginx (Optional)
-
-To access all apps under a single domain (http://localhost:3000):
-
-1. Install nginx
-2. Run: `nginx -c $(pwd)/nginx/nginx.local.conf`
-3. Access:
-   - http://localhost:3000 (client)
-   - http://localhost:3000/instructor
-   - http://localhost:3000/student
-
-## Building
-
-Build all apps:
+## Testing Local Builds
 
 ```bash
-pnpm build
+# Test all app builds
+./test-build.sh
 ```
 
-Build specific app:
+## Deployment on Render
 
-```bash
-pnpm build --filter=@unpuzzle/instructor
-```
+**Important**: Each app must be deployed separately as individual services.
 
-## Deployment
+### Step-by-Step Deployment:
 
-### Option 1: Vercel
+1. **Go to [render.com](https://render.com)**
+2. **Deploy Client App:**
+   - New Web Service
+   - Connect repo: `Muscled-clients-repo/unpuzzle-mono-repo-frontend`
+   - **Root Directory**: `apps/client`
+   - Build Command: `npm ci && npm run build`
+   - Start Command: `npm start`
 
-Each app can be deployed separately to Vercel with proper routing configuration.
+3. **Deploy Instructor App:**
+   - New Web Service
+   - Same repo
+   - **Root Directory**: `apps/instructor`
+   - Build Command: `npm ci && npm run build`
+   - Start Command: `npm start`
+   - Add environment variables from `.env.local`
 
-### Option 2: Docker
+4. **Deploy Student App:**
+   - New Web Service
+   - Same repo
+   - **Root Directory**: `apps/student`
+   - Build Command: `npm ci && npm run build`
+   - Start Command: `npm start`
 
-Use the provided Docker configurations for containerized deployment.
+### 🔑 Critical Setting
+**Always set "Root Directory"** to the specific app folder (`apps/client`, `apps/instructor`, or `apps/student`). This ensures Render builds the individual app instead of trying to build the entire monorepo.
 
-### Option 3: Traditional Server
+## Environment Variables
 
-Deploy with PM2 or similar process managers with nginx as reverse proxy.
+Copy from `apps/instructor/.env.local`:
+- `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`
+- `CLERK_SECRET_KEY`
+- `NEXT_PUBLIC_APP_SERVER_URL`
+- And others as needed
 
-## Adding New Apps
-
-1. Create new app in `apps/` directory
-2. Configure `basePath` in `next.config.ts`
-3. Update nginx configuration if needed
-4. Add to pnpm workspace
-
-## Shared Packages
-
-- `@unpuzzle/ui`: Shared React components
-- `@unpuzzle/config`: Shared ESLint, TypeScript configs
-- `@unpuzzle/utils`: Shared utility functions
-- `@unpuzzle/types`: Shared TypeScript types
+See `docs/RENDER_MANUAL_SETUP.md` for detailed deployment instructions.

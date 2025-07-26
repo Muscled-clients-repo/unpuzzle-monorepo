@@ -3,19 +3,18 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "turbo run dev",
-    "build": "turbo run build",
-    "start": "turbo run start",
-    "lint": "turbo run lint",
-    "test": "turbo run test",
+    "dev": "echo 'Use individual app dev commands'",
+    "build": "echo 'Use individual app build commands'",
+    "start": "echo 'Use individual app start commands'",
+    "lint": "echo 'Use individual app lint commands'",
+    "test": "echo 'Use individual app test commands'",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,md,json}\"",
-    "clean": "turbo run clean && rm -rf node_modules",
-    "deploy": "turbo run build"
+    "clean": "rm -rf node_modules apps/*/node_modules",
+    "deploy": "echo 'Deploy each app individually'"
   },
   "devDependencies": {
     "eslint": "^8.57.0",
     "prettier": "^3.2.5",
-    "turbo": "^2.0.0",
     "typescript": "^5.3.3"
   },
   "engines": {
