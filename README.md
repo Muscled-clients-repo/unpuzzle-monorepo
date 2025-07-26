@@ -22,7 +22,7 @@ unpuzzle-mono-repo-frontend/
 
 ### Prerequisites
 - Node.js 20+
-- npm
+- npm 10+
 
 ### Installation & Running
 
