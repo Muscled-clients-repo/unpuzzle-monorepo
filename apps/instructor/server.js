@@ -1,57 +1,47 @@
-// Custom server for Railway deployment
-const { createServer } = require('http');
-const { parse } = require('url');
+// Railway deployment server
+const fs = require('fs');
 const path = require('path');
 
 const port = parseInt(process.env.PORT || '3000', 10);
-const hostname = '0.0.0.0';
+const hostname = process.env.HOSTNAME || '0.0.0.0';
 
-// Handle uncaught exceptions
-process.on('uncaughtException', (err) => {
-  console.error('Uncaught Exception:', err);
-  // Don't exit on uncaught exceptions
-});
+console.log(`Starting server on ${hostname}:${port}`);
+console.log('Current directory:', process.cwd());
+console.log('Directory contents:', fs.readdirSync('.'));
 
-process.on('unhandledRejection', (reason, promise) => {
-  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
-  // Don't exit on unhandled rejections
-});
-
-// Import and start the standalone server
-try {
-  process.env.PORT = String(port);
-  process.env.HOSTNAME = hostname;
+// Check if .next/standalone exists
+const standalonePath = './.next/standalone';
+if (fs.existsSync(standalonePath)) {
+  console.log('Found .next/standalone directory');
+  console.log('Standalone contents:', fs.readdirSync(standalonePath));
   
-  console.log(`Starting Next.js standalone server on port ${port}`);
-  
-  // Run the standalone server
-  require('./.next/standalone/server.js');
-  
-  console.log(`Server is running on http://${hostname}:${port}`);
-} catch (error) {
-  console.error('Failed to start server:', error);
-  // Keep the process alive
-  setInterval(() => {
-    console.log('Server heartbeat - keeping process alive');
-  }, 30000);
+  const serverPath = path.join(standalonePath, 'server.js');
+  if (fs.existsSync(serverPath)) {
+    console.log('Found standalone server.js, starting...');
+    
+    // Set environment variables for the standalone server
+    process.env.PORT = String(port);
+    process.env.HOSTNAME = hostname;
+    
+    // Start the Next.js standalone server
+    require(serverPath);
+  } else {
+    console.error('standalone/server.js not found');
+    process.exit(1);
+  }
+} else {
+  console.error('.next/standalone directory not found');
+  console.log('Available files:', fs.readdirSync('.', { withFileTypes: true }));
+  process.exit(1);
 }
 
-// Graceful shutdown
-let isShuttingDown = false;
+// Graceful shutdown handling
+process.on('SIGTERM', () => {
+  console.log('SIGTERM received, shutting down gracefully');
+  process.exit(0);
+});
 
-const gracefulShutdown = (signal) => {
-  if (isShuttingDown) return;
-  isShuttingDown = true;
-  
-  console.log(`\n${signal} received. Performing graceful shutdown...`);
-  
-  // Give the server time to finish ongoing requests
-  setTimeout(() => {
-    console.log('Graceful shutdown complete');
-    process.exit(0);
-  }, 5000);
-};
-
-// Listen for termination signals
-process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
-process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+process.on('SIGINT', () => {
+  console.log('SIGINT received, shutting down gracefully');
+  process.exit(0);
+});
