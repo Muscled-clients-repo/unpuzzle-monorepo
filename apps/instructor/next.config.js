@@ -22,6 +22,10 @@ const nextConfig = {
     ignoreBuildErrors: false,
   },
   output: 'standalone',
+  // Skip static generation for pages that require Clerk auth
+  experimental: {
+    missingSuspenseWithCSRBailout: false,
+  },
 };
 
 module.exports = nextConfig;

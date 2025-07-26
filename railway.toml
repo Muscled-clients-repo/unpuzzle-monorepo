@@ -1,6 +1,6 @@
 [build]
 builder = "nixpacks"
-buildCommand = "cd apps/instructor && npm ci --only=production --loglevel=error && npm run build"
+buildCommand = "cd apps/instructor && npm ci --loglevel=error && npm run build"
 
 [deploy]
 startCommand = "cd apps/instructor && node server.js"
