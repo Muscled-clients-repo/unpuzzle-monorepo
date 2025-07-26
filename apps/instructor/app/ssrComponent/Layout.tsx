@@ -50,15 +50,6 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState<boolean>(true);
   const pathname = usePathname();
 
-  // In your layout or any server component
-  console.log(
-    "CLERK_SECRET_KEY:",
-    process.env.CLERK_SECRET_KEY?.substring(0, 10) + "..."
-  );
-  console.log(
-    "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY:",
-    process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.substring(0, 10) + "..."
-  );
 
   useEffect(() => {
     // Content will not be displayed if loading is always true.

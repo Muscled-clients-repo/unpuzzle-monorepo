@@ -5,9 +5,9 @@
     "buildCommand": "cd apps/instructor && npm ci && npm run build"
   },
   "deploy": {
-    "startCommand": "cd apps/instructor && node server.js",
+    "startCommand": "cd apps/instructor && node .next/standalone/server.js",
     "restartPolicyType": "ON_FAILURE",
-    "restartPolicyMaxRetries": 3
+    "restartPolicyMaxRetries": 10
   },
   "env": {
     "NODE_ENV": "production"

@@ -5,4 +5,4 @@ nixPkgs = ["nodejs_20"]
 cmds = ["cd apps/instructor && npm ci && npm run build"]
 
 [start]
-cmd = "cd apps/instructor && node server.js"
+cmd = "cd apps/instructor && node .next/standalone/server.js"
