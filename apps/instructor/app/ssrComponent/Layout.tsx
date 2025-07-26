@@ -21,7 +21,6 @@ import { UserSync } from "../components";
 
 // clerk
 import {
-  ClerkProvider,
   SignInButton,
   SignUpButton,
   SignedIn,
@@ -29,6 +28,7 @@ import {
   UserButton,
   RedirectToSignIn,
 } from "@clerk/nextjs";
+import { ClerkProviderWrapper } from "../components/providers/ClerkProviderWrapper";
 
 const geistSans = Geist({
   subsets: ["latin"],
@@ -131,7 +131,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ClerkProvider>
+    <ClerkProviderWrapper>
       <html
         lang="en"
         className={`${geistSans.className} ${geistMono.className} overflow-hidden`}
@@ -149,6 +149,6 @@ export default function RootLayout({
           </Provider>
         </body>
       </html>
-    </ClerkProvider>
+    </ClerkProviderWrapper>
   );
 }

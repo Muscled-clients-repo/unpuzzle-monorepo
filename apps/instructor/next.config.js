@@ -22,16 +22,6 @@ const nextConfig = {
     ignoreBuildErrors: false,
   },
   output: 'standalone',
-  // Disable static exports during build
-  generateBuildId: async () => {
-    // Return a consistent build ID
-    return 'build-' + Date.now()
-  },
 };
-
-// During build, if Clerk keys are missing, skip static generation
-if (process.env.NODE_ENV === 'production' && !process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY) {
-  console.warn('Clerk keys not found during build, some features may be limited');
-}
 
 module.exports = nextConfig;
