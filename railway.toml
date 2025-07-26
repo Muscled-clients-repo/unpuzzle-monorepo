@@ -2,4 +2,4 @@
 buildCommand = "npm run build"
 
 [deploy]
-startCommand = "npm run start:test"
+startCommand = "cd apps/instructor && node startup-test.js"
