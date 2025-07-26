@@ -3,14 +3,17 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "build": "cd apps/instructor && npm ci && npm run build",
+    "start": "cd apps/instructor && npm start",
+    "build:client": "cd apps/client && npm ci && npm run build",
+    "start:client": "cd apps/client && npm start",
+    "build:student": "cd apps/student && npm ci && npm run build", 
+    "start:student": "cd apps/student && npm start",
     "dev": "echo 'Use individual app dev commands'",
-    "build": "echo 'Use individual app build commands'",
-    "start": "echo 'Use individual app start commands'",
     "lint": "echo 'Use individual app lint commands'",
     "test": "echo 'Use individual app test commands'",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,md,json}\"",
-    "clean": "rm -rf node_modules apps/*/node_modules",
-    "deploy": "echo 'Deploy each app individually'"
+    "clean": "rm -rf node_modules apps/*/node_modules"
   },
   "devDependencies": {
     "eslint": "^8.57.0",
