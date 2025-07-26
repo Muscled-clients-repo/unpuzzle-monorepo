@@ -1,7 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  basePath: process.env.NEXT_PUBLIC_BASE_PATH || '/instructor',
-  assetPrefix: process.env.NEXT_PUBLIC_BASE_PATH || '/instructor',
+  // Remove basePath for Railway deployment to avoid routing issues
+  // basePath: process.env.NEXT_PUBLIC_BASE_PATH || '/instructor',
+  // assetPrefix: process.env.NEXT_PUBLIC_BASE_PATH || '/instructor',
   images: {
     remotePatterns: [
       {
@@ -11,7 +12,7 @@ const nextConfig = {
         pathname: "/**", // allows all paths under this domain
       },
     ],
-    path: `${process.env.NEXT_PUBLIC_BASE_PATH || '/instructor'}/_next/image`,
+    // path: `${process.env.NEXT_PUBLIC_BASE_PATH || '/instructor'}/_next/image`,
   },
   eslint: {
     // Temporarily disable ESLint during builds to focus on TypeScript errors

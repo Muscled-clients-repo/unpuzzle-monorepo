@@ -9,7 +9,3 @@ restartPolicyMaxRetries = 10
 [[services]]
 name = "instructor"
 source = "apps/instructor"
-
-[services.variables]
-NODE_ENV = "production"
-PORT = "3000"
