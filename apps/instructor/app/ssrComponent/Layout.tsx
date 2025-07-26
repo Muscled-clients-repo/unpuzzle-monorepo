@@ -85,14 +85,16 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
   // Show AnnotationHeader for specific paths
   const showAnnotationHeader = noSidebarPaths.includes(pathname);
 
-  // Debug logging
+  // Debug logging - only in development
   useEffect(() => {
-    console.log('Sidebar Debug:', {
-      pathname,
-      showSidebar,
-      hasUser: !!user.user,
-      user: user.user,
-    });
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Sidebar Debug:', {
+        pathname,
+        showSidebar,
+        hasUser: !!user.user,
+        user: user.user,
+      });
+    }
   }, [pathname, showSidebar, user.user]);
 
   return (
