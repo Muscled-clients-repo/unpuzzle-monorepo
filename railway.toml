@@ -1,0 +1,7 @@
+[build]
+builder = "nixpacks"
+buildCommand = "cd apps/instructor && npm ci && npm run build"
+
+[deploy]
+startCommand = "cd apps/instructor && npm start"
+restartPolicyType = "NEVER"
