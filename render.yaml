@@ -2,8 +2,9 @@ services:
   - type: web
     name: unpuzzle-client
     env: node
-    buildCommand: cd apps/client && npm install && npm run build
-    startCommand: cd apps/client && npm start
+    root: apps/client
+    buildCommand: npm install && npm run build
+    startCommand: npm start
     envVars:
       - key: NODE_ENV
         value: production
@@ -13,8 +14,9 @@ services:
   - type: web
     name: unpuzzle-instructor
     env: node
-    buildCommand: cd apps/instructor && npm install && npm run build
-    startCommand: cd apps/instructor && npm start
+    root: apps/instructor
+    buildCommand: npm install && npm run build
+    startCommand: npm start
     envVars:
       - key: NODE_ENV
         value: production
@@ -38,8 +40,9 @@ services:
   - type: web
     name: unpuzzle-student
     env: node
-    buildCommand: cd apps/student && npm install && npm run build
-    startCommand: cd apps/student && npm start
+    root: apps/student
+    buildCommand: npm install && npm run build
+    startCommand: npm start
     envVars:
       - key: NODE_ENV
         value: production
