@@ -1,10 +1,12 @@
 [[services]]
 name = "unpuzzle-client"
-source = "apps/client"
+builder = "DOCKERFILE"
+dockerfilePath = "./Dockerfile.client"
 
 [[services]]
 name = "unpuzzle-instructor"
-source = "apps/instructor"
+builder = "DOCKERFILE"
+dockerfilePath = "./Dockerfile.instructor"
 
 [services.unpuzzle-instructor.variables]
 NEXT_PUBLIC_APP_SERVER_URL = "https://dev.nazmulcodes.org"
@@ -19,4 +21,5 @@ NEXT_PUBLIC_BASE_PATH = "/instructor"
 
 [[services]]
 name = "unpuzzle-student"
-source = "apps/student"
+builder = "DOCKERFILE"
+dockerfilePath = "./Dockerfile.student"
