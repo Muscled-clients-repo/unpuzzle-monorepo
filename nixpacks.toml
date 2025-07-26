@@ -1,0 +1,8 @@
+[phases.setup]
+nixPkgs = ["nodejs-20_x"]
+
+[phases.build]
+cmds = ["cd apps/instructor", "npm ci", "npm run build"]
+
+[start]
+cmd = "cd apps/instructor && node server.js"

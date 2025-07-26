@@ -1,0 +1,1 @@
+web: cd apps/instructor && node server.js

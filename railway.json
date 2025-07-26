@@ -2,13 +2,16 @@
   "$schema": "https://railway.app/railway.schema.json",
   "build": {
     "builder": "NIXPACKS",
-    "buildCommand": "cd apps/instructor && npm ci && npm run build"
+    "buildCommand": "cd apps/instructor && rm -rf node_modules .next && npm ci && npm run build"
   },
   "deploy": {
-    "startCommand": "cd apps/instructor && npm start",
+    "startCommand": "cd apps/instructor && node server.js",
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 3,
-    "healthcheckPath": "/api/health",
+    "healthcheckPath": "/instructor/api/health",
     "healthcheckTimeout": 30
+  },
+  "env": {
+    "NODE_ENV": "production"
   }
 }
