@@ -5,6 +5,7 @@
   "scripts": {
     "build": "cd apps/instructor && npm ci && npm run build",
     "start": "cd apps/instructor && npm start",
+    "start:test": "cd apps/instructor && npm run start:test",
     "build:client": "cd apps/client && npm ci && npm run build",
     "start:client": "cd apps/client && npm start",
     "build:student": "cd apps/student && npm ci && npm run build",
