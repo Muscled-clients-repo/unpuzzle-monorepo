@@ -1,13 +1,9 @@
-@import "tailwindcss";
-@custom-variant dark (&:where(.dark, .dark *)); /* Enables `dark:` styles via `.dark` class */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-@theme {
+/* Custom CSS variables */
+:root {
   --color-primary-blue: #00aff0;
 }
 
