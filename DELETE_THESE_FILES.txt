@@ -1,0 +1,7 @@
+Please delete these files as we're going with a different approach:
+- /next.config.js
+- /app/layout.tsx
+- /app/page.tsx
+- /app/instructor/layout.tsx
+- /app/instructor/page.tsx
+- /middleware.ts
