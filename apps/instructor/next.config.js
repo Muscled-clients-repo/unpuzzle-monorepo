@@ -18,7 +18,7 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  // output: 'standalone',
+  // output: 'standalone', // Commented out for Vercel deployment
   webpack: (config) => {
     config.resolve.alias = {
       ...config.resolve.alias,
