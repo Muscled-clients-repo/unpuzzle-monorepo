@@ -1,7 +1,7 @@
 "use client";
 import { Geist, Geist_Mono } from "next/font/google";
 import type { Metadata } from "next";
-import "../components/assets/globals.css";
+import "../assets/globals.css";
 // import Header from "./Header";
 import { Provider, useSelector } from "react-redux";
 import store, { RootState } from "../redux/store";
@@ -45,7 +45,7 @@ export const metadata: Metadata = {
   description: "Create interactive educational content that engages students through puzzle-based learning",
 };
 
-function LayoutContent({ children, hasClerkKeys }: { children: React.ReactNode; hasClerkKeys?: boolean }) {
+function LayoutContent({ children }: { children: React.ReactNode }) {
   const user = useSelector((state: RootState) => state.user);
   const [loading, setLoading] = useState<boolean>(true);
   const pathname = usePathname();
@@ -106,8 +106,7 @@ function LayoutContent({ children, hasClerkKeys }: { children: React.ReactNode; 
 
   return (
     <>
-      {/* Only render UserSync when Clerk is available */}
-      {hasClerkKeys && <UserSync />}
+      <UserSync />
       <main>
         <div className="flex h-screen">
           {/* Sidebar - Using direct Clerk approach */}
@@ -138,43 +137,25 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // Check if Clerk keys are available
-  const hasClerkKeys = !!(
-    process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY &&
-    process.env.CLERK_SECRET_KEY
-  );
-
-  // Always return the same structure, but conditionally wrap with ClerkProvider
   return (
-    <html
-      lang="en"
-      className={`${geistSans.className} ${geistMono.className} overflow-hidden`}
-    >
-      <body className="antialiased light" suppressHydrationWarning>
+    <ClerkProvider>
+      <html
+        lang="en"
+        className={`${geistSans.className} ${geistMono.className} overflow-hidden`}
+      >
+        <body className="antialiased light" suppressHydrationWarning>
         <ToastContainer />
-        
-        {hasClerkKeys ? (
-          <ClerkProvider>
-            <Provider store={store}>
-              <NavigationProvider>
-                <VideoTimeProvider>
-                  <NavigationLoader />
-                  <LayoutContent hasClerkKeys={true}>{children}</LayoutContent>
-                </VideoTimeProvider>
-              </NavigationProvider>
-            </Provider>
-          </ClerkProvider>
-        ) : (
+
           <Provider store={store}>
             <NavigationProvider>
               <VideoTimeProvider>
-                  <NavigationLoader />
-                  <LayoutContent hasClerkKeys={true}>{children}</LayoutContent>
+                <NavigationLoader />
+                <LayoutContent>{children}</LayoutContent>
               </VideoTimeProvider>
             </NavigationProvider>
           </Provider>
-        )}
-      </body>
-    </html>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }

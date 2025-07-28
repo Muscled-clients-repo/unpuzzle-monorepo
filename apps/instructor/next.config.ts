@@ -17,14 +17,8 @@ const nextConfig: NextConfig = {
   },
   typescript: {
     // Enable TypeScript checking during builds
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
   },
-  // Skip validation of environment variables during build
-  env: {
-    SKIP_ENV_VALIDATION: "true",
-  },
-  basePath: '/instructor',
-  trailingSlash: true,
 };
 
 export default nextConfig;

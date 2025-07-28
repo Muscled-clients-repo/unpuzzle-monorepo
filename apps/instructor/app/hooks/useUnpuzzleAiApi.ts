@@ -15,7 +15,7 @@ export class UnpuzzleAiApi {
   private readonly apiUrl: string;
 
   constructor() {
-    this.apiUrl = process.env.NEXT_PUBLIC_CORE_SERVER_URL || "";
+    this.apiUrl = process.env.NEXT_PUBLIC_APP_SERVER_URL || "";
   }
 
   getApiUrl(): string {
