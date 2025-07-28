@@ -3,25 +3,35 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "cd apps/instructor && npm install --production=false && npm run build",
-    "start": "cd apps/instructor && npm start",
-    "start:test": "cd apps/instructor && node startup-test.js",
-    "build:client": "cd apps/client && npm install && npm run build",
-    "start:client": "cd apps/client && npm start",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "dev:all": "concurrently \"npm run dev\" \"cd apps/instructor && npm run dev\" \"cd apps/student && npm run dev\"",
+    "build:all": "npm run build && cd apps/instructor && npm run build && cd ../student && npm run build",
+    "build:instructor": "cd apps/instructor && npm install --production=false && npm run build",
+    "start:instructor": "cd apps/instructor && npm start",
     "build:student": "cd apps/student && npm install && npm run build",
     "start:student": "cd apps/student && npm start",
-    "dev": "echo 'Use individual app dev commands'",
-    "lint": "echo 'Use individual app lint commands'",
-    "test": "echo 'Use individual app test commands'",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,md,json}\"",
-    "clean": "rm -rf node_modules apps/*/node_modules"
+    "clean": "rm -rf node_modules apps/*/node_modules .next"
   },
   "dependencies": {
-    "next": "15.3.3"
+    "next": "15.3.3",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "autoprefixer": "^10.4.0",
+    "concurrently": "^8.2.0",
     "eslint": "^8.57.0",
+    "eslint-config-next": "15.3.3",
+    "postcss": "^8.4.0",
     "prettier": "^3.2.5",
+    "tailwindcss": "^3.4.0",
     "typescript": "^5.3.3"
   },
   "engines": {
