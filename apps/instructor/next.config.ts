@@ -19,6 +19,8 @@ const nextConfig: NextConfig = {
     // Enable TypeScript checking during builds
     ignoreBuildErrors: false,
   },
+  basePath: '/instructor',
+  trailingSlash: true,
 };
 
 export default nextConfig;
