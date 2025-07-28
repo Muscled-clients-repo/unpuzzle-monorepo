@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/instructor/:match*",
-      "destination": "https://unpuzzle-mono-repo-frontend-v9qa-mceveraj4.vercel.app/instructor/:match*"
+      "destination": "https://unpuzzle-mono-repo-frontend-v9qa-mceveraj4.vercel.app/:match*"
     },
     {
       "source": "/:match*",
