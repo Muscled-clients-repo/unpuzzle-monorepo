@@ -1,5 +1,0 @@
-Please delete these files/directories:
-- /next.config.js (at root)
-- /app/ directory (at root - if it exists)
-- /middleware.ts (at root - if it exists)
-- /apps/students/app/instructor-redirect/ directory
