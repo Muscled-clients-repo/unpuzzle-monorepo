@@ -1,6 +1,0 @@
-{
-  "buildCommand": "cd apps/instructor && npm install --production=false && npm run build",
-  "outputDirectory": "apps/instructor/.next",
-  "installCommand": "echo 'Dependencies will be installed during build'",
-  "framework": null
-}
