@@ -3,7 +3,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import PuzzleCheck from "./agents/PuzzleCheck";
-import { useVideoTime } from "@/context/VideoTimeContext";
+import { useVideoTime } from "../../context/VideoTimeContext";
 import { useCourse } from "@/hooks/useCourse";
 
 // Refactored agentOptions with all info and component

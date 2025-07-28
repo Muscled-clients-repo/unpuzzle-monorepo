@@ -5,8 +5,9 @@ import "../assets/globals.css";
 // import Header from "./Header";
 import { Provider } from "react-redux";
 import store from "../redux/store";
-import AuthenticatedSidebar from "../components/authenticated-sidebar";
+// import AuthenticatedSidebar from "../components/authenticated-sidebar"; // Removed - no sidebar needed
 import PageLoadingSpinner from "../components/shared/loading-indicator";
+import StudentHeader from "../components/shared/student-header";
 import React, { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { VideoTimeProvider } from "../context/VideoTimeContext";
@@ -47,34 +48,15 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
     setLoading(false);
   }, []);
 
-  // Paths without Sidebar
-  const noSidebarPaths = [
-    "/student-annotations",
-    "/confusions-puzzlejourney",
-    "/annotations-puzzlejourney",
-    "/sign-in",
-    "/sign-up",
-  ];
-
-  // Exclude home page from sidebar
-  const excludeFromSidebar = pathname === "/";
-
-  // Only show sidebar on these routes (exact or as prefix)
-  const sidebarAllowedPaths = [
-    "/courses",
-    "/settings",
-    "/puzzle-content",
-    "/my-courses",
-    "/student-view",
-    "/course",
-    "/video-detail",
-  ];
-  const showSidebar = !excludeFromSidebar && sidebarAllowedPaths.some((path) =>
-    pathname.startsWith(path)
-  ) && !noSidebarPaths.includes(pathname);
+  // Disable sidebar completely for all paths
+  const showSidebar = false;
 
   // Show AnnotationHeader for specific paths
-  const showAnnotationHeader = noSidebarPaths.includes(pathname);
+  const showAnnotationHeader = [
+    "/student-annotations",
+    "/confusions-puzzlejourney", 
+    "/annotations-puzzlejourney"
+  ].includes(pathname);
 
   return (
     <>

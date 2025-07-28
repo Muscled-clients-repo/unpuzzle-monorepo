@@ -28,7 +28,11 @@ const VideoDetailSection: React.FC<{ video: Video }> = ({
           {/* Instructor Info */}
           <div className="flex items-center mb-4">
             <div className=" relative mr-4">
-              <Image src="" alt="" fill className="w-14 h-14 rounded-full object-cover border" />
+              {video?.instructor?.picture ? (
+                <Image src={video.instructor.picture} alt={video.instructor.name || "Instructor"} fill className="w-14 h-14 rounded-full object-cover border" />
+              ) : (
+                <div className="w-14 h-14 rounded-full bg-gray-200 border" />
+              )}
               <Image
                 src="/assets/blue-tick.svg"
                 width={18}

@@ -623,7 +623,6 @@ const NewVideoPlayer: React.FC<NewVideoPlayerProps> = ({
                   ref={(el: any) => (scrollRefs.current[index] = el)}
                   onClick={() => handleAnnotationClick(annotation.time, index)}
                 >
-                  <Image src="" alt="" fill className="w-[25px] h-[25px]" />
                   <p>{annotation.formattedTime}</p>
                 </div>
               ))}

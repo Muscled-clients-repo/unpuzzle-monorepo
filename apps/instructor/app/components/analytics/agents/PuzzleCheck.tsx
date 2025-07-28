@@ -1,7 +1,7 @@
-import SharedButton from '@/components/common/SharedButton';
+import SharedButton from '../../common/SharedButton';
 import Image from 'next/image';
 import React, { MutableRefObject, useState } from 'react';
-import { usePuzzleCheck } from '@/hooks/usePuzzleCheck';
+import { usePuzzleCheck } from '../../../hooks/usePuzzleCheck';
 import LoadingSpinner from '../../common/Loading';
 import { toast } from 'react-toastify';
 

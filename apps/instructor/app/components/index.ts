@@ -82,6 +82,7 @@ export { NavigationLoader } from './navigation/NavigationLoader';
 // PAGES - Page-level components
 // =====================================
 export { default as CourseScreen } from './pages/CourseScreen';
+export { default as CourseDetailsScreen } from './pages/CourseDetailsScreen';
 export { default as MyCoursesScreen } from './pages/MyCoursesScreen';
 export { default as SettingScreen } from './pages/SettingScreen';
 // AssetsScreen uses react-media-recorder which requires Worker API (client-only)
@@ -112,6 +113,7 @@ export { default as AnnotationHeader } from './video/AnnotationHeader';
 export { default as AnnotationsPuzzleJourney } from './video/annotations/AnnotationsPuzzleJourney';
 export { default as Comments } from './video/annotations/Comments';
 export { ViewAllCommentContext as ViewAllComments } from './video/annotations/ViewAllComments';
+export { default as CourseVideoPlayer } from './video/CourseVideoPlayer';
 
 // =====================================
 // ANALYTICS - Analytics and stats components

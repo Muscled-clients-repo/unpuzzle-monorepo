@@ -79,6 +79,8 @@ export interface Course {
   courseAuthor?: string;
   authorId?: string;
   category?: string;
+  rating?: number;
+  reviewCount?: number;
 }
 
 export interface CoursesData {

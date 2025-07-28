@@ -9,6 +9,8 @@ import sidebarReducer from './features/sidebarSlice/sidebarSlice';
 import annotaionReducer from './features/annotationSlice';
 import selectedIndexReducer from "./features/selectedCourse/selectedIndexSlice"
 import videoEditorReducer from "./features/videoEditor/videoEditorSlice";
+import coursesReducer from './features/courses/coursesSlice';
+import { createSlice } from '@reduxjs/toolkit';
 import { pokemonApi } from './services/pokemon.services';
 import { enrollApi } from './services/enroll.services';
 import { permissionApi } from './services/permission.services';
@@ -19,7 +21,20 @@ import { courseApi } from './services/course.services';
 import { puzzlepiecesApi } from "./services/puzzlePieces.services";
 import { quizzApi } from "./services/quizzes.services";
 
+const authTokenSlice = createSlice({
+  name: 'auth',
+  initialState: { token: null },
+  reducers: {
+    setToken: (state, action) => {
+      state.token = action.payload;
+    },
+  },
+});
+
+export const { setToken } = authTokenSlice.actions;
+
 const rootReducer = combineReducers({
+    auth: authTokenSlice.reducer,
     recording: recordingReducer,
     user: userReducer,
     video: videoReducer,
@@ -29,6 +44,7 @@ const rootReducer = combineReducers({
     annotations: annotaionReducer,
     selectedIndex: selectedIndexReducer,
     videoEditor: videoEditorReducer,
+    courses: coursesReducer,
     [pokemonApi.reducerPath]: pokemonApi.reducer,
     [enrollApi.reducerPath]: enrollApi.reducer,
     [permissionApi.reducerPath]: permissionApi.reducer,

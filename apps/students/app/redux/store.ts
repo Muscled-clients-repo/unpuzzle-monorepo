@@ -9,53 +9,11 @@ import { puzzlepiecesApi } from './services/puzzlePieces.services';
 import { courseApi } from './services/course.services';
 import { setupListeners } from '@reduxjs/toolkit/query';
 import { quizzApi } from './services/quizzes.services';
-
-import recordingReducer from "./features/recording/recordingSlice";
-import userReducer from "./features/user/userSlice";
-import videoReducer from "./features/recordingSlice/recordingSlice";
-import notificationReducer from "./features/notifications/notificationSlice";
-import previewReducer from './features/previewSlice/previewSlice';
-import sidebarReducer from './features/sidebarSlice/sidebarSlice';
-import annotaionReducer from './features/annotationSlice';
-import selectedIndexReducer from "./features/selectedCourse/selectedIndexSlice";
-import videoEditorReducer from "./features/videoEditor/videoEditorSlice";
-
-import { createSlice } from '@reduxjs/toolkit';
-
-const authTokenSlice = createSlice({
-  name: 'auth',
-  initialState: { token: null },
-  reducers: {
-    setToken: (state, action) => {
-      state.token = action.payload;
-    },
-  },
-});
-
-export const { setToken } = authTokenSlice.actions;
+import rootReducer from './rootReducer';
+export { setToken } from './rootReducer';
 
 const store = configureStore({
-  reducer: {
-    auth: authTokenSlice.reducer,
-    recording: recordingReducer,
-    user: userReducer,
-    video: videoReducer,
-    notification: notificationReducer,
-    preview: previewReducer,
-    sidebar: sidebarReducer,
-    annotations: annotaionReducer,
-    selectedIndex: selectedIndexReducer,
-    videoEditor: videoEditorReducer,
-    [pokemonApi.reducerPath]: pokemonApi.reducer,
-    [enrollApi.reducerPath]: enrollApi.reducer,
-    [permissionApi.reducerPath]: permissionApi.reducer,
-    [videosApi.reducerPath]: videosApi.reducer,
-    [userApi.reducerPath]: userApi.reducer,
-    [userPermissionApi.reducerPath]: userPermissionApi.reducer,
-    [courseApi.reducerPath]: courseApi.reducer,
-    [puzzlepiecesApi.reducerPath]: puzzlepiecesApi.reducer,
-    [quizzApi.reducerPath]: quizzApi.reducer,
-  },
+  reducer: rootReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
       pokemonApi.middleware,
