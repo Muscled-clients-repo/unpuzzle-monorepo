@@ -1,16 +1,6 @@
 {
-  "buildCommand": "npm run build",
-  "outputDirectory": ".next",
+  "buildCommand": "cd apps/client && npm install --production=false && npm run build",
+  "outputDirectory": "apps/client/.next",
   "installCommand": "npm install",
-  "framework": "nextjs",
-  "rewrites": [
-    {
-      "source": "/apps/instructor/:path*",
-      "destination": "https://unpuzzle-instructor.vercel.app/:path*"
-    },
-    {
-      "source": "/apps/student/:path*", 
-      "destination": "https://unpuzzle-student.vercel.app/:path*"
-    }
-  ]
+  "framework": "nextjs"
 }
