@@ -11,6 +11,20 @@
   --color-primary-blue: #00aff0;
 }
 
+/* Hero section animation delays */
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+/* Fallback for video loading */
+video {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
 /* @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;

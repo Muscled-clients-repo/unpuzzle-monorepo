@@ -1,13 +1,15 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useSearchParams } from "next/navigation";
 import { Course } from "@/app/types/course.types";
 import { useCourses, usePopularCourses } from "@/app/hooks/useCourses";
 import { MagnifyingGlassIcon, FunnelIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
 import { StarIcon, ClockIcon, UsersIcon, PhotoIcon } from "@heroicons/react/24/solid";
 import LoadingSpinner from "@/app/components/shared/ui/loading-spinner";
+import { Brain } from "lucide-react";
 
 const categories = [
   "All Categories",
@@ -30,6 +32,8 @@ const sortOptions = [
 ];
 
 export default function CoursesListingClient() {
+  const searchParams = useSearchParams();
+  
   const {
     courses,
     loading,
@@ -41,6 +45,7 @@ export default function CoursesListingClient() {
     updateFilters,
     goToPage,
     refreshCourses,
+    fetchCourses,
   } = useCourses();
   
   // Debug logging
@@ -50,10 +55,13 @@ export default function CoursesListingClient() {
       loading,
       error,
       totalCourses,
+      currentPage,
+      totalPages,
       filters,
-      apiBase: process.env.NEXT_PUBLIC_CORE_SERVER_URL
+      apiBase: process.env.NEXT_PUBLIC_CORE_SERVER_URL,
+      courseIds: courses.map(c => c.id).slice(0, 5) // Show first 5 IDs
     });
-  }, [courses, loading, error, totalCourses, filters]);
+  }, [courses, loading, error, totalCourses, currentPage, totalPages, filters]);
   
   // Re-enabled after fixing data structure
   const { popularCourses } = usePopularCourses(4);
@@ -69,13 +77,77 @@ export default function CoursesListingClient() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const [localPriceRange, setLocalPriceRange] = useState<[number, number]>([0, 1000]);
+  const [allCourses, setAllCourses] = useState<Course[]>([]);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const loadMoreRef = useRef<HTMLDivElement>(null);
   
-  // Debug: Force refresh courses by clearing cache
+  // Initialize allCourses when courses change
   useEffect(() => {
-    console.log('Debug - Forcing fresh course fetch');
-    // Force a fresh fetch
-    refreshCourses();
-  }, []); // Only run once on mount
+    if (currentPage === 1) {
+      setAllCourses(courses);
+    } else if (courses.length > 0 && !loading) {
+      // For infinite scroll, append new courses
+      setAllCourses(prev => {
+        const existingIds = new Set(prev.map((c: Course) => c.id));
+        const newCourses = courses.filter((c: Course) => !existingIds.has(c.id));
+        return [...prev, ...newCourses];
+      });
+    }
+  }, [courses, currentPage, loading]);
+  
+  // Infinite scroll observer
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const target = entries[0];
+        if (target.isIntersecting && !loading && !isLoadingMore && currentPage < totalPages) {
+          loadMoreCourses();
+        }
+      },
+      {
+        root: null,
+        rootMargin: '100px',
+        threshold: 0.1
+      }
+    );
+
+    if (loadMoreRef.current) {
+      observer.observe(loadMoreRef.current);
+    }
+
+    return () => {
+      if (loadMoreRef.current) {
+        observer.unobserve(loadMoreRef.current);
+      }
+    };
+  }, [loading, isLoadingMore, currentPage, totalPages]);
+  
+  // Load more courses
+  const loadMoreCourses = async () => {
+    if (isLoadingMore || loading || currentPage >= totalPages) return;
+    
+    setIsLoadingMore(true);
+    const nextPage = currentPage + 1;
+    
+    // Update page state
+    goToPage(nextPage);
+    
+    // Fetch next page
+    await fetchCourses({ page: nextPage, force: true });
+    
+    setIsLoadingMore(false);
+  };
+  
+  // Sync page from URL only on mount
+  useEffect(() => {
+    const page = searchParams.get('page');
+    if (page) {
+      const pageNum = parseInt(page);
+      if (!isNaN(pageNum) && pageNum > 0 && pageNum !== currentPage) {
+        goToPage(pageNum);
+      }
+    }
+  }, []); // Only run on mount
 
   // Update Redux filters when local state changes
   useEffect(() => {
@@ -87,12 +159,14 @@ export default function CoursesListingClient() {
   }, [searchQuery, updateFilters]);
 
   const handleCategoryChange = (category: string) => {
+    setAllCourses([]); // Reset courses for new filter
     updateFilters({ 
       category: category === "All Categories" ? undefined : category 
     });
   };
 
   const handleSortChange = (sort: string) => {
+    setAllCourses([]); // Reset courses for new sort
     updateFilters({ sortBy: sort as any });
   };
 
@@ -166,7 +240,7 @@ export default function CoursesListingClient() {
       )}
 
       {/* Main Content */}
-      <section className="container mx-auto px-4 py-12">
+      <section id="main-course-content" className="container mx-auto px-4 py-12">
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Filters Sidebar */}
           <aside className={`lg:w-64 ${showFilters ? 'block' : 'hidden lg:block'}`}>
@@ -258,13 +332,16 @@ export default function CoursesListingClient() {
                   Filters
                 </button>
                 <button
-                  onClick={refreshCourses}
+                  onClick={() => {
+                    setAllCourses([]);
+                    refreshCourses();
+                  }}
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all"
                 >
                   Refresh
                 </button>
                 <p className="text-gray-600">
-                  {loading ? "Loading..." : `Showing ${courses.length} of ${totalCourses} courses`}
+                  {loading && allCourses.length === 0 ? "Loading..." : `Showing ${allCourses.length} of ${totalCourses} courses`}
                 </p>
               </div>
               
@@ -289,51 +366,26 @@ export default function CoursesListingClient() {
               <div className="flex justify-center items-center py-12">
                 <LoadingSpinner />
               </div>
-            ) : courses.length > 0 ? (
+            ) : allCourses.length > 0 ? (
               <>
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {courses.map((course) => (
+                  {allCourses.map((course) => (
                     <CourseCard key={course.id} course={course} />
                   ))}
                 </div>
                 
-                {/* Pagination */}
-                {totalPages > 1 && (
-                  <div className="flex justify-center items-center gap-2 mt-8">
-                    <button
-                      onClick={() => goToPage(currentPage - 1)}
-                      disabled={currentPage === 1}
-                      className="px-4 py-2 border rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      Previous
-                    </button>
-                    
-                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                      const page = i + 1;
-                      return (
-                        <button
-                          key={page}
-                          onClick={() => goToPage(page)}
-                          className={`px-4 py-2 rounded-lg ${
-                            currentPage === page
-                              ? "bg-blue-600 text-white"
-                              : "border hover:bg-gray-50"
-                          }`}
-                        >
-                          {page}
-                        </button>
-                      );
-                    })}
-                    
-                    <button
-                      onClick={() => goToPage(currentPage + 1)}
-                      disabled={currentPage === totalPages}
-                      className="px-4 py-2 border rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      Next
-                    </button>
-                  </div>
-                )}
+                {/* Loading more indicator */}
+                <div ref={loadMoreRef} className="flex justify-center items-center py-8">
+                  {isLoadingMore && (
+                    <div className="flex items-center gap-3">
+                      <LoadingSpinner />
+                      <span className="text-gray-600">Loading more courses...</span>
+                    </div>
+                  )}
+                  {currentPage >= totalPages && allCourses.length > 0 && (
+                    <p className="text-gray-500">You've reached the end!</p>
+                  )}
+                </div>
               </>
             ) : (
               <div className="text-center py-12">
@@ -357,11 +409,55 @@ export default function CoursesListingClient() {
           </div>
         </div>
       </section>
+
+      {/* Footer */}
+      <footer className="py-12 bg-gray-900 text-gray-400">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-4 gap-8">
+            <div>
+              <div className="flex items-center space-x-2 mb-4">
+                <Brain className="h-8 w-8 text-white" />
+                <span className="text-xl font-bold text-white">Unpuzzle</span>
+              </div>
+              <p className="text-sm">
+                Making learning interactive and engaging through puzzle-based education.
+              </p>
+            </div>
+            <div>
+              <h4 className="font-semibold text-white mb-4">Platform</h4>
+              <ul className="space-y-2 text-sm">
+                <li><Link href="/courses" className="hover:text-white">Browse Courses</Link></li>
+                <li><Link href="/pricing" className="hover:text-white">Pricing</Link></li>
+                <li><Link href="/sign-up" className="hover:text-white">Sign Up</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold text-white mb-4">Resources</h4>
+              <ul className="space-y-2 text-sm">
+                <li><a href="#" className="hover:text-white">Help Center</a></li>
+                <li><a href="#" className="hover:text-white">Community</a></li>
+                <li><a href="#" className="hover:text-white">Blog</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold text-white mb-4">Company</h4>
+              <ul className="space-y-2 text-sm">
+                <li><a href="#" className="hover:text-white">About Us</a></li>
+                <li><a href="#" className="hover:text-white">Contact</a></li>
+                <li><a href="#" className="hover:text-white">Privacy Policy</a></li>
+              </ul>
+            </div>
+          </div>
+          <div className="mt-8 pt-8 border-t border-gray-800 text-center text-sm">
+            <p>&copy; 2024 Unpuzzle. All rights reserved.</p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
 
-function CourseCard({ course, featured = false }: { course: Course; featured?: boolean }) {
+function CourseCard({ course, featured = false }: { course: any; featured?: boolean }) {
   const [imageError, setImageError] = useState(false);
   
   // Debug: Check thumbnail data
@@ -378,7 +474,7 @@ function CourseCard({ course, featured = false }: { course: Course; featured?: b
 
   return (
     <Link 
-      href={`${process.env.NEXT_PUBLIC_CORE_SERVER_URL}/course-video/${course.id}`} 
+      href={`${process.env.NEXT_PUBLIC_CORE_SERVER_URL}/courses/${course.id}`} 
       target="_blank"
       className={`group bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden ${
         featured ? 'ring-2 ring-blue-500' : ''
@@ -421,7 +517,7 @@ function CourseCard({ course, featured = false }: { course: Course; featured?: b
         <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
           <div className="flex items-center gap-1">
             <StarIcon className="w-4 h-4 text-yellow-400" />
-            <span>{course.rating || 4.8}</span>
+            <span>{(course as any).rating || 4.8}</span>
           </div>
           <div className="flex items-center gap-1">
             <ClockIcon className="w-4 h-4" />

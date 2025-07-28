@@ -61,29 +61,31 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
   return (
     <>
       <AuthStateSync />
+      
+      {/* Student Header */}
+      <StudentHeader />
+      
       <main>
-        <div className="flex h-screen">
-          {/* Sidebar - Using direct Clerk approach */}
-          {showSidebar && <AuthenticatedSidebar />}
-          <div className="flex-grow bg-white text-black flex flex-col h-full">
-            {/* Annotation Header */}
-            {showAnnotationHeader && (
-              <div className="sticky top-0 z-50">
-                <ClientSideWrapper fallback={null}>
-                  {() => <AnnotationViewHeader />}
-                </ClientSideWrapper>
-              </div>
-            )}
-
-            {/* Scrollable Children Section */}
-            <div className="overflow-scroll min-h-[90vh] light">
-              {loading ? <PageLoadingSpinner /> : (
-                <ComponentErrorBoundary>
-                  {children}
-                </ComponentErrorBoundary>
-              )}
-            </div>
+        {/* Annotation Header for specific paths */}
+        {showAnnotationHeader && (
+          <div className="sticky top-16 z-40">
+            <ClientSideWrapper fallback={null}>
+              {() => <AnnotationViewHeader />}
+            </ClientSideWrapper>
           </div>
+        )}
+
+        {/* Main Content */}
+        <div className="min-h-screen bg-gray-50">
+          {loading ? (
+            <div className="flex items-center justify-center min-h-[50vh]">
+              <PageLoadingSpinner />
+            </div>
+          ) : (
+            <ComponentErrorBoundary>
+              {children}
+            </ComponentErrorBoundary>
+          )}
         </div>
       </main>
     </>
@@ -99,7 +101,7 @@ export default function RootLayout({
     <ClerkProvider>
       <html
         lang="en"
-        className={`${geistSans.className} ${geistMono.className} overflow-hidden`}
+        className={`${geistSans.className} ${geistMono.className}`}
       >
         <body className="antialiased light" suppressHydrationWarning>
         <ToastContainer />

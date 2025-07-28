@@ -47,13 +47,19 @@ export const useCourses = () => {
   }, [lastFetch, cacheExpiry]);
 
   // Fetch all courses with filters
-  const fetchCourses = useCallback(async (customFilters?: CourseFilters, force = false) => {
+  const fetchCourses = useCallback(async (options?: { filters?: CourseFilters; page?: number; force?: boolean }) => {
+    const { filters: customFilters, page: customPage, force = false } = options || {};
+    
     if (!force && isCacheValid()) {
       console.log('Debug - Using cached data');
       return; // Use cached data
     }
 
+    // Use page from options if provided, otherwise use currentPage from state
+    const pageToUse = customPage !== undefined ? customPage : currentPage;
+
     console.log('Debug - Fetching courses with params:', {
+      pageToUse,
       currentPage,
       filters,
       customFilters,
@@ -63,8 +69,8 @@ export const useCourses = () => {
     dispatch(fetchCoursesStart());
     
     const params: Record<string, any> = {
-      page: currentPage,
-      limit: 12,
+      page: pageToUse,
+      limit: 15,
       ...(filters.category && { category: filters.category }),
       ...(filters.searchQuery && { search: filters.searchQuery }),
       ...(filters.sortBy && { sort: filters.sortBy }),
@@ -77,6 +83,7 @@ export const useCourses = () => {
     };
 
     console.log('Debug - API params:', params);
+    console.log('Debug - Full API URL:', `/courses?${new URLSearchParams(params).toString()}`);
 
     const response = await api.get<{ 
       body: { 
@@ -102,7 +109,13 @@ export const useCourses = () => {
         dataExists: !!response.data,
         bodyExists: !!response.data.body,
         coursesArray: coursesData,
-        coursesLength: coursesData.length
+        coursesLength: coursesData.length,
+        pageFromResponse: apiBody.page,
+        totalPagesFromResponse: apiBody.total_page,
+        countFromResponse: apiBody.count,
+        firstCourseId: coursesData[0]?.id,
+        lastCourseId: coursesData[coursesData.length - 1]?.id,
+        requestedPage: pageToUse
       });
       
       dispatch(fetchCoursesSuccess({
@@ -138,7 +151,7 @@ export const useCourses = () => {
     
     if (response.success && response.data) {
       dispatch(invalidateCache());
-      await fetchCourses(undefined, true);
+      await fetchCourses({ force: true });
     }
     
     return response;
@@ -161,7 +174,7 @@ export const useCourses = () => {
     
     if (response.success) {
       dispatch(invalidateCache());
-      await fetchCourses(undefined, true);
+      await fetchCourses({ force: true });
     }
     
     return response;
@@ -263,6 +276,8 @@ export const useCourses = () => {
   // Pagination
   const goToPage = useCallback((page: number) => {
     dispatch(setCurrentPage(page));
+    // Invalidate cache to force new fetch
+    dispatch(invalidateCache());
   }, [dispatch]);
 
   // Auto-fetch courses when filters or page changes (with debouncing)
@@ -307,7 +322,7 @@ export const useCourses = () => {
     goToPage,
     refreshCourses: () => {
       dispatch(invalidateCache());
-      return fetchCourses(undefined, true);
+      return fetchCourses({ force: true });
     },
   };
 };
