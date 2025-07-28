@@ -1,8 +1,8 @@
 import { useState, useCallback } from "react";
-import { Avatar, AvatarFallback } from "../../../../../components/ui/Avatar";
-import { Popover, PopoverContent, PopoverTrigger } from "../../../../../components/ui/Popover";
-import { ScrollArea } from "../../../../../components/ui/ScrollArea";
-import { Voice } from '../../../../../types/videoeditor.types'
+import { Avatar, AvatarFallback } from "../../../../components/ui/Avatar";
+import { Popover, PopoverContent, PopoverTrigger } from "../../../../components/ui/Popover";
+import { ScrollArea } from "../../../../components/ui/ScrollArea";
+import { Voice } from '../../../../types/videoeditor.types'
 import AiWaveSurfacePicker from "./AiWaveSurferBox";
 import Image from "next/image";
 

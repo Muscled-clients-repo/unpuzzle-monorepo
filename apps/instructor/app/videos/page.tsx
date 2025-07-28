@@ -17,7 +17,7 @@
 
 // export default Courses;
 // "use client";
-import VideoJourney from "../../components/video/VideoScreen/VideoJourney";
+import VideoJourney from "../components/video/VideoScreen/VideoJourney";
 
 export default function Videos() {
   return <VideoJourney />;

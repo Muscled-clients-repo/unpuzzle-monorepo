@@ -1,7 +1,7 @@
 "use client";
 import { Geist, Geist_Mono } from "next/font/google";
 import type { Metadata } from "next";
-import "../assets/globals.css";
+import "../components/assets/globals.css";
 // import Header from "./Header";
 import { Provider, useSelector } from "react-redux";
 import store, { RootState } from "../redux/store";

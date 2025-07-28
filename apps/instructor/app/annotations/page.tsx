@@ -3,10 +3,10 @@
 import React from "react";
 import Image from "next/image";
 import dynamic from "next/dynamic";
-import { VideoTimeProvider } from "../../context/VideoTimeContext";
+import { VideoTimeProvider } from "../context/VideoTimeContext";
 
 const VideoTeacherScreen = dynamic(
-  () => import("../../components/video/VideoTeacherScreen"),
+  () => import("../components/video/VideoTeacherScreen"),
   { ssr: false }
 );
 // import Header from "../ssrComponent/Header";

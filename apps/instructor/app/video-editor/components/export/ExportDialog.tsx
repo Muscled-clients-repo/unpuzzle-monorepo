@@ -1,8 +1,8 @@
 'use client'
 import React, { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../../components/ui/Dialog';
-import { Progress } from '../../../../components/ui/Progress';
-import { videoExportService } from '../../../../services/videoExport.service';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../components/ui/Dialog';
+import { Progress } from '../../../components/ui/Progress';
+import { videoExportService } from '../../../services/videoExport.service';
 
 interface ExportSettings {
   format: 'mp4' | 'webm' | 'mov';

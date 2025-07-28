@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import Layout from "../../ssrComponent/Layout";
-import { PricingPlans } from "../../components";
+import Layout from "../ssrComponent/Layout";
+import { PricingPlans } from "../components";
 
 export const metadata: Metadata = {
   title: "Create Next App",

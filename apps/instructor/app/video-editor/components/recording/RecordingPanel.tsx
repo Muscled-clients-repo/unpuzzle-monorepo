@@ -2,7 +2,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { useAuth } from '@clerk/nextjs';
-import { useRecording } from '../../../../context/RecordingContext';
+import { useRecording } from '../../../context/RecordingContext';
 
 interface RecordingPanelProps {
   onRecordingComplete: (videoBlob: Blob, duration: number) => void;

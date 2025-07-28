@@ -1,7 +1,7 @@
 import * as React from "react";
 const { useCallback, useRef } = React;
 import { useWavesurfer } from "@wavesurfer/react";
-import { AudioUrlProp } from "../../../../../types/videoeditor.types";
+import { AudioUrlProp } from "../../../../types/videoeditor.types";
 import Image from "next/image";
 
 export default function AiWaveSurferBox({ audioUrl }: AudioUrlProp) {

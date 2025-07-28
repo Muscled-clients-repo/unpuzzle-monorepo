@@ -3,7 +3,7 @@ import {
     TabsContent,
     TabsList,
     TabsTrigger,
-} from "../../../components/ui/Tabs";
+} from "../../components/ui/Tabs";
 
 import ScriptLibrary from './sidebar/ScriptLibrary';
 import MediaLibrary from "./sidebar/MediaLibrary";

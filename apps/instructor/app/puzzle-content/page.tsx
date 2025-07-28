@@ -6,7 +6,7 @@ import React from "react";
 // import store from "../redux/store";
 // import CourseScreen from "../components/screens/CourseScreen";
 // import { VideoTimeProvider } from "../context/VideoTimeContext";
-import PuzzleContentScreen from "../../components/pages/puzzle/PuzzleContentScreen";
+import PuzzleContentScreen from "../components/pages/puzzle/PuzzleContentScreen";
 
 function PuzzleContent() {
   return (

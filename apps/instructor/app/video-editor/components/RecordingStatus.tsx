@@ -1,6 +1,6 @@
 'use client'
 import React, { useEffect, useState } from 'react';
-import { useRecording } from '../../../context/RecordingContext';
+import { useRecording } from '../../context/RecordingContext';
 
 const RecordingIndicator: React.FC = () => {
   const { isRecording, recordingStartTime } = useRecording();

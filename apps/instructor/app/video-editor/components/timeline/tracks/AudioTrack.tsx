@@ -2,7 +2,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import WaveSurfer from 'wavesurfer.js';
-import { Clips } from '../../../../../types/videoeditor.types';
+import { Clips } from '../../../../types/videoeditor.types';
 
 interface AudioTrackProps {
   clips: Clips[];

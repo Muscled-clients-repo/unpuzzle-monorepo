@@ -1,8 +1,8 @@
 'use client'
 import React, { useState, useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../../../../redux/store';
-import { addTextOverlay, updateTextOverlay, removeTextOverlay } from '../../../../../redux/features/videoEditor/videoEditorSlice';
+import { RootState } from '../../../../redux/store';
+import { addTextOverlay, updateTextOverlay, removeTextOverlay } from '../../../../redux/features/videoEditor/videoEditorSlice';
 
 interface TextOverlayEditorProps {
   overlayId?: string;

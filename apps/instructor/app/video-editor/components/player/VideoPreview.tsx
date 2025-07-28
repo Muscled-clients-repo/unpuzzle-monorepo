@@ -1,7 +1,7 @@
 'use client'
 import React, { useRef, useEffect, useState, forwardRef, useImperativeHandle } from 'react';
 import PlaybackControls from './PlaybackControls';
-import { useVideoTime } from '../../../../context/VideoTimeContext';
+import { useVideoTime } from '../../../context/VideoTimeContext';
 
 export interface VideoPlayerRef {
   play: () => void;

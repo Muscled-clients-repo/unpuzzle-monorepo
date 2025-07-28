@@ -1,6 +1,6 @@
 
 import EditorLayout from "./EditorLayout";
-import { RecordingProvider } from "../../../context/RecordingContext";
+import { RecordingProvider } from "../../context/RecordingContext";
 import RecordingStatus from "./RecordingStatus";
 
 export default function EditorContainer() {

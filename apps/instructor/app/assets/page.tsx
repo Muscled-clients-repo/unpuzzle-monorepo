@@ -3,7 +3,7 @@
 import dynamic from 'next/dynamic';
 
 const AssetsScreen = dynamic(
-  () => import("../../components/pages/AssetsScreen"),
+  () => import("../components/pages/AssetsScreen"),
   { ssr: false }
 );
 

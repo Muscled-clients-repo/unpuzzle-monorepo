@@ -1,16 +1,16 @@
 import { useRef, useState, useEffect, DragEvent, ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../components/ui/Tabs";
-import { FileWithMetadata, VideoDurations } from '../../../../types/videoeditor.types'
-import { RootState } from "../../../../redux/store";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../components/ui/Tabs";
+import { FileWithMetadata, VideoDurations } from '../../../types/videoeditor.types'
+import { RootState } from "../../../redux/store";
 import { useDispatch, useSelector } from "react-redux";
 import {
   startCountdown,
   decrementCountdown,
-} from "../../../../redux/features/recording/recordingSlice";
+} from "../../../redux/features/recording/recordingSlice";
 // import "../../../../components/style/style.css"; // Path doesn't exist
 import LoadingSpinner from '@/components/common/Loading'
-import useApi from "../../../../hooks/useApi"
+import useApi from "../../../hooks/useApi"
 
 
 export default function MediaLibrary({cb}:{cb:void}) {

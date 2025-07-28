@@ -1,13 +1,13 @@
 'use client'
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../../../../redux/store';
+import { RootState } from '../../../../redux/store';
 import {
   setSnappingEnabled,
   setShowAlignmentGuides,
   addMarker,
   clearMarkers
-} from '../../../../../redux/features/videoEditor/videoEditorSlice';
+} from '../../../../redux/features/videoEditor/videoEditorSlice';
 
 const SnappingControls: React.FC = () => {
   const dispatch = useDispatch();

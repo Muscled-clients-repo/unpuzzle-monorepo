@@ -1,8 +1,8 @@
 'use client'
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../../../../redux/store';
-import { addTransition } from '../../../../../redux/features/videoEditor/videoEditorSlice';
+import { RootState } from '../../../../redux/store';
+import { addTransition } from '../../../../redux/features/videoEditor/videoEditorSlice';
 
 interface TransitionType {
   id: string;

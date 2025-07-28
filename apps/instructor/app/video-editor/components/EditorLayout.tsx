@@ -1,7 +1,7 @@
 'use client'
 import React, { useEffect, useRef, useState, useMemo } from "react";
 import { useDispatch, useSelector } from 'react-redux';
-import type { RootState } from '../../../redux/store';
+import type { RootState } from '../../redux/store';
 import SidebarTabs from "./SidebarTabs";
 import TimelineCanvas from "./timeline/TimelineCanvas";
 import VideoPreview, { VideoPlayerRef } from "./player";
@@ -9,16 +9,16 @@ import ExportDialog from "./export/ExportDialog";
 import TextEditor from "./tools/textoverlay/TextEditor";
 import TransitionSelector from "./tools/transitions/TransitionSelector";
 import AlignmentControls from "./timeline/controls/AlignmentControls";
-import { useKeyboardShortcuts } from "../../../hooks/useKeyboardShortcuts";
-import { getVideoDuration } from "../../../utils/videoUtils";
-import { useVideoTime } from "../../../context/VideoTimeContext";
+import { useKeyboardShortcuts } from "../../hooks/useKeyboardShortcuts";
+import { getVideoDuration } from "../../utils/videoUtils";
+import { useVideoTime } from "../../context/VideoTimeContext";
 import { 
   buildPlaybackSegments, 
   timelineToSourceTime, 
   getNextSegment,
   isAtSegmentEnd,
   calculateTimelineDuration 
-} from "../../../utils/timelinePlayback";
+} from "../../utils/timelinePlayback";
 import {
   addVideoClip,
   addAiAudioClip,
@@ -30,7 +30,7 @@ import {
   setSelectedTool,
   loadProject,
   markAsSaved
-} from '../../../redux/features/videoEditor/videoEditorSlice';
+} from '../../redux/features/videoEditor/videoEditorSlice';
 import './styles/video-editor.css';
 import './timeline/utils/timeline-snapping.css';
 

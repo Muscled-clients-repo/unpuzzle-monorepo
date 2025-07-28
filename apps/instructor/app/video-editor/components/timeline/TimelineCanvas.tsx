@@ -1,15 +1,15 @@
 'use client'
 import React, { useRef, useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { RootState } from '../../../../redux/store';
-import { setCurrentTime } from '../../../../redux/features/videoEditor/videoEditorSlice';
-import { useVideoTime } from '../../../../context/VideoTimeContext';
+import { RootState } from '../../../redux/store';
+import { setCurrentTime } from '../../../redux/features/videoEditor/videoEditorSlice';
+import { useVideoTime } from '../../../context/VideoTimeContext';
 import VideoTrack from './tracks/VideoTrack';
 import AudioTrack from './tracks/AudioTrack';
 import AIVoiceTrack from './tracks/AIVoiceTrack';
 import MusicTrack from './tracks/MusicTrack';
 import TimeRuler from './controls/TimeRuler';
-import { Clips } from '../../../../types/videoeditor.types';
+import { Clips } from '../../../types/videoeditor.types';
 import { calculateTimelineWidth, calculatePixelPosition, calculateTimeFromPixels } from './utils/timelineUtils';
 
 interface TimelineCanvasProps {

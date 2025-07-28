@@ -1,6 +1,6 @@
 'use client'
 import React, { useState, useRef, useEffect } from 'react';
-import { Progress } from '../../../../../components/ui/Progress';
+import { Progress } from '../../../../components/ui/Progress';
 import LoadingSpinner from '@/components/common/Loading';
 import VoiceSelector from './VoiceSelector';
 import Image from 'next/image';

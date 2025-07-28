@@ -1,11 +1,11 @@
 'use client'
 import React, { useState, useRef, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { Clips } from '../../../../../types/videoeditor.types';
-import { splitVideoClip, updateVideoClip, removeVideoClip } from '../../../../../redux/features/videoEditor/videoEditorSlice';
+import { Clips } from '../../../../types/videoeditor.types';
+import { splitVideoClip, updateVideoClip, removeVideoClip } from '../../../../redux/features/videoEditor/videoEditorSlice';
 import { calculatePixelPosition, calculateTimeFromPixels } from '../utils/timelineUtils';
 import { useSelector } from 'react-redux';
-import { RootState } from '../../../../../redux/store';
+import { RootState } from '../../../../redux/store';
 
 interface ClipItemProps {
   clip: Clips;

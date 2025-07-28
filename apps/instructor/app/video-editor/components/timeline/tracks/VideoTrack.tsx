@@ -1,9 +1,9 @@
 'use client'
 import React, { useState, useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../../../../redux/store';
-import { Clips } from '../../../../../types/videoeditor.types';
-import { updateVideoClip, reorderVideoClips, setSelectedClip } from '../../../../../redux/features/videoEditor/videoEditorSlice';
+import { RootState } from '../../../../redux/store';
+import { Clips } from '../../../../types/videoeditor.types';
+import { updateVideoClip, reorderVideoClips, setSelectedClip } from '../../../../redux/features/videoEditor/videoEditorSlice';
 import { calculatePixelPosition, calculateTimeFromPixels } from '../utils/timelineUtils';
 import { 
   getSnapPoints, 
@@ -12,7 +12,7 @@ import {
   isWithinSnapDistance,
   timeToPixels,
   SnapPoint
-} from '../../../../../utils/snappingUtils';
+} from '../../../../utils/snappingUtils';
 import ClipItem from '../clips/ClipItem';
 
 interface VideoTrackProps {
