@@ -3,21 +3,19 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "cd apps/client && npm run dev",
-    "build": "cd apps/client && npm install --production=false && npm run build",
-    "start": "cd apps/client && npm start",
-    "lint": "cd apps/client && npm run lint",
-    "dev:all": "concurrently \"npm run dev\" \"cd apps/instructor && npm run dev\" \"cd apps/student && npm run dev\"",
-    "build:all": "npm run build && cd apps/instructor && npm run build && cd ../student && npm run build",
+    "dev": "cd apps/student && npm run dev",
+    "build": "cd apps/student && npm install --production=false && npm run build",
+    "start": "cd apps/student && npm start",
+    "lint": "cd apps/student && npm run lint",
+    "dev:all": "concurrently \"npm run dev\" \"cd apps/instructor && npm run dev\"",
+    "build:all": "npm run build && cd apps/instructor && npm run build",
     "build:instructor": "cd apps/instructor && npm install --production=false && npm run build",
     "start:instructor": "cd apps/instructor && npm start",
-    "build:student": "cd apps/student && npm install && npm run build",
-    "start:student": "cd apps/student && npm start",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,md,json}\"",
     "clean": "rm -rf node_modules apps/*/node_modules"
   },
   "dependencies": {
-    "next": "14.1.0"
+    "next": "15.3.3"
   },
   "devDependencies": {
     "concurrently": "^8.2.0",

@@ -2,8 +2,8 @@
 
 Since you're configuring via Vercel dashboard, here are the settings you need:
 
-## For Client App (Root Landing Page)
-1. **Root Directory**: `apps/client`
+## For Student App (Root Landing Page)
+1. **Root Directory**: `apps/student`
 2. **Framework Preset**: Next.js (auto-detected)
 3. **Build Command**: `npm run build` (default)
 4. **Output Directory**: `.next` (default)
