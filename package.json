@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "cd apps/instructor && npm install && npm run build",
+    "build": "cd apps/instructor && npm install --production=false && npm run build",
     "start": "cd apps/instructor && npm start",
     "start:test": "cd apps/instructor && node startup-test.js",
     "build:client": "cd apps/client && npm install && npm run build",
