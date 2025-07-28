@@ -2,11 +2,7 @@
   "rewrites": [
     {
       "source": "/instructor/:match*",
-      "destination": "https://instructor.nazmulcodes.org/:match*"
-    },
-    {
-      "source": "/:match*",
-      "destination": "https://nazmulcodes.org/:match*"
+      "destination": "https://instructor.nazmulcodes.org/instructor/:match*"
     }
   ]
 }
