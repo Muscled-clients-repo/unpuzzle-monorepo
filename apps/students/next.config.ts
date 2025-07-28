@@ -35,7 +35,14 @@ const nextConfig: NextConfig = {
     // your project has type errors.
     ignoreBuildErrors: true,
   },
-  trailingSlash: true,
+  async rewrites() {
+    return [
+      {
+        source: '/instructor/:path*',
+        destination: `${process.env.NEXT_PUBLIC_INSTRUCTOR_APP_URL}/instructor/:path*`,
+      },
+    ];
+  },
 };
 
 export default withBundleAnalyzer(nextConfig);
