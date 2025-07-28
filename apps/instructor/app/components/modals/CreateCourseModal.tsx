@@ -3,7 +3,6 @@ import { MouseEvent, useEffect, useState } from "react";
 import { CreateCourseModalProps } from "@/types/course.types";
 import { useCourse } from "@/hooks/useCourse";
 import CreateChaptersModal from "./CreateChaptersModal";
-import { useAuth } from "@clerk/nextjs";
 
 interface CreateCourseModalPropsFixed extends Omit<CreateCourseModalProps, 'onNext'> {
   onNext: (courseId: string) => void;
@@ -19,7 +18,6 @@ const CreateCourseModal: React.FC<CreateCourseModalPropsFixed> = ({
   onNext,
 }) => {
   const { createCourse, updateCourse, loading } = useCourse();
-  const { getToken } = useAuth();
   const [showChaptersModal, setShowChaptersModal] = useState(false);
   const [createdCourseId, setCreatedCourseId] = useState<string | null>(null);
 

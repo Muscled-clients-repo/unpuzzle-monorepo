@@ -2,7 +2,6 @@
 import { useState, useEffect } from "react";
 import { useNavigationWithLoading } from "@/hooks/useNavigationWithLoading";
 import { SelectCourseVideoModalProps } from "@/types/course.types";
-import { useAuth } from "@clerk/nextjs";
 
 const API_BASE_URL = "https://dev.nazmulcodes.org/api";
 
@@ -17,7 +16,6 @@ const SelectCourseVideoModal: React.FC<SelectCourseVideoModalProps> = ({
   onClose,
   courseId,
 }) => {
-  const { getToken } = useAuth();
   const [selectedIndexes, setSelectedIndexes] = useState<number[]>([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newChapter, setNewChapter] = useState({ title: "", thumbnail: "" });
@@ -34,12 +32,10 @@ const SelectCourseVideoModal: React.FC<SelectCourseVideoModalProps> = ({
   const getChapters = async () => {
     try {
       setLoading(true);
-      const token = await getToken();
       const res = await fetch(
         `${API_BASE_URL}/chapters?course_id=${courseId}`,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
         }
@@ -77,7 +73,6 @@ const SelectCourseVideoModal: React.FC<SelectCourseVideoModalProps> = ({
     if (!newChapter.title) return;
     try {
       setLoading(true);
-      const token = await getToken();
       const chapterPayload = {
         id: generateId(),
         title: newChapter.title,
@@ -87,7 +82,6 @@ const SelectCourseVideoModal: React.FC<SelectCourseVideoModalProps> = ({
       await fetch(`${API_BASE_URL}/chapters`, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(chapterPayload),

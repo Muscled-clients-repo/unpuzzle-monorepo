@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import io from "socket.io-client";
-import { useAuth } from "@clerk/nextjs";
 import { PuzzleCheck } from "../context/PuzzleCheck";
 
 interface PuzzleCheckData {
@@ -36,7 +35,6 @@ export function usePuzzleCheck(socketId: string | null) {
   const socketRef = useRef<any>(null);
   const checkInterfaceRef = useRef<PuzzleCheckInterface | null>(null);
   const streamingRef = useRef(false);
-  const { getToken } = useAuth();
   // Initialize PuzzleCheckInterface
   useEffect(() => {
     if (!checkInterfaceRef.current) {
@@ -112,12 +110,9 @@ export function usePuzzleCheck(socketId: string | null) {
   const getCheck = useCallback(async (params?: {id:string,duration:number}) => {
     if (!checkInterfaceRef.current) return;
 
-    const token = await getToken();
-    console.log("token: ", token);
-
     const { id, duration } = params || {};
-    if (!id || !duration || !token) {
-      console.error(!id ? "Video not available" : !duration ? "Duration not provided" : "Token not provided");
+    if (!id || !duration) {
+      console.error(!id ? "Video not available" : "Duration not provided");
       return;
     }
 
@@ -134,7 +129,6 @@ export function usePuzzleCheck(socketId: string | null) {
         )}&endTime=${encodeURIComponent(duration)}`,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
         }

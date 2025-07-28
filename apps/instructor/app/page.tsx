@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { SignInButton, SignedIn, SignedOut } from "@clerk/nextjs";
 import Image from "next/image";
 import { useNavigationWithLoading } from "./hooks/useNavigationWithLoading";
 
@@ -91,21 +90,12 @@ export default function Home() {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <SignedOut>
-              <SignInButton mode="modal">
-                <button className="px-8 py-4 bg-gradient-to-r from-[#00AFF0] to-[#0077BE] text-white font-semibold rounded-full hover:from-[#0099d6] hover:to-[#0066a6] shadow-lg transform hover:scale-105 transition-all duration-200">
-                  Get Started Free
-                </button>
-              </SignInButton>
-            </SignedOut>
-            <SignedIn>
-              <button 
-                onClick={() => navigate('/instructor/video-editor')}
-                className="px-8 py-4 bg-gradient-to-r from-[#00AFF0] to-[#0077BE] text-white font-semibold rounded-full hover:from-[#0099d6] hover:to-[#0066a6] shadow-lg transform hover:scale-105 transition-all duration-200"
-              >
-                Go to Dashboard
-              </button>
-            </SignedIn>
+            <button 
+              onClick={() => navigate('/instructor/video-editor')}
+              className="px-8 py-4 bg-gradient-to-r from-[#00AFF0] to-[#0077BE] text-white font-semibold rounded-full hover:from-[#0099d6] hover:to-[#0066a6] shadow-lg transform hover:scale-105 transition-all duration-200"
+            >
+              Go to Dashboard
+            </button>
             <button className="px-8 py-4 bg-white/10 backdrop-blur text-white font-semibold rounded-full border-2 border-white/20 hover:bg-white/20 hover:border-[#00AFF0] hover:shadow-lg transform hover:scale-105 transition-all duration-200">
               Watch Demo
             </button>
@@ -170,21 +160,12 @@ export default function Home() {
           <p className="text-xl text-gray-300 mb-8">
             Join thousands of educators who are already creating engaging content with Unpuzzle
           </p>
-          <SignedOut>
-            <SignInButton mode="modal">
-              <button className="px-10 py-5 bg-gradient-to-r from-[#00AFF0] to-[#0077BE] text-white text-lg font-semibold rounded-full hover:from-[#0099d6] hover:to-[#0066a6] shadow-lg transform hover:scale-105 transition-all duration-200">
-                Start Your Free Trial
-              </button>
-            </SignInButton>
-          </SignedOut>
-          <SignedIn>
-            <button 
-              onClick={() => navigate('/instructor/video-editor')}
-              className="px-10 py-5 bg-gradient-to-r from-[#00AFF0] to-[#0077BE] text-white text-lg font-semibold rounded-full hover:from-[#0099d6] hover:to-[#0066a6] shadow-lg transform hover:scale-105 transition-all duration-200"
-            >
-              Continue to Dashboard
-            </button>
-          </SignedIn>
+          <button 
+            onClick={() => navigate('/instructor/video-editor')}
+            className="px-10 py-5 bg-gradient-to-r from-[#00AFF0] to-[#0077BE] text-white text-lg font-semibold rounded-full hover:from-[#0099d6] hover:to-[#0066a6] shadow-lg transform hover:scale-105 transition-all duration-200"
+          >
+            Continue to Dashboard
+          </button>
         </div>
       </section>
 

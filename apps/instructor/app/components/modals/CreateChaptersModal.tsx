@@ -1,7 +1,6 @@
 "use client"
 
 import React, { useState } from "react";
-import { useAuth } from "@clerk/nextjs";
 
 const API_BASE_URL = "https://dev.nazmulcodes.org/api";
 
@@ -26,7 +25,6 @@ interface Chapter {
 }
 
 const CreateChaptersModal: React.FC<CreateChaptersModalProps> = ({ isOpen, onClose, courseId }) => {
-  const { getToken } = useAuth();
   const [chapters, setChapters] = useState<Chapter[]>([{ title: "", videos: [] }]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -124,7 +122,6 @@ const CreateChaptersModal: React.FC<CreateChaptersModalProps> = ({ isOpen, onClo
     setSaving(true);
     setError("");
     try {
-      const token = await getToken();
       for (let i = 0; i < chapters.length; i++) {
         const chapter = chapters[i];
         if (!chapter.title) continue;
@@ -137,7 +134,6 @@ const CreateChaptersModal: React.FC<CreateChaptersModalProps> = ({ isOpen, onClo
         await fetch(`${API_BASE_URL}/chapters`, {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify(chapterPayload),

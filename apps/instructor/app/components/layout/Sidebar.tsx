@@ -16,8 +16,6 @@ import { MenuItem } from "../../types/lib.types";
 import { togglePopover } from "../../redux/features/recording/recordingSlice";
 import Image from "next/image";
 import dynamic from "next/dynamic";
-import { useClerkUser } from "../../hooks/useClerkUser";
-import { useClerk } from "@clerk/nextjs";
 
 const ScreenRecording = dynamic(() => import("../recording/ScreenRecording"), {
   ssr: false,
@@ -30,7 +28,6 @@ const Sidebar: React.FC<SidebarProps> = ({ user }) => {
   const { persistent, isVisible } = useSelector(
     (state: RootState) => state.sidebar
   );
-  const { signOut } = useClerk();
 
   // Since this is an instructor-only app, always use instructor menu items
   console.log('Instructor sidebar loaded for user:', user?.id);
@@ -156,7 +153,7 @@ const Sidebar: React.FC<SidebarProps> = ({ user }) => {
           })}
           <li>
             <button
-              onClick={() => signOut({ redirectUrl: '/sign-up' })}
+              onClick={() => window.location.href = '/'}
               className="flex flex-col items-center px-[8px] py-[7px] text-[#1D1D1D] rounded-md text-sm font-medium hover:bg-[#F3F5F8] cursor-pointer"
             >
               <Image

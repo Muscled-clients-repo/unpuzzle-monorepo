@@ -2,7 +2,6 @@
 import React from "react";
 import { NavigationLink } from "@/components/content/NavigationLink";
 import { usePathname } from "next/navigation";
-import { useUser, useClerk } from "@clerk/nextjs";
 import { menuItems } from "../../lib/menu-list";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -21,16 +20,8 @@ export default function SidebarWithAuth() {
     (state: RootState) => state.sidebar
   );
   
-  // Get user directly from Clerk
-  const { user, isLoaded } = useUser();
-  const { signOut } = useClerk();
-  
-  if (!isLoaded || !user) {
-    return null; // Don't render sidebar if not loaded or no user
-  }
-
-  // Since this is an instructor-only app, no need to check user roles
-  console.log('SidebarWithClerk - Instructor user:', user.id);
+  // No authentication needed for instructor app
+  // Sidebar is always visible
 
   const topItems = menuItems.slice(0, -1);
   const bottomItems = menuItems.slice(-1);
@@ -140,21 +131,7 @@ export default function SidebarWithAuth() {
               </NavigationLink>
             </li>
           ))}
-          <li>
-            <button
-              onClick={() => signOut({ redirectUrl: '/sign-up' })}
-              className="flex flex-col items-center px-[8px] py-[7px] text-[#1D1D1D] rounded-md text-sm font-medium hover:bg-[#F3F5F8] cursor-pointer"
-            >
-              <Image
-                src="/assets/logout.svg"
-                alt="Logout icon"
-                className="mr-2"
-                width={22}
-                height={22}
-              />
-              Logout
-            </button>
-          </li>
+          {/* Logout button removed - no authentication needed */}
         </ul>
       </div>
     </div>

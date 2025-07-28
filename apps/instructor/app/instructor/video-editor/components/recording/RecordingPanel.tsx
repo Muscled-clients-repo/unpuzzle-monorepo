@@ -1,7 +1,6 @@
 'use client'
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import Image from 'next/image';
-import { useAuth } from '@clerk/nextjs';
 import { useRecording } from '../../../../context/RecordingContext';
 
 interface RecordingPanelProps {
@@ -15,7 +14,6 @@ const RecordingPanel: React.FC<RecordingPanelProps> = ({
   onRecordingStart,
   onRecordingStop,
 }) => {
-  const { getToken } = useAuth();
   const { isRecording, setIsRecording, setRecordingStartTime } = useRecording();
   const [status, setStatus] = useState<'idle' | 'recording' | 'paused' | 'processing'>('idle');
   const [recordingTime, setRecordingTime] = useState(0);
@@ -67,10 +65,9 @@ const RecordingPanel: React.FC<RecordingPanelProps> = ({
   // get upload url
   const getUploadId = async () => {
     try {
-      const token = await getToken();
       const response = await fetch(`${m1Url}/api/video/upload`, {
         headers: {
-          Authorization: `Bearer ${token}`
+          'Content-Type': 'application/json'
         }
       });
       if (response.ok) {
@@ -128,13 +125,9 @@ const RecordingPanel: React.FC<RecordingPanelProps> = ({
 
       formData.append("status", isRecordingRef.current ? "uploading" : "completed");
 
-      const token = await getToken();
       const response = await fetch(`${m1Url}/api/video/upload`, {
         method: "POST",
-        body: formData,
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
+        body: formData
       });
 
       if (!response.ok) {

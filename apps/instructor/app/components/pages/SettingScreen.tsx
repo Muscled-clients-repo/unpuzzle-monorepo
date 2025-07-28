@@ -1,13 +1,16 @@
 'use client'
 import { useState } from 'react'
-import { useClerkUser } from '../../hooks/useClerkUser'
 import axios from "axios"
 import { useGetAllPermissionsQuery } from "../../redux//services/permission.services"; 
 import { useAddUserPermissionMutation, useRemoveUserPermissionMutation } from '../../redux/services/userPermission.services'
 import Image from 'next/image'
 
 export default function SettingScreen() {
-  const { user } = useClerkUser();
+  // Mock user data since we're removing Clerk authentication
+  const user = {
+    id: 'mock-user-id',
+    publicMetadata: { permission: [] }
+  };
   const [selectedPermissions, setSelectedPermissions] = useState<string[]>(
     (user?.publicMetadata?.permission as string[]) || []
   );
@@ -24,11 +27,11 @@ export default function SettingScreen() {
     if (isAlreadySelected) {
       // Remove permission (send ID but check with name)
       setSelectedPermissions(selectedPermissions.filter((p) => p !== permissionName));
-      await removeUserPermission({ userId: user?.id, permissionId: permissionId });
+      await removeUserPermission({ userId: user.id, permissionId: permissionId });
     } else {
       // Add permission (send ID but check with name)
       setSelectedPermissions([...selectedPermissions, permissionName]);
-      await addUserPermission({ userId: user?.id, permissionId: permissionId });
+      await addUserPermission({ userId: user.id, permissionId: permissionId });
     }
   };
 

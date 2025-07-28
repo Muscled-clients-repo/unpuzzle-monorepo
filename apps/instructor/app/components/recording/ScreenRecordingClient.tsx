@@ -4,11 +4,9 @@ import React, { useState, useRef, useEffect } from "react";
 import { useSelector } from "react-redux";
 import Image from "next/image";
 import { RootState } from "@/redux/rootReducer";
-import { useAuth } from '@clerk/nextjs';
 
 
 const ScreenRecording = () => {
-  const {getToken} = useAuth();
   const user = useSelector((state: RootState) => state.user.user);
   const [status, setStatus] = useState("idle");
   const [videoPlaybackUrl, setVideoPlaybackUrl] = useState<string | null>(null);
@@ -42,10 +40,9 @@ const ScreenRecording = () => {
   // Get upload id
   const getUploadId = async () => {
     try {
-      const token = await getToken();
       const response = await fetch(`${m1Url}/api/video/upload`, {
         headers: {
-          Authorization: `Bearer ${token}`
+          'Content-Type': 'application/json'
         }
       });
       if (response.ok) {
@@ -95,13 +92,9 @@ const ScreenRecording = () => {
 
       formData.append("status", isRecording ? "uploading" : "completed");
 
-      const token = await getToken();
       const response = await fetch(`${m1Url}/api/video/upload`, {
         method: "POST",
-        body: formData,
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
+        body: formData
       });
 
       if (!response.ok) {

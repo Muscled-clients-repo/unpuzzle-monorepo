@@ -5,8 +5,6 @@ import "../assets/globals.css";
 // import Header from "./Header";
 import { Provider, useSelector } from "react-redux";
 import store, { RootState } from "../redux/store";
-import userReducer from "../redux/features/user/userSlice";
-import { Sidebar } from "../components";
 import { SidebarWithAuth } from "../components";
 import { Loading as LoadingSpinner } from "../components";
 import React, { useState, useEffect } from "react";
@@ -17,18 +15,9 @@ import { NavigationLoader } from "../components";
 import { ClientOnly } from "../components";
 import { AnnotationHeader } from "../components";
 import { ToastContainer } from 'react-toastify';
-import { UserSync } from "../components";
+// UserSync removed - no Clerk authentication needed
 
-// clerk
-import {
-  ClerkProvider,
-  SignInButton,
-  SignUpButton,
-  SignedIn,
-  SignedOut,
-  UserButton,
-  RedirectToSignIn,
-} from "@clerk/nextjs";
+// Clerk authentication removed from instructor app
 
 const geistSans = Geist({
   subsets: ["latin"],
@@ -50,15 +39,7 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState<boolean>(true);
   const pathname = usePathname();
 
-  // In your layout or any server component
-  console.log(
-    "CLERK_SECRET_KEY:",
-    process.env.CLERK_SECRET_KEY?.substring(0, 10) + "..."
-  );
-  console.log(
-    "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY:",
-    process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.substring(0, 10) + "..."
-  );
+  // Clerk authentication removed - no longer needed
 
   useEffect(() => {
     // Content will not be displayed if loading is always true.
@@ -106,10 +87,10 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      <UserSync />
+      {/* UserSync removed - no Clerk authentication needed */}
       <main>
         <div className="flex h-screen">
-          {/* Sidebar - Using direct Clerk approach */}
+          {/* Sidebar - Now without Clerk authentication */}
           {showSidebar && <SidebarWithAuth />}
           <div className="flex-grow bg-white text-black flex flex-col h-full">
             {/* Annotation Header */}
@@ -138,24 +119,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ClerkProvider>
-      <html
-        lang="en"
-        className={`${geistSans.className} ${geistMono.className} overflow-hidden`}
-      >
-        <body className="antialiased light" suppressHydrationWarning>
-        <ToastContainer />
+    <html
+      lang="en"
+      className={`${geistSans.className} ${geistMono.className} overflow-hidden`}
+    >
+      <body className="antialiased light" suppressHydrationWarning>
+      <ToastContainer />
 
-          <Provider store={store}>
-            <NavigationProvider>
-              <VideoTimeProvider>
-                <NavigationLoader />
-                <LayoutContent>{children}</LayoutContent>
-              </VideoTimeProvider>
-            </NavigationProvider>
-          </Provider>
-        </body>
-      </html>
-    </ClerkProvider>
+        <Provider store={store}>
+          <NavigationProvider>
+            <VideoTimeProvider>
+              <NavigationLoader />
+              <LayoutContent>{children}</LayoutContent>
+            </VideoTimeProvider>
+          </NavigationProvider>
+        </Provider>
+      </body>
+    </html>
   );
 }
