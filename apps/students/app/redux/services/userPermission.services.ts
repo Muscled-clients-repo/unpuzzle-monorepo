@@ -1,10 +1,9 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-
-const BASE_URL = 'http://localhost:3001';
+import { API_BASE_URL } from '../../config/api.config';
 
 export const userPermissionApi = createApi({
   reducerPath: 'userPermissionApi',
-  baseQuery: fetchBaseQuery({ baseUrl: BASE_URL }),
+  baseQuery: fetchBaseQuery({ baseUrl: API_BASE_URL }),
   endpoints: (build) => ({
     addUserPermission: build.mutation({
       query: ({ userId, permissionId }) => ({

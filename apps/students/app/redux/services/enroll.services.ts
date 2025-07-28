@@ -1,8 +1,9 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { API_ENDPOINTS } from '../../config/api.config';
 
 export const enrollApi = createApi({
   reducerPath: 'enrollApi',
-  baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:3001/api/' }),
+  baseQuery: fetchBaseQuery({ baseUrl: API_ENDPOINTS.BASE + '/' }),
   tagTypes: ['Enrolls'], // Add tag to manage UI updates
   endpoints: (builder) => ({
     // Create Enroll

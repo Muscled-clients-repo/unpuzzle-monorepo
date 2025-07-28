@@ -1,8 +1,9 @@
 import { useEffect, useRef } from "react";
 import { io, Socket } from "socket.io-client";
+import { SOCKET_URL } from "../config/api.config";
 
 const useSocket = (
-  url = "http://localhost:3001",
+  url = SOCKET_URL,
   options = { transports: ["websocket"], upgrade: false }
 ) => {
   const socketRef = useRef<Socket | null>(null);

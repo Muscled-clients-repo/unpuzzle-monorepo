@@ -12,31 +12,23 @@ export default function SignInPage() {
   }, [dispatch]);
 
   return (
-    <div className="container relative  h-full flex-col items-center justify-center md:grid lg:max-w-none lg:px-0">
-      <div className="lg:p-8">
-        <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
-          {/* <div className="grid gap-6">aaa</div> */}
-          <SignInRoute />
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="w-full max-w-md">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">Welcome Back</h1>
+          <p className="mt-2 text-gray-600">Sign in to continue your learning journey</p>
         </div>
-      </div>
-    </div>
-  );
-}
-function SignInRoute() {
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch(logout());
-  }, [dispatch]);
-
-  return (
-    <div className="container relative  h-full flex-col items-center justify-center md:grid lg:max-w-none lg:px-0">
-      <div className="lg:p-8">
-        <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
-          <div className="grid gap-6">
-            <SignIn />
-          </div>
-        </div>
+        <SignIn 
+          appearance={{
+            elements: {
+              card: "shadow-none",
+              formButtonPrimary: "bg-blue-600 hover:bg-blue-700",
+              footerActionLink: "text-blue-600 hover:text-blue-700"
+            }
+          }}
+          signUpUrl="/sign-up"
+          afterSignInUrl="/courses"
+        />
       </div>
     </div>
   );

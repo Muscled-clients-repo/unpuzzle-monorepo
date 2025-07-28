@@ -1,8 +1,9 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { API_ENDPOINTS } from "../../config/api.config";
 
 export const puzzleSolutionApi = createApi({
   reducerPath: "puzzleSolutionApi",
-  baseQuery: fetchBaseQuery({ baseUrl: "http://localhost:3001/api" }),
+  baseQuery: fetchBaseQuery({ baseUrl: API_ENDPOINTS.BASE }),
   endpoints: (builder) => ({
     getAllPuzzleSolutions: builder.query({
       query: ({ userId, courseId }) => ({

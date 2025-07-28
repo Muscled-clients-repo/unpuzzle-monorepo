@@ -1,8 +1,9 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { API_ENDPOINTS } from '../../config/api.config';
 
 export const puzzlepiecesApi = createApi({
   reducerPath: 'puzzlepiecesApi',
-  baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:3001/api' }),
+  baseQuery: fetchBaseQuery({ baseUrl: API_ENDPOINTS.BASE }),
   tagTypes: ['PuzzlePieces'], // ✅ Ensures UI updates automatically
   endpoints: (builder) => ({
     // Create Puzzle Piece

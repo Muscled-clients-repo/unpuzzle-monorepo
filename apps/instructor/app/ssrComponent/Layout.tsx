@@ -137,25 +137,36 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <ClerkProvider>
-      <html
-        lang="en"
-        className={`${geistSans.className} ${geistMono.className} overflow-hidden`}
-      >
-        <body className="antialiased light" suppressHydrationWarning>
-        <ToastContainer />
-
-          <Provider store={store}>
-            <NavigationProvider>
-              <VideoTimeProvider>
-                <NavigationLoader />
-                <LayoutContent>{children}</LayoutContent>
-              </VideoTimeProvider>
-            </NavigationProvider>
-          </Provider>
-        </body>
-      </html>
-    </ClerkProvider>
+  // Check if Clerk keys are available
+  const hasClerkKeys = !!(
+    process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY &&
+    process.env.CLERK_SECRET_KEY
   );
+
+  const content = (
+    <html
+      lang="en"
+      className={`${geistSans.className} ${geistMono.className} overflow-hidden`}
+    >
+      <body className="antialiased light" suppressHydrationWarning>
+      <ToastContainer />
+
+        <Provider store={store}>
+          <NavigationProvider>
+            <VideoTimeProvider>
+              <NavigationLoader />
+              <LayoutContent>{children}</LayoutContent>
+            </VideoTimeProvider>
+          </NavigationProvider>
+        </Provider>
+      </body>
+    </html>
+  );
+
+  // Only wrap with ClerkProvider if keys are available
+  return hasClerkKeys ? (
+    <ClerkProvider>
+      {content}
+    </ClerkProvider>
+  ) : content;
 }

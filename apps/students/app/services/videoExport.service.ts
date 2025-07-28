@@ -118,7 +118,7 @@ class VideoExportService {
 
   constructor() {
     // Configure your server API URL
-    this.apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+    this.apiUrl = process.env.NEXT_PUBLIC_CORE_SERVER_URL || 'https://dev.nazmulcodes.org';
   }
 
   async initialize() {
