@@ -1,13 +1,11 @@
 "use client";
 import React, { useCallback, useMemo } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { ContentCard, CardHeader, CardTitle } from "../shared/ui/content-card";
 import { useRouter, usePathname } from "next/navigation";
 import { RootState } from "../../redux/store";
 import {
-  Course,
   CourseCardProps,
-  UserState,
 } from "../../types/course.types";
 import {
   useCreateEnrollMutation,
@@ -16,14 +14,11 @@ import Image from "next/image";
 
 export const CourseCard: React.FC<CourseCardProps> = React.memo(({
   layout,
-  index,
   course,
 }) => {
   const router = useRouter();
   const pathname = usePathname();
-  const courseId = course?.id;
-  const dispatch = useDispatch();
-  const [createEnroll, { isLoading, error }] = useCreateEnrollMutation();
+  const [createEnroll] = useCreateEnrollMutation();
 
   const user = useSelector((state: RootState) => state.user.user);
 
@@ -37,7 +32,7 @@ export const CourseCard: React.FC<CourseCardProps> = React.memo(({
       return;
     }
     try {
-      const response = await createEnroll({
+      await createEnroll({
         userId: user.id,
         courseId: course.id,
       }).unwrap();

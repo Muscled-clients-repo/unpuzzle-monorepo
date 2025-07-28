@@ -1,16 +1,17 @@
-"use client";
-import { useSelector, useDispatch } from "react-redux";
-import { useEffect, useMemo, useState } from "react";
+// import { useSelector } from "react-redux";
+import { useEffect, useState } from "react";
+import dynamic from 'next/dynamic';
+import { useGetCoursesQuery } from "../../redux/hooks";
+import { EnrolledCourse } from '../../types/course.types';
+// import PageLoadingSpinner from "../shared/page-loading-spinner";
 import Image from "next/image";
-import {
-  useGetAllEnrollsQuery,
-} from "../../redux/services/enroll.services";
-import { usePathname } from "next/navigation";
-import { CourseCard } from "./course-card";
-import { EnrolledCourse, EnrolledCoursesData } from "../../types/course.types";
-import PageLoadingSpinner from "../shared/page-loading-spinner";
+import { CourseGridSkeleton } from "../shared/content-skeleton-loader";
 
-// Types
+// Dynamic imports for better code splitting
+const CourseCard = dynamic(() => import('./course-card').then(mod => ({ default: mod.CourseCard })), {
+  loading: () => <CourseGridSkeleton />,
+  ssr: false
+});
 
 type User = {
   publicMetadata?: {
@@ -24,46 +25,34 @@ type RootState = {
   };
 };
 
-type LayoutType = "grid-4" | "grid-3" | "list";
+type LayoutType = "grid-1" | "grid-4" | "list";
 
 const CourseScreen: React.FC = () => {
-  const pathname = usePathname();
   const [filterType, setFilterType] = useState<string>("All");
-  const [selectedCourse, setSelectedCourse] = useState<EnrolledCourse | null>(
-    null
-  );
-  const [layout, setLayout]: any = useState<LayoutType>("grid-4");
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [layout] = useState<LayoutType>("grid-4");
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [filteredCourses, setFilteredCourses] = useState<EnrolledCourse[]>([]);
-  const { data: courses, isLoading, error } = useGetAllEnrollsQuery(undefined);
-  const dispatch = useDispatch();
+  const { data: courses, isLoading } = useGetCoursesQuery(undefined);
 
+  // Courses data loaded
   useEffect(() => {
+    
     if (courses) {
-      let updatedCourses: EnrolledCourse[] = courses;
 
+      let updatedCourses: EnrolledCourse[] = courses.data;
       if (filterType !== "All") {
-        updatedCourses = updatedCourses.filter(
-          (course) => course.category === filterType
-        );
+        updatedCourses = updatedCourses.filter(course => course.category === filterType);
       }
-
       if (searchTerm) {
-        updatedCourses = updatedCourses.filter((course) =>
+        updatedCourses = updatedCourses.filter(course =>
           course.title.toLowerCase().includes(searchTerm.toLowerCase())
         );
       }
-
       setFilteredCourses(updatedCourses);
     }
   }, [courses, filterType, searchTerm]);
 
-  const { user } = useSelector((state: RootState) => state.user);
-
-  const handleBackClick = () => {
-    setSelectedCourse(null);
-  };
+  // const { user } = useSelector((state: RootState) => state.user);
 
   const handleFilterClick = (filter: string) => {
     setFilterType(filter);
@@ -73,12 +62,7 @@ const CourseScreen: React.FC = () => {
     <div>
       <div className="px-10">
         <div className="w-[70%] flex items-center px-4 py-2 bg-[#F5F4F6] rounded-[100px]">
-          <Image
-            src="/assets/searchIcon.svg"
-            alt="searchIcon"
-            width={20}
-            height={20}
-          />
+          <Image src="/assets/searchIcon.svg" width={15} height={15} alt="searchIcon" />
           <input
             type="text"
             placeholder="Search..."
@@ -119,7 +103,6 @@ const CourseScreen: React.FC = () => {
             >
               Shopify Theme Design
             </button>
-
             <button
               className={`py-3 w-fit px-4 rounded-[8px] cursor-pointer ${
                 filterType === "App Development"
@@ -131,33 +114,33 @@ const CourseScreen: React.FC = () => {
               App Development
             </button>
           </div>
-
         </div>
         <div className="overflow-auto h-[75vh]">
-          {isLoading && (
-            <div className="w-full h-full">
-              <PageLoadingSpinner />
+          {isLoading ? (
+            <div className="pr-[20px]">
+              <CourseGridSkeleton count={layout === "grid-1" ? 3 : 8} />
+            </div>
+          ) : (
+            <div
+              className={`pr-[20px] grid ${
+                layout === "grid-1"
+                  ? "grid-cols-1"
+                  : "grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+              } gap-x-[15px] gap-y-6`}
+            >
+              {filteredCourses.map((course, index) => (
+                <button
+                  key={index}
+                  className=" cursor-pointer"
+                >
+                  <div>
+                    {/* TODO: Align EnrolledCourse and Course types for CourseCard. For now, cast as any. */}
+                    <CourseCard layout={layout} course={course as any} index={index} />
+                  </div>
+                </button>
+              ))}
             </div>
           )}
-          <div
-            className={`pr-[20px] grid ${
-              layout === "grid-1"
-                ? "grid-cols-1"
-                : "grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-            } gap-x-[15px] gap-y-6`}
-          >
-            {filteredCourses.map((course, index) => (
-              <button
-                key={index}
-                // onClick={() => handleCardClick(course)}
-                className=" cursor-pointer"
-              >
-                <div>
-                  <CourseCard layout={layout} course={course} index={index} />
-                </div>
-              </button>
-            ))}
-          </div>
         </div>
       </div>
     </div>

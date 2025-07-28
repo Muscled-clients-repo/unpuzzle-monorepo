@@ -493,7 +493,7 @@ const NewVideoPlayer: React.FC<NewVideoPlayerProps> = ({
 
                 <div className="flex pl-9 items-center gap-2">
                   <h1 className="text-white text-sm font-normal">
-                    Puzzle peices
+                    Puzzle pieces
                   </h1>
                   <button
                     onClick={() => setIsPuzzleVisible(!isPuzzleVisible)}
@@ -606,7 +606,7 @@ const NewVideoPlayer: React.FC<NewVideoPlayerProps> = ({
       ) : (
         /* Annotations by experts  */
         <div className="mt-3 px-4  dark:bg-[#0F0F0F] dark:text-white">
-          <h1 className="text-xl font-bold #1D1D1D dark:text-white">
+          <h1 className="text-xl font-bold text-[#1D1D1D] dark:text-white">
             The Secrets to Growing a Business with Minimal Resources...
           </h1>
 

@@ -26,7 +26,7 @@ const QuizResult = ({ score, total, onBack, passed, topic }: { score: number; to
     </div>
     {!passed ? (
       <>
-        <div className="text-[#F24E1E] text-sm mb-4">Let's Go Back to 2:40</div>
+        <div className="text-[#F24E1E] text-sm mb-4">Let&apos;s Go Back to 2:40</div>
         <button onClick={onBack} className="w-full h-9 bg-[#1D1D1D] text-white rounded-md font-semibold text-sm">Back to 2:40</button>
       </>
     ) : (

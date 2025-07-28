@@ -8,11 +8,11 @@ Since you're configuring via Vercel dashboard, here are the settings you need:
 1. **Root Directory**: Leave empty (use repository root)
 2. **Framework Preset**: Next.js
 3. **Build Command**: `npm run build`
-4. **Output Directory**: `apps/student/.next`
+4. **Output Directory**: `apps/students/.next`
 5. **Install Command**: `npm install`
 
-### Option 2: Build from apps/student directory
-1. **Root Directory**: `apps/student`
+### Option 2: Build from apps/students directory
+1. **Root Directory**: `apps/students`
 2. **Framework Preset**: Next.js (auto-detected)
 3. **Build Command**: `npm run build:no-lint`
 4. **Output Directory**: `.next`
@@ -26,7 +26,7 @@ Since you're configuring via Vercel dashboard, here are the settings you need:
 5. **Install Command**: `npm install` (default)
 
 ## For Student App (Separate Deployment)
-1. **Root Directory**: `apps/student`
+1. **Root Directory**: `apps/students`
 2. **Framework Preset**: Next.js (auto-detected)
 3. **Build Command**: `npm run build` (default)
 4. **Output Directory**: `.next` (default)

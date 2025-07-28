@@ -1,12 +1,11 @@
 import { useEffect, useRef } from "react";
-// @ts-ignore
 import { io, Socket } from "socket.io-client";
 
 const useSocket = (
   url = "http://localhost:3001",
   options = { transports: ["websocket"], upgrade: false }
 ) => {
-  const socketRef = useRef<any>(null);
+  const socketRef = useRef<Socket | null>(null);
 
   useEffect(() => {
     if (!socketRef.current) {
@@ -45,7 +44,7 @@ const useSocket = (
     }
   };
 
-  const emitEvent = async (event: string, ...args: any[]) => {
+  const emitEvent = async (event: string, ...args: unknown[]) => {
     if (socketRef.current?.connected) {
       socketRef.current.emit(event, ...args);
     } else {

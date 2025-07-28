@@ -1,5 +1,4 @@
 'use client'
-import { useEffect, useRef } from "react";
 import axios from "axios"
 
 const useApi = () => {
@@ -26,12 +25,22 @@ const useApi = () => {
     }
   }
 
-  const putRequest = async()=>{
-
+  const putRequest = async(endpoint: string, data: unknown) => {
+    try {
+      const response = await axios.put(endpoint, data);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
   }
 
-  const deleteRequest =async()=>{
-
+  const deleteRequest = async(endpoint: string) => {
+    try {
+      const response = await axios.delete(endpoint);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
   }
 
   return { get:getRequest, post:postRequest, put:putRequest, delete:deleteRequest };

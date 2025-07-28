@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import { useClerkUser } from '../../hooks/useClerkUser'
 import axios from "axios"
-import { useGetAllPermissionsQuery } from "../../redux//services/permission.services"; 
+import { useGetAllPermissionsQuery } from "../../redux/services/permission.services"; 
 import { useAddUserPermissionMutation, useRemoveUserPermissionMutation } from '../../redux/services/userPermission.services'
 import Image from 'next/image'
 

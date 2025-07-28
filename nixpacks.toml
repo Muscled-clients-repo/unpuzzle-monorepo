@@ -2,7 +2,7 @@
 nixPkgs = ["nodejs_20"]
 
 [phases.build]
-cmds = ["cd apps/student && npm install --production=false && npm run build:no-lint"]
+cmds = ["cd apps/students && npm install --production=false && npm run build"]
 
 [start]
-cmd = "cd apps/student && npm start"
+cmd = "cd apps/students && npm start"
