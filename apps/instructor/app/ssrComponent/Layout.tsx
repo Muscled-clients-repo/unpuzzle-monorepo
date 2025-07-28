@@ -21,6 +21,7 @@ import { UserSync } from "../components";
 
 // clerk
 import {
+  ClerkProvider,
   SignInButton,
   SignUpButton,
   SignedIn,
@@ -28,7 +29,6 @@ import {
   UserButton,
   RedirectToSignIn,
 } from "@clerk/nextjs";
-import { ClerkProviderWrapper } from "../components/providers/ClerkProviderWrapper";
 
 const geistSans = Geist({
   subsets: ["latin"],
@@ -50,6 +50,15 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState<boolean>(true);
   const pathname = usePathname();
 
+  // In your layout or any server component
+  console.log(
+    "CLERK_SECRET_KEY:",
+    process.env.CLERK_SECRET_KEY?.substring(0, 10) + "..."
+  );
+  console.log(
+    "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY:",
+    process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.substring(0, 10) + "..."
+  );
 
   useEffect(() => {
     // Content will not be displayed if loading is always true.
@@ -85,16 +94,14 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
   // Show AnnotationHeader for specific paths
   const showAnnotationHeader = noSidebarPaths.includes(pathname);
 
-  // Debug logging - only in development
+  // Debug logging
   useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
-      console.log('Sidebar Debug:', {
-        pathname,
-        showSidebar,
-        hasUser: !!user.user,
-        user: user.user,
-      });
-    }
+    console.log('Sidebar Debug:', {
+      pathname,
+      showSidebar,
+      hasUser: !!user.user,
+      user: user.user,
+    });
   }, [pathname, showSidebar, user.user]);
 
   return (
@@ -131,7 +138,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ClerkProviderWrapper>
+    <ClerkProvider>
       <html
         lang="en"
         className={`${geistSans.className} ${geistMono.className} overflow-hidden`}
@@ -149,6 +156,6 @@ export default function RootLayout({
           </Provider>
         </body>
       </html>
-    </ClerkProviderWrapper>
+    </ClerkProvider>
   );
 }

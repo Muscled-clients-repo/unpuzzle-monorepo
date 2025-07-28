@@ -16,15 +16,6 @@ services:
 
   # These are placeholders - in dev mode, you'll run these with pnpm
   # This file shows how they would be containerized for consistent dev environment
-  client:
-    build:
-      context: ./apps/client
-      dockerfile: Dockerfile.dev
-    ports:
-      - "3001:3001"
-    networks:
-      - unpuzzle-network
-
   instructor:
     build:
       context: ./apps/instructor

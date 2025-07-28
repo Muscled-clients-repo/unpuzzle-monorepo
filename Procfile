@@ -1,1 +1,0 @@
-web: cd apps/instructor && node .next/standalone/server.js
