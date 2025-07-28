@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "cd apps/student && npm run dev",
-    "build": "cd apps/student && npm install --production=false && npm run build",
+    "build": "cd apps/student && npm install --production=false && npm run build:no-lint",
     "start": "cd apps/student && npm start",
     "lint": "cd apps/student && npm run lint",
     "dev:all": "concurrently \"npm run dev\" \"cd apps/instructor && npm run dev\"",
