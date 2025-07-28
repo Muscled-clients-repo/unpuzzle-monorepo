@@ -3,11 +3,20 @@
 Since you're configuring via Vercel dashboard, here are the settings you need:
 
 ## For Student App (Root Landing Page)
+
+### Option 1: Build from monorepo root (Recommended)
+1. **Root Directory**: Leave empty (use repository root)
+2. **Framework Preset**: Next.js
+3. **Build Command**: `npm run build`
+4. **Output Directory**: `apps/student/.next`
+5. **Install Command**: `npm install`
+
+### Option 2: Build from apps/student directory
 1. **Root Directory**: `apps/student`
 2. **Framework Preset**: Next.js (auto-detected)
 3. **Build Command**: `npm run build:no-lint`
-4. **Output Directory**: `.next` (default)
-5. **Install Command**: `npm install` (default)
+4. **Output Directory**: `.next`
+5. **Install Command**: `npm install`
 
 ## For Instructor App (Separate Deployment)
 1. **Root Directory**: `apps/instructor`
