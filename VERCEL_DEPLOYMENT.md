@@ -25,12 +25,15 @@ vercel
 
 4. Follow the prompts to link your project
 
-### Option 2: Deploy via Vercel Dashboard
+### Option 2: Deploy via Vercel Dashboard (RECOMMENDED)
 
 1. Go to https://vercel.com/new
 2. Import your Git repository
-3. Configure the project:
-   - **Root Directory**: `apps/instructor`
+3. **IMPORTANT**: Set the Root Directory to `apps/instructor` 
+   - Click "Edit" next to Root Directory
+   - Select `apps/instructor` from the dropdown
+4. Vercel will auto-detect Next.js settings
+5. The following will be set automatically:
    - **Framework Preset**: Next.js
    - **Build Command**: `npm run build`
    - **Output Directory**: `.next`

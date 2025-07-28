@@ -1,6 +1,0 @@
-{
-  "buildCommand": "cd apps/instructor && npm install && npm run build",
-  "outputDirectory": "apps/instructor/.next",
-  "installCommand": "echo 'Skipping root install'",
-  "framework": null
-}
