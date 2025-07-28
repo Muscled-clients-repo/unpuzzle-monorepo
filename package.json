@@ -16,6 +16,9 @@
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,md,json}\"",
     "clean": "rm -rf node_modules apps/*/node_modules"
   },
+  "dependencies": {
+    "next": "15.3.3"
+  },
   "devDependencies": {
     "eslint": "^8.57.0",
     "prettier": "^3.2.5",

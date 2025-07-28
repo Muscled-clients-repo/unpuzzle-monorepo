@@ -1,6 +1,6 @@
 {
-  "buildCommand": "cd apps/instructor && npm install --production=false && npm run build",
+  "buildCommand": "npm run build",
   "outputDirectory": "apps/instructor/.next",
-  "installCommand": "npm install --production=false",
+  "installCommand": "npm install",
   "framework": "nextjs"
 }
