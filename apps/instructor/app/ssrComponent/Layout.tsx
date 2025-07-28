@@ -45,7 +45,7 @@ export const metadata: Metadata = {
   description: "Create interactive educational content that engages students through puzzle-based learning",
 };
 
-function LayoutContent({ children }: { children: React.ReactNode }) {
+function LayoutContent({ children, hasClerkKeys }: { children: React.ReactNode; hasClerkKeys?: boolean }) {
   const user = useSelector((state: RootState) => state.user);
   const [loading, setLoading] = useState<boolean>(true);
   const pathname = usePathname();
@@ -106,7 +106,8 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      <UserSync />
+      {/* Only render UserSync when Clerk is available */}
+      {hasClerkKeys && <UserSync />}
       <main>
         <div className="flex h-screen">
           {/* Sidebar - Using direct Clerk approach */}
@@ -143,30 +144,37 @@ export default function RootLayout({
     process.env.CLERK_SECRET_KEY
   );
 
-  const content = (
+  // Always return the same structure, but conditionally wrap with ClerkProvider
+  return (
     <html
       lang="en"
       className={`${geistSans.className} ${geistMono.className} overflow-hidden`}
     >
       <body className="antialiased light" suppressHydrationWarning>
-      <ToastContainer />
-
-        <Provider store={store}>
-          <NavigationProvider>
-            <VideoTimeProvider>
-              <NavigationLoader />
-              <LayoutContent>{children}</LayoutContent>
-            </VideoTimeProvider>
-          </NavigationProvider>
-        </Provider>
+        <ToastContainer />
+        
+        {hasClerkKeys ? (
+          <ClerkProvider>
+            <Provider store={store}>
+              <NavigationProvider>
+                <VideoTimeProvider>
+                  <NavigationLoader />
+                  <LayoutContent hasClerkKeys={true}>{children}</LayoutContent>
+                </VideoTimeProvider>
+              </NavigationProvider>
+            </Provider>
+          </ClerkProvider>
+        ) : (
+          <Provider store={store}>
+            <NavigationProvider>
+              <VideoTimeProvider>
+                  <NavigationLoader />
+                  <LayoutContent hasClerkKeys={true}>{children}</LayoutContent>
+              </VideoTimeProvider>
+            </NavigationProvider>
+          </Provider>
+        )}
       </body>
     </html>
   );
-
-  // Only wrap with ClerkProvider if keys are available
-  return hasClerkKeys ? (
-    <ClerkProvider>
-      {content}
-    </ClerkProvider>
-  ) : content;
 }
