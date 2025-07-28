@@ -35,22 +35,6 @@ const nextConfig: NextConfig = {
     // your project has type errors.
     ignoreBuildErrors: true,
   },
-  async redirects() {
-    return [
-      {
-        source: '/instructor',
-        destination: process.env.NEXT_PUBLIC_INSTRUCTOR_APP_URL || 'https://unpuzzle-mono-repo-frontend-v9qa-mceveraj4.vercel.app',
-        permanent: false,
-        basePath: false,
-      },
-      {
-        source: '/instructor/:path*',
-        destination: `${process.env.NEXT_PUBLIC_INSTRUCTOR_APP_URL || 'https://unpuzzle-mono-repo-frontend-v9qa-mceveraj4.vercel.app'}/:path*`,
-        permanent: false,
-        basePath: false,
-      },
-    ];
-  },
 };
 
 export default withBundleAnalyzer(nextConfig);
