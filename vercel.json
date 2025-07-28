@@ -1,0 +1,18 @@
+{
+  "buildCommand": "cd apps/instructor && npm ci && npm run build",
+  "devCommand": "cd apps/instructor && npm run dev",
+  "installCommand": "cd apps/instructor && npm install",
+  "framework": null,
+  "outputDirectory": "apps/instructor/.next",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/apps/instructor/$1"
+    }
+  ],
+  "functions": {
+    "apps/instructor/**/*.ts": {
+      "runtime": "nodejs20.x"
+    }
+  }
+}
