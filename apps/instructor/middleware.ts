@@ -15,13 +15,13 @@ export default clerkMiddleware(async (auth, req) => {
   }
 
   // For protected routes, check if user is authenticated
-  const { userId } = await auth();
+  // const { userId } = await auth();
   
-  if (!userId) {
-    // Redirect to sign-up if not authenticated
-    const signUpUrl = new URL("/sign-up", process.env.NEXT_PUBLIC_STUDENT_APP_URL);
-    return NextResponse.redirect(signUpUrl);
-  }
+  // if (!userId) {
+  //   // Redirect to sign-up if not authenticated
+  //   const signUpUrl = new URL("/sign-up", process.env.NEXT_PUBLIC_STUDENT_APP_URL);
+  //   return NextResponse.redirect(signUpUrl);
+  // }
 
   return NextResponse.next();
 });
