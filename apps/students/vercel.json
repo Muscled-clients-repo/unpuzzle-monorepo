@@ -6,7 +6,7 @@
     },
     {
       "source": "/:match*",
-      "destination": "https://unpuzzle-mono-repo-frontend.vercel.app/:match*"
+      "destination": "https://nazmulcodes.org/:match*"
     }
   ]
 }
