@@ -23,6 +23,7 @@ const nextConfig: NextConfig = {
   env: {
     SKIP_ENV_VALIDATION: "true",
   },
+  trailingSlash: true,
 };
 
 export default nextConfig;

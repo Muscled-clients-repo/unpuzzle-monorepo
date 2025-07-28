@@ -35,6 +35,7 @@ const nextConfig: NextConfig = {
     // your project has type errors.
     ignoreBuildErrors: true,
   },
+  trailingSlash: true,
 };
 
 export default withBundleAnalyzer(nextConfig);
