@@ -10,7 +10,7 @@
     },
     {
       "source": "/instructor/:path*",
-      "destination": "https://unpuzzle-mono-repo-frontend-v9qa-mceveraj4.vercel.app/instructor/:path*"
+      "destination": "https://unpuzzle-mono-repo-frontend-v9qa.vercel.app/instructor/:path*"
     }
   ]
 }
