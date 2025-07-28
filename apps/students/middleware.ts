@@ -21,9 +21,8 @@ export default clerkMiddleware(async (auth, req) => {
   
   // Redirect to sign-in if not authenticated
   if (!userId) {
-    const signInUrl = new URL("/sign-in", req.url);
-    signInUrl.searchParams.set("redirect_url", req.url);
-    return NextResponse.redirect(signInUrl);
+    const signUpUrl = new URL("/sign-up", process.env.NEXT_PUBLIC_STUDENT_APP_URL);
+    return NextResponse.redirect(signUpUrl);
   }
 
   return NextResponse.next();
