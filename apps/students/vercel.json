@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/instructor/:match*",
+      "destination": "https://unpuzzle-mono-repo-frontend-v9qa-mceveraj4.vercel.app/instructor/:match*"
+    },
+    {
+      "source": "/:match*",
+      "destination": "https://unpuzzle-mono-repo-frontend.vercel.app/:match*"
+    }
+  ]
+}
