@@ -1,6 +1,0 @@
-{
-  "buildCommand": "cd apps/client && npm ci && npm run build",
-  "outputDirectory": "apps/client/.next",
-  "installCommand": "npm install --omit=dev",
-  "framework": "nextjs"
-}
