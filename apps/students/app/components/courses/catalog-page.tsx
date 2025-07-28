@@ -13,18 +13,6 @@ const CourseCard = dynamic(() => import('./course-card').then(mod => ({ default:
   ssr: false
 });
 
-type User = {
-  publicMetadata?: {
-    privileges?: string;
-  };
-};
-
-type RootState = {
-  user: {
-    user: User | null;
-  };
-};
-
 type LayoutType = "grid-1" | "grid-4" | "list";
 
 const CourseScreen: React.FC = () => {
