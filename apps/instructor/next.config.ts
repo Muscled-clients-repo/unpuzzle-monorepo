@@ -18,7 +18,8 @@ const nextConfig: NextConfig = {
   typescript: {
     // Enable TypeScript checking during builds
     ignoreBuildErrors: false,
-  }
+  },
+  assetPrefix: process.env.NEXT_PUBLIC_INSTRUCTOR_APP_URL,
 };
 
 export default nextConfig;
