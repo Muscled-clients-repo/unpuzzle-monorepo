@@ -2,22 +2,15 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import type { Metadata } from "next";
 import "../assets/globals.css";
-// import Header from "./Header";
-import { Provider, useSelector } from "react-redux";
-import store, { RootState } from "../redux/store";
-import { SidebarWithAuth } from "../components";
+import { Provider } from "react-redux";
+import store from "../redux/store";
 import { Loading as LoadingSpinner } from "../components";
-import React, { useState, useEffect } from "react";
-import { usePathname } from "next/navigation";
 import { VideoTimeProvider } from "../context/VideoTimeContext";
 import { NavigationProvider } from "../context/NavigationContext";
 import { NavigationLoader } from "../components";
-import { ClientOnly } from "../components";
-import { AnnotationHeader } from "../components";
 import { ToastContainer } from 'react-toastify';
-// UserSync removed - no Clerk authentication needed
+import { useEffect, useState } from "react";
 
-// Clerk authentication removed from instructor app
 
 const geistSans = Geist({
   subsets: ["latin"],
@@ -35,55 +28,11 @@ export const metadata: Metadata = {
 };
 
 function LayoutContent({ children }: { children: React.ReactNode }) {
-  const user = useSelector((state: RootState) => state.user);
   const [loading, setLoading] = useState<boolean>(true);
-  const pathname = usePathname();
-
-  // Clerk authentication removed - no longer needed
 
   useEffect(() => {
-    // Content will not be displayed if loading is always true.
     setLoading(false);
   }, []);
-
-  // Paths without Sidebar
-  const noSidebarPaths = [
-    "/student-annotations",
-    "/teacher-annotations",
-    "/confusions-puzzlejourney",
-    "/annotations-puzzlejourney",
-  ];
-
-  // Only show sidebar on these routes (exact or as prefix)
-  const sidebarAllowedPaths = [
-    "/instructor",
-    "/editor",
-    "/courses",
-    "/my-assets",
-    "/videos",
-    "/settings",
-    "/assets",
-    "/all-courses",
-    "/puzzle-content",
-    "/my-courses",
-    "/test-sidebar",
-  ];
-  const showSidebar = sidebarAllowedPaths.some((path) =>
-    pathname.startsWith(path)
-  ) && !noSidebarPaths.includes(pathname);
-
-  // Show AnnotationHeader for specific paths
-  const showAnnotationHeader = noSidebarPaths.includes(pathname);
-
-  // Debug logging
-  useEffect(() => {
-    console.log('Sidebar Debug:', {
-      pathname,
-      showSidebar,
-      hasUser: !!user.user,
-      user: user.user,
-    });
-  }, [pathname, showSidebar, user.user]);
 
   return (
     <>
@@ -91,21 +40,8 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
       <main>
         <div className="flex h-screen">
           {/* Sidebar - Now without Clerk authentication */}
-          {showSidebar && <SidebarWithAuth />}
           <div className="flex-grow bg-white text-black flex flex-col h-full">
-            {/* Annotation Header */}
-            {showAnnotationHeader && (
-              <div className="sticky top-0 z-50">
-                <ClientOnly fallback={null}>
-                  {() => <AnnotationHeader />}
-                </ClientOnly>
-              </div>
-            )}
-
-            {/* Scrollable Children Section */}
-            <div className="overflow-scroll min-h-[90vh] light">
-              {loading ? <LoadingSpinner /> : children}
-            </div>
+            {loading ? <LoadingSpinner /> : children}
           </div>
         </div>
       </main>
@@ -125,7 +61,6 @@ export default function RootLayout({
     >
       <body className="antialiased light" suppressHydrationWarning>
       <ToastContainer />
-
         <Provider store={store}>
           <NavigationProvider>
             <VideoTimeProvider>
