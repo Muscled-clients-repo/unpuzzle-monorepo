@@ -1,7 +1,5 @@
-import MyCourseScreen from "../components/courses/enrolled-courses-page";
-import RootLayout from "../ssrComponent/Layout";
-const AllCourses = () => {
-  return <MyCourseScreen />;
-};
+import MyCoursesClient from "./my-courses-client";
 
-export default AllCourses;
+export default function MyCoursesPage() {
+  return <MyCoursesClient />;
+}
