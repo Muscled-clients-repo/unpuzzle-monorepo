@@ -3,6 +3,10 @@
     {
       "source": "/instructor/:match*",
       "destination": "https://instructor.nazmulcodes.org/instructor/:match*"
+    },
+    {
+      "source": "/courses/:id",
+      "destination": "https://unpuzzle-ai-backend-9ce95198fbde.herokuapp.com/courses/id"
     }
   ]
 }
