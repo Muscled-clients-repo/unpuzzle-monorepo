@@ -43,6 +43,7 @@ export default function CoursesListingClient() {
     currentPage,
     totalPages,
     updateFilters,
+    performSearch,
     goToPage,
     refreshCourses,
     fetchCourses,
@@ -149,14 +150,14 @@ export default function CoursesListingClient() {
     }
   }, []); // Only run on mount
 
-  // Update Redux filters when local state changes
+  // Debounced search effect - handle locally
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      updateFilters({ searchQuery });
-    }, 500); // Debounce search
+      performSearch(searchQuery);
+    }, 500);
     
     return () => clearTimeout(timeoutId);
-  }, [searchQuery, updateFilters]);
+  }, [searchQuery]); // Remove performSearch from deps to prevent loop
 
   const handleCategoryChange = (category: string) => {
     setAllCourses([]); // Reset courses for new filter
@@ -185,7 +186,7 @@ export default function CoursesListingClient() {
         <div className="text-center">
           <p className="text-red-600 mb-4">Error loading courses: {error}</p>
           <button 
-            onClick={() => window.location.reload()}
+            onClick={() => refreshCourses()}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
           >
             Retry

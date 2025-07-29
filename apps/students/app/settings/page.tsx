@@ -1,6 +1,5 @@
-import UserProfileSettingsPage from "../components/profile/settings-page";
-import RootLayout from "../ssrComponent/Layout";
+import SettingsClient from "./settings-client";
 
-export default function Settings() {
-  return <UserProfileSettingsPage />;
+export default function SettingsPage() {
+  return <SettingsClient />;
 }
