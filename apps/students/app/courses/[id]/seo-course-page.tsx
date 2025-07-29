@@ -1,12 +1,14 @@
 "use client";
 
+import { use } from "react";
 import { notFound } from "next/navigation";
 import CourseDetailClient from "./course-detail-client";
 
 interface PageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export default function CoursePage({ params }: PageProps) {
-  return <CourseDetailClient courseId={params.id} />;
+  const { id } = use(params);
+  return <CourseDetailClient courseId={id} />;
 }
