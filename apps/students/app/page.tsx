@@ -3,15 +3,67 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, BookOpen, Brain, Users, Sparkles, PlayCircle, CheckCircle } from "lucide-react";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import SEOStructuredData from "./components/shared/seo-structured-data";
+import { generateOrganizationSchema } from "./utils/seo.utils";
 
 export const metadata: Metadata = {
   title: "Unpuzzle - Transform Your Learning Experience",
-  description: "Interactive educational platform that makes learning engaging through puzzle-based content",
+  description: "Interactive educational platform that makes learning engaging through puzzle-based content, AI-powered assistance, and collaborative learning features.",
+  keywords: "online learning, interactive education, puzzle-based learning, AI tutoring, educational platform, online courses",
+  authors: [{ name: "Unpuzzle Team" }],
+  creator: "Unpuzzle",
+  publisher: "Unpuzzle",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  openGraph: {
+    title: "Unpuzzle - Transform Your Learning Experience",
+    description: "Interactive educational platform that makes learning engaging through puzzle-based content, AI-powered assistance, and collaborative learning features.",
+    url: "/",
+    siteName: "Unpuzzle",
+    type: "website",
+    locale: "en_US",
+    images: [
+      {
+        url: "/assets/logo.png",
+        width: 1200,
+        height: 630,
+        alt: "Unpuzzle Learning Platform",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Unpuzzle - Transform Your Learning Experience",
+    description: "Interactive educational platform with puzzle-based content and AI-powered assistance.",
+    creator: "@unpuzzle",
+    images: ["/assets/logo.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  verification: {
+    google: "google-site-verification-code",
+  },
 };
 
 export default function Home() {
+  const organizationSchema = generateOrganizationSchema();
+  
   return (
-    <div className="min-h-screen">
+    <>
+      <SEOStructuredData data={organizationSchema} />
+      <div className="min-h-screen">
 
       {/* Hero Section - Udemy Style */}
       <section className="relative bg-gray-50 py-16 lg:py-24">
@@ -296,6 +348,7 @@ export default function Home() {
           </div>
         </div>
       </footer>
-    </div>
+      </div>
+    </>
   );
 }
