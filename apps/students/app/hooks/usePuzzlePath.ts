@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { PuzzlePath } from "../context/PuzzlePath";
-import { useAuth } from "@clerk/nextjs";
 
 interface VideoData {
   id?: string;
@@ -12,7 +11,6 @@ interface VideoData {
 export function usePuzzlePath() {
   const [data, setData] = useState<VideoData | null>(null);
   const [loading, setLoading] = useState(false);
-  const { getToken } = useAuth();
 
   const pathInterfaceRef = useRef<PuzzlePath | null>(null);
 
@@ -63,12 +61,6 @@ export function usePuzzlePath() {
     //   author: "Dummy Channel",
     // };
 
-    const token = await getToken();
-
-    if (!video?.id && token) {
-      console.error(video?.id ? "token Not Provided" : "Video not available");
-      return;
-    }
 
     if (!video?.id) {
       console.error("Video not available");
@@ -86,7 +78,6 @@ export function usePuzzlePath() {
         )}&endTime=${encodeURIComponent(duration)}`,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
         }

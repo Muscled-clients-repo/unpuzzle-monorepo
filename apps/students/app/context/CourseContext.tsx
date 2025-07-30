@@ -2,7 +2,6 @@
 import React, { createContext, useState, useCallback, ReactNode } from "react";
 import useApi from "../hooks/useApi";
 import { Course } from "@/app/types/course.types";
-import { useAuth } from "@clerk/nextjs";
 
 interface CourseContextType {
   course:Course | undefined,
@@ -45,19 +44,15 @@ const CourseProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const api = useApi();
-  const { getToken } = useAuth();
   const getAllCourses = useCallback(
     async (page = 1, limit = 10): Promise<Course[]> => {
       setLoading(true);
       setError(null);
       try {
-        const token = await getToken();
-        
         const res = await fetch(
           `${process.env.NEXT_PUBLIC_APP_SERVER_URL}/api/courses?page=${page}&limit=${limit}`,
           {
             headers: {
-              Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",
             },
             credentials: "include",
@@ -85,13 +80,10 @@ const CourseProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
       try {
         // const data = await api.get(`${}/api/courses/${id}`);
         // return data;
-        const token = await getToken();
-
         const res = await fetch(
           `${process.env.NEXT_PUBLIC_APP_SERVER_URL}/api/courses/${id}`,
           {
             headers: {
-              Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",
             },
             credentials: "include",
@@ -152,9 +144,6 @@ const CourseProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     async (courseData: Partial<Course>): Promise<Course | null> => {
       setLoading(true);
       setError(null);
-      const token = await getToken();
-      
-      if(!token) return null;
       try {
         // If you need to send as JSON, adjust useApi or use fetch directly
         
@@ -170,7 +159,6 @@ const CourseProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
           {
             method: "POST",
             headers: {
-              Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",
             },
             body: JSON.stringify(courseData),

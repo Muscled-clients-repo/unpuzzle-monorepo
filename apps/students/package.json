@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev --turbopack -p ${PORT:-3000}",
     "build": "next build",
     "build:no-lint": "SKIP_ENV_VALIDATION=1 next build --no-lint",
     "start": "next start",
@@ -23,7 +23,6 @@
     "perf": "npm run optimize:check"
   },
   "dependencies": {
-    "@clerk/nextjs": "^6.25.4",
     "@ffmpeg/ffmpeg": "^0.12.15",
     "@ffmpeg/util": "^0.12.2",
     "@heroicons/react": "^2.2.0",

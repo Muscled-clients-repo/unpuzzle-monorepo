@@ -1,7 +1,6 @@
 import React, { createContext, useState, useCallback, ReactNode } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
-import { useAuth } from "@clerk/nextjs";
 import type {
   Instructor,
   Availability,
@@ -55,15 +54,11 @@ const MeetingBookingProvider: React.FC<{ children: ReactNode }> = ({
   const [meetingStatus, setMeetingStatus] = useState<string>("scheduled");
   const [priceEstimate, setPriceEstimate] = useState<number>(0);
   // hooks
-  const { getToken } = useAuth();
   const loadInstructors = useCallback(async () => {
-    const token = await getToken();
-    
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_APP_SERVER_URL}/api/users?role=instructor`,
       {
         headers: {
-          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
         credentials: "include",

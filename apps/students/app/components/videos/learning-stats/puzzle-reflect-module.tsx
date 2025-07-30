@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { useAuth } from "@clerk/nextjs";
 
 interface Event {
   id: string;
@@ -24,7 +23,6 @@ function getLoomEmbedUrl(url: string | null) {
 const PuzzleReflect = () => {
   // Use the same videoId as NewVideoPlayer component
   const videoId = "uQsyobT2Rv8";
-  const { getToken } = useAuth();
   const [events, setEvents] = useState<Event[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [selectedMediaIdx, setSelectedMediaIdx] = useState<number | null>(null);

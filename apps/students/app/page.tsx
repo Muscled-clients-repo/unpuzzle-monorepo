@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
-import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import { ArrowRight, BookOpen, Brain, Users, Sparkles, PlayCircle, CheckCircle } from "lucide-react";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 
@@ -46,28 +45,18 @@ export default function Home() {
               
               {/* CTA Buttons */}
               <div className="flex flex-col sm:flex-row gap-4">
-                <SignedOut>
-                  <Link 
-                    href="/sign-up" 
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg font-medium rounded-lg transition-colors inline-flex items-center justify-center"
-                  >
-                    Join for Free
-                  </Link>
-                  <Link 
-                    href="/courses" 
-                    className="border-2 border-blue-600 text-blue-600 hover:bg-blue-50 px-8 py-3 text-lg font-medium rounded-lg transition-colors inline-flex items-center justify-center"
-                  >
-                    Try Unpuzzle Business
-                  </Link>
-                </SignedOut>
-                <SignedIn>
-                  <Link 
-                    href="/courses" 
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg font-medium rounded-lg transition-colors inline-flex items-center justify-center"
-                  >
-                    Explore Courses
-                  </Link>
-                </SignedIn>
+                <Link 
+                  href="/courses" 
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg font-medium rounded-lg transition-colors inline-flex items-center justify-center"
+                >
+                  Get Started
+                </Link>
+                <Link 
+                  href="/courses" 
+                  className="border-2 border-blue-600 text-blue-600 hover:bg-blue-50 px-8 py-3 text-lg font-medium rounded-lg transition-colors inline-flex items-center justify-center"
+                >
+                  Browse Courses
+                </Link>
               </div>
               
               {/* Trust Indicators */}
@@ -253,22 +242,12 @@ export default function Home() {
             Join thousands of students who are already learning smarter with Unpuzzle
           </p>
           <div className="flex gap-4 justify-center">
-            <SignedOut>
-              <Link 
-                href="/sign-up" 
-                className="bg-white text-blue-600 px-8 py-3 rounded-lg hover:bg-gray-100 font-semibold"
-              >
-                Get Started Free
-              </Link>
-            </SignedOut>
-            <SignedIn>
-              <Link 
-                href="/courses" 
-                className="bg-white text-blue-600 px-8 py-3 rounded-lg hover:bg-gray-100 font-semibold"
-              >
-                Explore Courses
-              </Link>
-            </SignedIn>
+            <Link 
+              href="/courses" 
+              className="bg-white text-blue-600 px-8 py-3 rounded-lg hover:bg-gray-100 font-semibold"
+            >
+              Get Started Free
+            </Link>
           </div>
           </div>
         </div>
@@ -292,7 +271,7 @@ export default function Home() {
             <ul className="space-y-2 text-sm">
               <li><Link href="/courses" className="hover:text-white">Browse Courses</Link></li>
               <li><Link href="/pricing" className="hover:text-white">Pricing</Link></li>
-              <li><Link href="/sign-up" className="hover:text-white">Sign Up</Link></li>
+              <li><Link href="/courses" className="hover:text-white">Get Started</Link></li>
             </ul>
           </div>
           <div>

@@ -1,16 +1,12 @@
 'use client'
 import { useState } from 'react'
-import { useClerkUser } from '../../hooks/useClerkUser'
 import axios from "axios"
 import { useGetAllPermissionsQuery } from "../../redux/services/permission.services"; 
 import { useAddUserPermissionMutation, useRemoveUserPermissionMutation } from '../../redux/services/userPermission.services'
 import Image from 'next/image'
 
 export default function SettingScreen() {
-  const { user } = useClerkUser();
-  const [selectedPermissions, setSelectedPermissions] = useState<string[]>(
-    (user?.publicMetadata?.permission as string[]) || []
-  );
+  const [selectedPermissions, setSelectedPermissions] = useState<string[]>([]);
 
   const [addUserPermission] = useAddUserPermissionMutation();
   const [removeUserPermission] = useRemoveUserPermissionMutation();
@@ -23,11 +19,13 @@ export default function SettingScreen() {
     if (isAlreadySelected) {
       // Remove permission (send ID but check with name)
       setSelectedPermissions(selectedPermissions.filter((p) => p !== permissionName));
-      await removeUserPermission({ userId: user?.id, permissionId: permissionId });
+      // TODO: Get userId from another source
+      // await removeUserPermission({ userId: userId, permissionId: permissionId });
     } else {
       // Add permission (send ID but check with name)
       setSelectedPermissions([...selectedPermissions, permissionName]);
-      await addUserPermission({ userId: user?.id, permissionId: permissionId });
+      // TODO: Get userId from another source
+      // await addUserPermission({ userId: userId, permissionId: permissionId });
     }
   };
 

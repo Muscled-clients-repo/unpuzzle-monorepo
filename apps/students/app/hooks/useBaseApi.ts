@@ -1,5 +1,4 @@
 import { useState, useCallback } from 'react';
-import { useAuth } from '@clerk/nextjs';
 import { API_ENDPOINTS } from '@/app/config/api.config';
 
 export interface ApiResponse<T> {
@@ -17,7 +16,6 @@ export interface ApiOptions {
 }
 
 export const useBaseApi = () => {
-  const { getToken } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -41,10 +39,8 @@ export const useBaseApi = () => {
   };
 
   const getHeaders = async (customHeaders?: Record<string, string>) => {
-    const token = await getToken();
     return {
       'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` }),
       ...customHeaders,
     };
   };
@@ -98,7 +94,7 @@ export const useBaseApi = () => {
     } finally {
       setLoading(false);
     }
-  }, [getToken]);
+  }, []);
 
   const get = useCallback(<T = any>(endpoint: string, options?: ApiOptions) => {
     return request<T>('GET', endpoint, undefined, options);
