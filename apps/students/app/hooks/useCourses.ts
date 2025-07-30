@@ -112,7 +112,6 @@ export const useCourses = () => {
         bodyExists: !!response.data.body,
         coursesArray: coursesData,
         coursesLength: coursesData.length,
-        pageFromResponse: apiBody.page,
         totalPagesFromResponse: apiBody.total_page,
         countFromResponse: apiBody.count,
         firstCourseId: coursesData[0]?.id,
