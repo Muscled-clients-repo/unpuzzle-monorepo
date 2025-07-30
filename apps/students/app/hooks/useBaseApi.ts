@@ -61,6 +61,7 @@ export const useBaseApi = () => {
       const requestOptions: RequestInit = {
         method,
         headers,
+        credentials: 'include',
         ...(options?.cache && { cache: options.cache }),
         ...(options?.revalidate && { next: { revalidate: options.revalidate } }),
       };
