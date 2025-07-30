@@ -5,7 +5,9 @@ const useApi = () => {
 
   const getRequest = async(endpoint: string)=>{
         try{
-            const response = await axios.get(endpoint)
+            const response = await axios.get(endpoint, {
+                withCredentials: true
+            })
             return response.data
         }catch(error){
             throw error
@@ -18,6 +20,7 @@ const useApi = () => {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
+        withCredentials: true
       })
       return response.data
     }catch(error){
@@ -27,7 +30,9 @@ const useApi = () => {
 
   const putRequest = async(endpoint: string, data: unknown) => {
     try {
-      const response = await axios.put(endpoint, data);
+      const response = await axios.put(endpoint, data, {
+        withCredentials: true
+      });
       return response.data;
     } catch (error) {
       throw error;
@@ -36,7 +41,9 @@ const useApi = () => {
 
   const deleteRequest = async(endpoint: string) => {
     try {
-      const response = await axios.delete(endpoint);
+      const response = await axios.delete(endpoint, {
+        withCredentials: true
+      });
       return response.data;
     } catch (error) {
       throw error;
