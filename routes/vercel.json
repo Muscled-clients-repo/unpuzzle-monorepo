@@ -17,8 +17,8 @@
       "destination": "https://dev.nazmulcodes.org/api/:match*"
     },
     {
-      "source": "/courses/:id",
-      "destination": "https://dev.nazmulcodes.org/courses/:id"
+      "source": "/:match*",
+      "destination": "https://student.nazmulcodes.org/courses/:match*"
     }
   ]
 }
