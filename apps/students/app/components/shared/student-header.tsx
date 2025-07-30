@@ -22,7 +22,6 @@ const navigation = [
   { name: 'Courses', href: '/courses', icon: BookOpenIcon },
   { name: 'My Courses', href: '/my-courses', icon: AcademicCapIcon },
   { name: 'Puzzle Content', href: '/puzzle-content', icon: PuzzlePieceIcon },
-  { name: 'Video Detail', href: '/video-detail', icon: VideoCameraIcon },
   { name: 'Settings', href: '/settings', icon: Cog6ToothIcon },
 ];
 

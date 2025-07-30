@@ -1,14 +1,13 @@
-"use client";
-
 import { use } from "react";
-import { notFound } from "next/navigation";
-import CourseDetailClient from "./course-detail-client";
+import CourseSEOWrapper from "./course-seo-wrapper";
 
 interface PageProps {
   params: Promise<{ id: string }>;
 }
 
+export { generateMetadata } from "./course-seo-wrapper";
+
 export default function CoursePage({ params }: PageProps) {
   const { id } = use(params);
-  return <CourseDetailClient courseId={id} />;
+  return <CourseSEOWrapper courseId={id} />;
 }

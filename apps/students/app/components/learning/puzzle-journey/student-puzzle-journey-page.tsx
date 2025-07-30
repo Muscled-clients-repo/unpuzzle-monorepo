@@ -1,11 +1,11 @@
+"use client";
+
 import { useState } from "react";
 import Image from "next/image";
-
-// import SearchIcon from "../../assets/searchIcon.svg";
+import { MagnifyingGlassIcon, ChevronDownIcon, SparklesIcon } from "@heroicons/react/24/outline";
+import { AcademicCapIcon } from "@heroicons/react/24/solid";
 import RecentActivityCard from './recent-activity-card';
 import { LearningJourneyCard } from './learning-journey-card';
-// import thumbnail from "../../assets/courseThumbnail.svg";
-// import thumbnailWeb from "../../assets/thumbnailWebCourse.svg";
 
 const data = [
   {
@@ -80,112 +80,130 @@ const PuzzleContentScreen = () => {
       ? data
       : data.filter((item) => item.annotationStatus === filter);
   return (
-    <div className="">
-      {/* header  */}
-      <div className="border-b border-b-[#F4EEEE] flex justify-between py-[14px] px-[40px]">
-        <div className="w-[50%] flex items-center px-4 py-2 bg-[#F5F4F6] rounded-[100px]">
-          {/* <img src={SearchIcon} alt="searchIcon" /> */}
-          <Image
-            src="/assets/searchIcon.svg"
-            width={15}
-            height={15}
-            alt="searchIcon"
-          />
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      {/* Enhanced Header with modern gradient */}
+      <div className="bg-white shadow-sm border-b border-gray-200">
+        <div className="flex justify-between items-center py-5 px-8">
+          {/* Modern Search Bar */}
+          <div className="relative w-[55%] max-w-2xl">
+            <div className="relative">
+              <MagnifyingGlassIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search puzzles, courses, or activities..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl 
+                         text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 
+                         focus:ring-blue-500 focus:border-transparent transition-all duration-200
+                         hover:bg-gray-100"
+              />
+            </div>
+          </div>
 
-          <input
-            type="text"
-            placeholder="Search or type"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="flex-grow outline-none bg-transparent px-3 bg-"
-          />
+          {/* Enhanced CTA Button */}
+          <button className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 
+                           hover:from-blue-700 hover:to-blue-800 text-white font-semibold 
+                           px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 
+                           transition-all duration-200">
+            <AcademicCapIcon className="h-5 w-5" />
+            Continue as Teacher
+          </button>
         </div>
-
-        <button className="cursor-pointer bg-[#1D1D1D] font-medium text-white text-sm rounded-[8px] px-4 py-[10px]">
-          Continue as Teacher
-        </button>
       </div>
 
-      <div className="px-[40px]">
-        <div className="flex justify-between mt-12">
-          <h1 className="text-black text-2xl font-bold ">
-            Recent Puzzle pieces
-          </h1>
-          <p className="text-[#1CABF2] text-sm underline font-normal cursor-pointer">
-            View All
-          </p>
-        </div>
-
-        <div className="mt-4">
-          <RecentActivityCard />
-        </div>
-
-        <div className="flex items-center justify-between mt-16">
-          <h1 className="text-[#1D1D1D] font-bold text-xl">
-            My puzzle journey
-          </h1>
-          <div className="relative">
-            <div
-              className="flex items-center cursor-pointer border border-[#1D1D1D1A] p-[6px]"
-              onClick={toggleDropdown}
-            >
-              {/* Use `filter` state to display the selected filter */}
-              <span className="text-[#1D1D1D] font-medium text-sm">
-                {filter}
-              </span>
-              <svg
-                className={`ml-2 w-4 h-4 transition-transform ${
-                  isDropdownOpen ? "rotate-180" : ""
-                }`}
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M19 9l-7 7-7-7"
-                />
-              </svg>
+      {/* Main Content Area */}
+      <div className="px-8 lg:px-12 py-8">
+        {/* Recent Puzzle Section with enhanced styling */}
+        <div className="mb-12">
+          <div className="flex justify-between items-center mb-6">
+            <div className="flex items-center gap-3">
+              <SparklesIcon className="h-8 w-8 text-blue-600" />
+              <h1 className="text-3xl font-bold text-gray-900">
+                Recent Puzzle Pieces
+              </h1>
             </div>
-            {isDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-32 bg-white shadow-md rounded-md border border-gray-200 z-50">
-                <div
-                  className="px-4 py-[6px] hover:bg-[#00AFF0] hover:text-white cursor-pointer text-sm"
-                  onClick={() => handleFilterChange("All")}
-                >
-                  All
-                </div>
-                <div
-                  className="px-4 py-[6px] hover:bg-[#00AFF0] hover:text-white cursor-pointer text-sm"
-                  onClick={() => handleFilterChange("Annotations")}
-                >
-                  Annotations
-                </div>
-                <div
-                  className="px-4 py-[6px] hover:bg-[#00AFF0] hover:text-white cursor-pointer text-sm"
-                  onClick={() => handleFilterChange("Confusions")}
-                >
-                  Confusions
-                </div>
-              </div>
-            )}
+            <button className="text-blue-600 hover:text-blue-700 font-semibold text-sm 
+                             flex items-center gap-1 group transition-colors duration-200">
+              View All
+              <span className="group-hover:translate-x-1 transition-transform duration-200">→</span>
+            </button>
+          </div>
+
+          <div className="bg-white p-6 rounded-2xl shadow-sm">
+            <RecentActivityCard />
           </div>
         </div>
 
-        <div className="mt-10 gap-4 flex flex-wrap">
-          {filteredData.map((item, index) => (
-            <LearningJourneyCard
-              key={index}
-              title={item.title}
-              badge={item.badge}
-              thumbnail={item.thumbnail}
-              annotationStatus={item.annotationStatus}
-              cardId={item.id}
-            />
-          ))}
+        {/* My Puzzle Journey Section */}
+        <div className="mt-12">
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-3xl font-bold text-gray-900">
+              My Puzzle Journey
+            </h2>
+            
+            {/* Enhanced Filter Dropdown */}
+            <div className="relative">
+              <button
+                className="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 
+                         rounded-lg hover:border-gray-400 focus:outline-none focus:ring-2 
+                         focus:ring-blue-500 focus:border-transparent transition-all duration-200
+                         shadow-sm hover:shadow-md"
+                onClick={toggleDropdown}
+              >
+                <span className="text-gray-700 font-medium text-sm">
+                  {filter}
+                </span>
+                <ChevronDownIcon 
+                  className={`h-4 w-4 text-gray-500 transition-transform duration-200 ${
+                    isDropdownOpen ? "rotate-180" : ""
+                  }`}
+                />
+              </button>
+              
+              {isDropdownOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg 
+                              border border-gray-200 overflow-hidden z-50 animate-in fade-in 
+                              slide-in-from-top-2 duration-200">
+                  <div
+                    className="px-4 py-3 hover:bg-blue-50 hover:text-blue-700 cursor-pointer 
+                             text-sm font-medium text-gray-700 transition-colors duration-150"
+                    onClick={() => handleFilterChange("All")}
+                  >
+                    All Puzzles
+                  </div>
+                  <div
+                    className="px-4 py-3 hover:bg-blue-50 hover:text-blue-700 cursor-pointer 
+                             text-sm font-medium text-gray-700 transition-colors duration-150"
+                    onClick={() => handleFilterChange("Annotations")}
+                  >
+                    Annotations
+                  </div>
+                  <div
+                    className="px-4 py-3 hover:bg-blue-50 hover:text-blue-700 cursor-pointer 
+                             text-sm font-medium text-gray-700 transition-colors duration-150"
+                    onClick={() => handleFilterChange("Confusions")}
+                  >
+                    Confusions
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Enhanced Grid Layout for Journey Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {filteredData.map((item, index) => (
+              <LearningJourneyCard
+                key={index}
+                title={item.title}
+                badge={item.badge}
+                thumbnail={item.thumbnail}
+                annotationStatus={item.annotationStatus}
+                cardId={item.id}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </div>
