@@ -6,19 +6,19 @@
     },
     {
       "source": "/sign-up",
-      "destination": "https://core.nazmulcodes.org/sign-up"
+      "destination": "https://dev.nazmulcodes.org/sign-up"
     },
     {
       "source": "/sign-in",
-      "destination": "https://core.nazmulcodes.org/sign-in"
+      "destination": "https://dev.nazmulcodes.org/sign-in"
     },
     {
       "source": "/api/:match*",
-      "destination": "https://core.nazmulcodes.org/api/:match*"
+      "destination": "https://dev.nazmulcodes.org/api/:match*"
     },
     {
       "source": "/courses/:id",
-      "destination": "https://core.nazmulcodes.org/courses/:id"
+      "destination": "https://dev.nazmulcodes.org/courses/:id"
     },
     {
       "source": "/(.*)",
