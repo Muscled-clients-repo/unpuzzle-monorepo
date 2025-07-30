@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { PuzzleHint } from "../context/PuzzleHint";
-import { useAuth } from "@clerk/nextjs";
+import io from "socket.io-client";
 
 interface PuzzleHintData {
   message?: string;
@@ -18,7 +18,6 @@ export function usePuzzleHint(socketId: string | null) {
   const hintInterfaceRef = useRef<PuzzleHint | null>(null);
   const streamingRef = useRef(false);
   const dataRef = useRef("");
-  const { getToken } = useAuth();
 
   // Initialize PuzzleHint
   useEffect(() => {
@@ -81,10 +80,8 @@ export function usePuzzleHint(socketId: string | null) {
 
   const getHint = useCallback(async ({id,duration}:{id:string,duration:number}) => {
     if (!hintInterfaceRef.current) return;
-    const token = await getToken();
-    
-    if (!id || !token) {
-      console.error(id ? "token Not Provided" : "Video not available");
+    if (!id) {
+      console.error("Video not available");
       return;
     }
 
@@ -101,7 +98,6 @@ export function usePuzzleHint(socketId: string | null) {
         )}&endTime=${encodeURIComponent(duration)}`,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
         }

@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { PuzzleReflect } from "../context/PuzzleReflect";
-import { useAuth } from "@clerk/nextjs";
 
 interface PuzzleReflectData {
   completion?: any[];
@@ -22,7 +21,6 @@ export function usePuzzleReflect() {
   const [loading, setLoading] = useState(false);
   const [score, setScore] = useState(0);
   const [totalScore, setTotalScore] = useState(0);
-  const { getToken } = useAuth();
   const reflectInterfaceRef = useRef<PuzzleReflect | null>(null);
 
   // Initialize PuzzleReflect
@@ -113,16 +111,10 @@ export function usePuzzleReflect() {
     formData.append("endTime", currentTime.toString());
 
     try {
-      const token = await getToken();
-      
       const response = await fetch(`${
         process.env.NEXT_PUBLIC_APP_SERVER_URL
       }/api/puzzel-reflects/audio`, {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
         body: formData,
         credentials: "include",
       });
@@ -159,12 +151,6 @@ export function usePuzzleReflect() {
 
   // 3. Loom link reflect
   const createLoomLinkReflect = useCallback(async (loom_link: string, id: string) => {
-    const token = await getToken();
-    
-    if (!token) {
-      console.error("token Not Provided");
-      return;
-    }
     if (!id || !loom_link) {
       console.error("Video ID or Loom link not provided");
       return;
@@ -179,7 +165,6 @@ export function usePuzzleReflect() {
         method: "POST",
         body: JSON.stringify({loom_link:loom_link, video_id:id}),
         headers: {
-          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       });
@@ -200,9 +185,6 @@ export function usePuzzleReflect() {
       console.error("Video ID or files not provided");
       return;
     }
-    const token = await getToken();
-    
-    if(!token) return null;
     const formData = new FormData();
     files.forEach((file, idx) => {
       formData.append("files", file);
@@ -212,10 +194,6 @@ export function usePuzzleReflect() {
       const response = await fetch(`${process.env.NEXT_PUBLIC_APP_SERVER_URL}/api/puzzel-reflects/file-uploads`, {
         method: "POST",
         body: formData,
-        headers: {
-          Authorization: `Bearer ${token}`,
-          // "Content-Type": "multipart/form-data",
-        },
         credentials: "include",
       });
       
@@ -240,10 +218,8 @@ export function usePuzzleReflect() {
       duration: 120, // Dummy duration in seconds
       author: "Dummy Channel",
     };
-    const token = await getToken();
-    
-    if (!video?.id && token) {
-      console.error(video?.id ? "token Not Provided" : "Video not available");
+    if (!video?.id) {
+      console.error("Video not available");
       return;
     }
     reflectInterfaceRef.current.setLoading(true);
@@ -255,7 +231,6 @@ export function usePuzzleReflect() {
         )}&endTime=${encodeURIComponent(duration)}`,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
         }
@@ -276,17 +251,12 @@ export function usePuzzleReflect() {
   }, []);
 
   // New: Get all puzzle reflects
-  const getAllPuzzleReflects = useCallback(async (manualToken?: string) => {
+  const getAllPuzzleReflects = useCallback(async () => {
     try {
-      const token = manualToken || await getToken();
-      if (!token) {
-        throw new Error("Token not available");
-      }
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_APP_SERVER_URL}/api/puzzel-reflects`,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
         }
@@ -302,22 +272,17 @@ export function usePuzzleReflect() {
       console.error("Error fetching all puzzle reflects:", error);
       throw error;
     }
-  }, [getToken]);
+  }, []);
 
   // New: Get puzzle reflect by ID
   const getPuzzleReflectById = useCallback(
     async (id: string) => {
       try {
-        const token = await getToken();
-        if (!token) {
-          throw new Error("Token not available");
-        }
-
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_APP_SERVER_URL}/api/puzzel-reflects/${id}`,
           {
             headers: {
-              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
             },
           }
         );
@@ -333,7 +298,7 @@ export function usePuzzleReflect() {
         throw error;
       }
     },
-    [getToken]
+    []
   );
 
   return {

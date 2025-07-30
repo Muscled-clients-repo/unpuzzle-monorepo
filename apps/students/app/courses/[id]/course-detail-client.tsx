@@ -5,7 +5,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { notFound } from "next/navigation";
-import { useAuth } from "@clerk/nextjs";
 import { useCourseDetails, useCourses } from "@/app/hooks/useCourses";
 import { CheckCircleIcon, ClockIcon, PlayCircleIcon, StarIcon, UsersIcon, TrophyIcon, BookOpenIcon } from "@heroicons/react/24/outline";
 import { StarIcon as StarSolidIcon } from "@heroicons/react/24/solid";
@@ -17,7 +16,6 @@ interface CourseDetailClientProps {
 
 export default function CourseDetailClient({ courseId }: CourseDetailClientProps) {
   const router = useRouter();
-  const { userId } = useAuth();
   const { course, loading, error } = useCourseDetails(courseId);
   const { enrollInCourse } = useCourses();
   const [isEnrolling, setIsEnrolling] = useState(false);
@@ -25,10 +23,7 @@ export default function CourseDetailClient({ courseId }: CourseDetailClientProps
   const [activeTab, setActiveTab] = useState<"overview" | "curriculum" | "instructor" | "reviews">("overview");
 
   const handleEnroll = async () => {
-    if (!userId) {
-      router.push("/sign-in");
-      return;
-    }
+    // Authentication check removed
 
     if (!course) return;
 

@@ -22,7 +22,6 @@ import {
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/app/components/shared/ui/tab-navigator";
 import { Switch } from "@/app/components/shared/ui/toggle-switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/app/components/shared/ui/modal-dialog";
-import { useClerkUser } from "@/app/hooks/useClerkUser";
 import { useSettings } from "@/app/hooks/useSettings";
 
 interface SettingsState {
@@ -181,7 +180,6 @@ const defaultSettings: SettingsState = {
 };
 
 export default function SettingsClient() {
-  const { user } = useClerkUser();
   const { settings, updateSettings, saveSettings, isLoading } = useSettings();
   const [localSettings, setLocalSettings] = useState<SettingsState>(defaultSettings);
   const [hasChanges, setHasChanges] = useState(false);
@@ -190,21 +188,10 @@ export default function SettingsClient() {
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState("profile");
 
-  // Initialize settings from user data
+  // Initialize settings when component mounts
   useEffect(() => {
-    if (user) {
-      setLocalSettings(prev => ({
-        ...prev,
-        profile: {
-          ...prev.profile,
-          firstName: user.firstName || "",
-          lastName: user.lastName || "",
-          email: user.emailAddresses?.[0]?.emailAddress || "",
-          avatar: user.imageUrl || "",
-        }
-      }));
-    }
-  }, [user]);
+    setLocalSettings(defaultSettings);
+  }, []);
 
   // Merge with saved settings
   useEffect(() => {

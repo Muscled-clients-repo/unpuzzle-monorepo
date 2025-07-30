@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { useAuth, UserButton } from '@clerk/nextjs';
 import { 
   Bars3Icon, 
   XMarkIcon, 
@@ -31,7 +30,6 @@ export default function StudentHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const pathname = usePathname();
-  const { isSignedIn, userId } = useAuth();
 
   // Close mobile menu when route changes
   useEffect(() => {
@@ -104,39 +102,15 @@ export default function StudentHeader() {
           {/* Right side - User Actions */}
           <div className="flex items-center space-x-4">
             {/* Notifications */}
-            {isSignedIn && (
-              <button className="relative p-2 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-full">
-                <BellIcon className="h-6 w-6" />
-                <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-400 ring-2 ring-white" />
-              </button>
-            )}
+            <button className="relative p-2 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-full">
+              <BellIcon className="h-6 w-6" />
+              <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-400 ring-2 ring-white" />
+            </button>
 
-            {/* User Menu */}
-            {isSignedIn ? (
-              <UserButton 
-                afterSignOutUrl="/"
-                appearance={{
-                  elements: {
-                    avatarBox: "h-8 w-8",
-                  },
-                }}
-              />
-            ) : (
-              <div className="flex items-center space-x-4">
-                <Link
-                  href="/sign-in"
-                  className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
-                >
-                  Sign In
-                </Link>
-                <Link
-                  href="/sign-up"
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium"
-                >
-                  Sign Up
-                </Link>
-              </div>
-            )}
+            {/* User Menu - Placeholder */}
+            <button className="p-2 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-full">
+              <Cog6ToothIcon className="h-6 w-6" />
+            </button>
 
             {/* Mobile menu button */}
             <button
@@ -193,25 +167,17 @@ export default function StudentHeader() {
               );
             })}
 
-            {/* Mobile Auth Links */}
-            {!isSignedIn && (
-              <div className="border-t border-gray-200 pt-4 pb-3">
-                <div className="flex items-center px-3 space-x-3">
-                  <Link
-                    href="/sign-in"
-                    className="flex-1 text-center bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-md text-sm font-medium"
-                  >
-                    Sign In
-                  </Link>
-                  <Link
-                    href="/sign-up"
-                    className="flex-1 text-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium"
-                  >
-                    Sign Up
-                  </Link>
-                </div>
+            {/* Mobile Settings */}
+            <div className="border-t border-gray-200 pt-4 pb-3">
+              <div className="flex items-center px-3 space-x-3">
+                <Link
+                  href="/settings"
+                  className="flex-1 text-center bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-md text-sm font-medium"
+                >
+                  Settings
+                </Link>
               </div>
-            )}
+            </div>
           </div>
         </div>
       )}

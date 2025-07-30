@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, useCallback } from "react";
-import { useAuth } from "@clerk/nextjs";
 // Define the shape of your context
 
 interface AIAgentContextType {
@@ -17,21 +16,17 @@ const AIAgentProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [pausedAt, setPausedAt] = useState<string>("");
   const [agentType, setAgentType] = useState<string | null>(null);
-  const { getToken } = useAuth();
 
   // Example: handle video paused event
   const handleVideoPaused = useCallback(
     async (formattedTime: string, videoId: string) => {
       setPausedAt(formattedTime);
 
-      const token = await getToken(); // Fetch recommendation from API
-      
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_APP_SERVER_URL}/api/recommend-agent/solution`,
         {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
           credentials: "include", // ✅ This is the correct way to include credentials

@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useBaseApi } from './useBaseApi';
-import { useClerkUser } from './useClerkUser';
 
 interface SettingsState {
   // Profile settings
@@ -159,7 +158,6 @@ const defaultSettings: SettingsState = {
 
 export const useSettings = () => {
   const api = useBaseApi();
-  const { user } = useClerkUser();
   const [settings, setSettings] = useState<SettingsState | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -270,14 +268,14 @@ export const useSettings = () => {
   const resetSettings = useCallback(async () => {
     const resetToDefaults = { ...defaultSettings };
     
-    // Preserve user profile data
-    if (user) {
+    // Profile data will be preserved from current settings if available
+    if (settings?.profile) {
       resetToDefaults.profile = {
         ...resetToDefaults.profile,
-        firstName: user.firstName || "",
-        lastName: user.lastName || "",
-        email: user.emailAddresses?.[0]?.emailAddress || "",
-        avatar: user.imageUrl || "",
+        firstName: settings.profile.firstName || "",
+        lastName: settings.profile.lastName || "",
+        email: settings.profile.email || "",
+        avatar: settings.profile.avatar || "",
       };
     }
     
@@ -291,7 +289,7 @@ export const useSettings = () => {
     }
     
     return result;
-  }, [saveSettings, user, loadSettings]);
+  }, [saveSettings, settings, loadSettings]);
 
   // Apply theme settings to document
   const applyThemeSettings = useCallback((appearance: SettingsState['appearance']) => {

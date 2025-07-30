@@ -3,7 +3,6 @@ import Image from "next/image";
 import Link from "next/link";
 import Tiers from "../tiers/Tiers";
 import React, { useState } from "react";
-import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
 
 export default function Header() {
   const [modalOpen, setModalOpen] = useState(false);
@@ -22,31 +21,11 @@ export default function Header() {
             <h1 className="text-2xl font-bold">Unpuzzle</h1>
           </div>
         </Link>
-        {/* clerk header */}
+        {/* Navigation placeholder */}
         <div className=" ml-auto mr-[17px] flex items-center">
-
-            <SignedOut>
-  <div className="flex gap-4">
-    {/* Sign In */}
-    <SignInButton>
-      <button className="bg-white text-[#6c47ff] border border-[#6c47ff] hover:bg-[#f3f0ff] transition-colors duration-200 rounded-full font-medium text-sm sm:text-base h-10 sm:h-12 px-5 shadow-md">
-        Sign In
-      </button>
-    </SignInButton>
-
-    {/* Sign Up */}
-    <SignUpButton>
-      <button className="bg-[#6c47ff] text-white hover:bg-[#5a39d9] transition-colors duration-200 rounded-full font-medium text-sm sm:text-base h-10 sm:h-12 px-5 shadow-md">
-        Sign Up
-      </button>
-    </SignUpButton>
-  </div>
-</SignedOut>
-
-            <SignedIn>
-              <UserButton />
-            </SignedIn>
-
+          <Link href="/courses" className="bg-[#6c47ff] text-white hover:bg-[#5a39d9] transition-colors duration-200 rounded-full font-medium text-sm sm:text-base h-10 sm:h-12 px-5 shadow-md flex items-center">
+            Browse Courses
+          </Link>
         </div>
 
         <button

@@ -2,7 +2,6 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useUser } from "@clerk/nextjs";
 import {
   menuItemsStudents,
 } from "../lib/menu-list";
@@ -25,12 +24,7 @@ export default function SidebarWithClerk() {
     (state: RootState) => state.sidebar
   );
   
-  // Get user directly from Clerk
-  const { user, isLoaded } = useUser();
-  
-  if (!isLoaded || !user) {
-    return null; // Don't render sidebar if not loaded or no user
-  }
+  // Sidebar is now always visible without authentication check
 
   // Always use student menu items
   const menuItems: MenuItem[] = menuItemsStudents;

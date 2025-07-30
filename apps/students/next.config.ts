@@ -23,18 +23,6 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "img.clerk.com",
-        port: "",
-        pathname: "/**",
-      },
-      {
-        protocol: "https",
-        hostname: "images.clerk.dev",
-        port: "",
-        pathname: "/**",
-      },
-      {
-        protocol: "https",
         hostname: "www.gravatar.com",
         port: "",
         pathname: "/**",
@@ -59,6 +47,30 @@ const nextConfig: NextConfig = {
     // your project has type errors.
     ignoreBuildErrors: true,
   },
+  // async rewrites(){
+  //   return [
+  //     {
+  //       "source": "/instructor/:match*",
+  //       "destination": "http://localhost:30002/:match*"
+  //     },
+  //     {
+  //       "source": "/sign-up",
+  //       "destination": "https://dev.nazmulcodes.org/sign-up"
+  //     },
+  //     {
+  //       "source": "/sign-in",
+  //       "destination": "https://dev.nazmulcodes.org/sign-in"
+  //     },
+  //     {
+  //       "source": "/api/:match*",
+  //       "destination": "https://dev.nazmulcodes.org/api/:match*"
+  //     },
+  //     {
+  //       "source": "/courses/:id",
+  //       "destination": "https://dev.nazmulcodes.org/courses/:id"
+  //     }
+  //   ]
+  // }
 };
 
 export default withBundleAnalyzer(nextConfig);

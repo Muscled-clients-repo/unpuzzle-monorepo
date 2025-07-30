@@ -14,12 +14,9 @@ import { VideoTimeProvider } from "../context/VideoTimeContext";
 import ClientSideWrapper from "../components/shared/client-side-wrapper";
 import AnnotationViewHeader from "../components/shared/annotation-header";
 import { ToastContainer } from 'react-toastify';
-import AuthStateSync from "../components/auth-state-sync";
 import ComponentErrorBoundary from "../components/shared/component-error-boundary";
 import { WebVitalsReporter } from "../components/web-vitals";
 
-// clerk
-import { ClerkProvider } from "@clerk/nextjs";
 
 const geistSans = Geist({
   subsets: ["latin"],
@@ -60,7 +57,6 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      <AuthStateSync />
       
       {/* Student Header */}
       <StudentHeader />
@@ -98,22 +94,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ClerkProvider>
-      <html
-        lang="en"
-        className={`${geistSans.className} ${geistMono.className}`}
-      >
-        <body className="antialiased light" suppressHydrationWarning>
-        <ToastContainer />
-        <WebVitalsReporter />
+    <html
+      lang="en"
+      className={`${geistSans.className} ${geistMono.className}`}
+    >
+      <body className="antialiased light" suppressHydrationWarning>
+      <ToastContainer />
+      <WebVitalsReporter />
 
-          <Provider store={store}>
-            <VideoTimeProvider>
-              <LayoutContent>{children}</LayoutContent>
-            </VideoTimeProvider>
-          </Provider>
-        </body>
-      </html>
-    </ClerkProvider>
+        <Provider store={store}>
+          <VideoTimeProvider>
+            <LayoutContent>{children}</LayoutContent>
+          </VideoTimeProvider>
+        </Provider>
+      </body>
+    </html>
   );
 }
