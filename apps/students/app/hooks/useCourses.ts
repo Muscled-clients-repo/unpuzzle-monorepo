@@ -311,7 +311,7 @@ export const useCourses = () => {
     dispatch(invalidateCache());
     // Trigger immediate fetch after page change
     setTimeout(() => {
-      fetchCourses({ force: true }).catch(console.error);
+      fetchCourses({ page, force: true }).catch(console.error);
     }, 50);
   }, [dispatch, fetchCourses]);
 
