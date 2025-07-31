@@ -60,14 +60,6 @@ export const useCourses = () => {
     // Use page from options if provided, otherwise use currentPage from state
     const pageToUse = customPage !== undefined ? customPage : currentPage;
 
-    console.log('Debug - Fetching courses with params:', {
-      pageToUse,
-      currentPage,
-      filters,
-      customFilters,
-      force
-    });
-
     dispatch(fetchCoursesStart());
     
     const params: Record<string, any> = {
@@ -84,9 +76,6 @@ export const useCourses = () => {
       ...customFilters,
     };
 
-    console.log('Debug - API params:', params);
-    console.log('Debug - Full API URL:', `/courses?${new URLSearchParams(params).toString()}`);
-
     const response = await api.get<{ 
       body: { 
         data: Course[]; 
@@ -100,24 +89,11 @@ export const useCourses = () => {
       { params }
     );
 
-    console.log('Debug - API response:', response);
-
     if (response.success && response.data) {
       // The API returns data in response.data.body.data format
+      console.log(response.data.body)
       const apiBody = response.data.body || response.data;
       const coursesData = apiBody.data || [];
-      
-      console.log('Debug - Processing successful response:', {
-        dataExists: !!response.data,
-        bodyExists: !!response.data.body,
-        coursesArray: coursesData,
-        coursesLength: coursesData.length,
-        totalPagesFromResponse: apiBody.total_page,
-        countFromResponse: apiBody.count,
-        firstCourseId: coursesData[0]?.id,
-        lastCourseId: coursesData[coursesData.length - 1]?.id,
-        requestedPage: pageToUse
-      });
       
       dispatch(fetchCoursesSuccess({
         courses: coursesData,
@@ -166,6 +142,7 @@ export const useCourses = () => {
     const response = await api.put<Course>(`/courses/${courseId}`, updates);
     
     if (response.success && response.data) {
+      console.log(response.data)
       dispatch(updateCourse(response.data));
       // Refresh data after successful update
       setTimeout(async () => {
