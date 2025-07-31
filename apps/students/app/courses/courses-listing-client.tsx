@@ -432,7 +432,7 @@ function CourseCard({ course, featured = false }: { course: any; featured?: bool
 
   return (
     <Link 
-      href={`/courses/${course.id}`} 
+      href={`/course-video/${course.id}`} 
       className={`group bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden ${
         featured ? 'ring-2 ring-blue-500' : ''
       }`}
