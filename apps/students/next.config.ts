@@ -47,30 +47,40 @@ const nextConfig: NextConfig = {
     // your project has type errors.
     ignoreBuildErrors: true,
   },
-  // async rewrites(){
-  //   return [
-  //     {
-  //       "source": "/instructor/:match*",
-  //       "destination": "http://localhost:30002/:match*"
-  //     },
-  //     {
-  //       "source": "/sign-up",
-  //       "destination": "https://dev.nazmulcodes.org/sign-up"
-  //     },
-  //     {
-  //       "source": "/sign-in",
-  //       "destination": "https://dev.nazmulcodes.org/sign-in"
-  //     },
-  //     {
-  //       "source": "/api/:match*",
-  //       "destination": "https://dev.nazmulcodes.org/api/:match*"
-  //     },
-  //     {
-  //       "source": "/courses/:id",
-  //       "destination": "https://dev.nazmulcodes.org/courses/:id"
-  //     }
-  //   ]
-  // }
+
+  async rewrites(){
+    // Only apply rewrites in development
+    if (process.env.NODE_ENV !== 'development') {
+      return [];
+    }
+    
+    return [
+      {
+        "source": "/instructor/:match*",
+        "destination": "https://dev2.nazmulcodes.org/:match*"
+      },
+      {
+        "source": "/sign-up",
+        "destination": "https://dev1.nazmulcodes.org/sign-up"
+      },
+      {
+        "source": "/sign-in",
+        "destination": "https://dev1.nazmulcodes.org/sign-in"
+      },
+      {
+        "source": "/api/:match*",
+        "destination": "https://dev1.nazmulcodes.org/api/:match*"
+      },
+      {
+        "source": "/courses/:id",
+        "destination": "https://dev1.nazmulcodes.org/courses/:id"
+      },
+      {
+        "source": "/(.*)",
+        "destination": "https://dev.nazmulcodes.org/$1"
+      }
+    ]
+  }
 };
 
 export default withBundleAnalyzer(nextConfig);
