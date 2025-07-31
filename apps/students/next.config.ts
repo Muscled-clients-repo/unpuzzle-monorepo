@@ -72,8 +72,8 @@ const nextConfig: NextConfig = {
         "destination": "https://dev1.nazmulcodes.org/api/:match*"
       },
       {
-        "source": "/courses/:id",
-        "destination": "https://dev1.nazmulcodes.org/courses/:id"
+        "source": "/course-video/:id",
+        "destination": "https://dev1.nazmulcodes.org/course-video/:id"
       },
       {
         "source": "/(.*)",
