@@ -1,9 +1,8 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useSearchParams } from "next/navigation";
 import { Course } from "@/app/types/course.types";
 import { useCourses, usePopularCourses } from "@/app/hooks/useCourses";
 import { MagnifyingGlassIcon, FunnelIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
@@ -32,8 +31,6 @@ const sortOptions = [
 ];
 
 export default function CoursesListingClient() {
-  const searchParams = useSearchParams();
-  
   const {
     courses,
     loading,
@@ -44,7 +41,6 @@ export default function CoursesListingClient() {
     totalPages,
     updateFilters,
     performSearch,
-    goToPage,
     refreshCourses,
     fetchCourses,
   } = useCourses();
@@ -79,76 +75,59 @@ export default function CoursesListingClient() {
   const [showFilters, setShowFilters] = useState(false);
   const [localPriceRange, setLocalPriceRange] = useState<[number, number]>([0, 1000]);
   const [allCourses, setAllCourses] = useState<Course[]>([]);
+  const [loadMorePage, setLoadMorePage] = useState(1);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const loadMoreRef = useRef<HTMLDivElement>(null);
+  const [hasMorePages, setHasMorePages] = useState(true);
   
-  // Initialize allCourses when courses change
+  // Initialize courses when data changes (first page or filters change)
   useEffect(() => {
-    if (currentPage === 1) {
+    if (currentPage === 1 && courses.length > 0) {
       setAllCourses(courses);
-    } else if (courses.length > 0 && !loading) {
-      // For infinite scroll, append new courses
-      setAllCourses(prev => {
-        const existingIds = new Set(prev.map((c: Course) => c.id));
-        const newCourses = courses.filter((c: Course) => !existingIds.has(c.id));
-        return [...prev, ...newCourses];
-      });
+      setLoadMorePage(2);
+      setHasMorePages(currentPage < totalPages);
     }
-  }, [courses, currentPage, loading]);
-  
-  // Infinite scroll observer
+  }, [courses, currentPage, totalPages]);
+
+  // Reset accumulated courses when filters change
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const target = entries[0];
-        if (target.isIntersecting && !loading && !isLoadingMore && currentPage < totalPages) {
-          loadMoreCourses();
-        }
-      },
-      {
-        root: null,
-        rootMargin: '100px',
-        threshold: 0.1
-      }
-    );
+    setAllCourses([]);
+    setLoadMorePage(1);
+    setHasMorePages(true);
+  }, [filters.category, filters.searchQuery, filters.sortBy, filters.priceRange, filters.level]);
 
-    if (loadMoreRef.current) {
-      observer.observe(loadMoreRef.current);
-    }
-
-    return () => {
-      if (loadMoreRef.current) {
-        observer.unobserve(loadMoreRef.current);
-      }
-    };
-  }, [loading, isLoadingMore, currentPage, totalPages]);
-  
-  // Load more courses
+  // Load more courses function
   const loadMoreCourses = async () => {
-    if (isLoadingMore || loading || currentPage >= totalPages) return;
+    if (isLoadingMore || !hasMorePages) return;
     
     setIsLoadingMore(true);
-    const nextPage = currentPage + 1;
     
-    // Update page state
-    goToPage(nextPage);
-    
-    // Fetch next page
-    await fetchCourses({ page: nextPage, force: true });
-    
-    setIsLoadingMore(false);
-  };
-  
-  // Sync page from URL only on mount
-  useEffect(() => {
-    const page = searchParams.get('page');
-    if (page) {
-      const pageNum = parseInt(page);
-      if (!isNaN(pageNum) && pageNum > 0 && pageNum !== currentPage) {
-        goToPage(pageNum);
-      }
+    try {
+      // Fetch next page
+      await fetchCourses({ page: loadMorePage, force: true });
+      
+      // The courses will be updated in the effect above
+    } catch (error) {
+      console.error('Failed to load more courses:', error);
+    } finally {
+      setIsLoadingMore(false);
     }
-  }, []); // Only run on mount
+  };
+
+  // Handle loading more courses when fetchCourses returns data for page > 1
+  useEffect(() => {
+    if (currentPage > 1 && courses.length > 0 && !loading) {
+      // Append new courses to existing list
+      setAllCourses(prev => {
+        const existingIds = new Set(prev.map(c => c.id));
+        const newCourses = courses.filter(c => !existingIds.has(c.id));
+        return [...prev, ...newCourses];
+      });
+      
+      // Update pagination state
+      setLoadMorePage(currentPage + 1);
+      setHasMorePages(currentPage < totalPages);
+    }
+  }, [courses, currentPage, totalPages, loading]);
 
   // Debounced search effect - handle locally
   useEffect(() => {
@@ -160,14 +139,12 @@ export default function CoursesListingClient() {
   }, [searchQuery]); // Remove performSearch from deps to prevent loop
 
   const handleCategoryChange = (category: string) => {
-    setAllCourses([]); // Reset courses for new filter
     updateFilters({ 
       category: category === "All Categories" ? undefined : category 
     });
   };
 
   const handleSortChange = (sort: string) => {
-    setAllCourses([]); // Reset courses for new sort
     updateFilters({ sortBy: sort as any });
   };
 
@@ -333,16 +310,13 @@ export default function CoursesListingClient() {
                   Filters
                 </button>
                 <button
-                  onClick={() => {
-                    setAllCourses([]);
-                    refreshCourses();
-                  }}
+                  onClick={() => refreshCourses()}
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all"
                 >
                   Refresh
                 </button>
                 <p className="text-gray-600">
-                  {loading && allCourses.length === 0 ? "Loading..." : `Showing ${allCourses.length} of ${totalCourses} courses`}
+                  {loading ? "Loading..." : `Showing ${allCourses.length} of ${totalCourses} courses`}
                 </p>
               </div>
               
@@ -363,11 +337,7 @@ export default function CoursesListingClient() {
             </div>
 
             {/* Course Grid */}
-            {loading ? (
-              <div className="flex justify-center items-center py-12">
-                <LoadingSpinner />
-              </div>
-            ) : allCourses.length > 0 ? (
+            {allCourses.length > 0 ? (
               <>
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {allCourses.map((course) => (
@@ -375,20 +345,33 @@ export default function CoursesListingClient() {
                   ))}
                 </div>
                 
-                {/* Loading more indicator */}
-                <div ref={loadMoreRef} className="flex justify-center items-center py-8">
-                  {isLoadingMore && (
-                    <div className="flex items-center gap-3">
-                      <LoadingSpinner />
-                      <span className="text-gray-600">Loading more courses...</span>
-                    </div>
-                  )}
-                  {currentPage >= totalPages && allCourses.length > 0 && (
-                    <p className="text-gray-500">You've reached the end!</p>
-                  )}
-                </div>
+                {/* Load More Button */}
+                {hasMorePages && (
+                  <div className="flex justify-center mt-8">
+                    <button
+                      onClick={loadMoreCourses}
+                      disabled={isLoadingMore}
+                      className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                    >
+                      {isLoadingMore ? (
+                        <div className="flex items-center gap-2">
+                          <LoadingSpinner />
+                          <span>Loading more courses...</span>
+                        </div>
+                      ) : (
+                        'Load More'
+                      )}
+                    </button>
+                  </div>
+                )}
+                
+                {!hasMorePages && allCourses.length > 0 && (
+                  <div className="text-center mt-8">
+                    <p className="text-gray-500">You've reached the end! No more courses to load.</p>
+                  </div>
+                )}
               </>
-            ) : (
+            ) : !loading ? (
               <div className="text-center py-12">
                 <p className="text-gray-600 text-lg mb-4">No courses found matching your criteria</p>
                 <button
@@ -406,9 +389,14 @@ export default function CoursesListingClient() {
                   Clear filters and try again
                 </button>
               </div>
-            )}
+            ) : null}
           </div>
         </div>
+        {loading && (
+          <div className="flex justify-center items-center py-12">
+            <LoadingSpinner />
+          </div>
+        )}
       </section>
 
       {/* Footer */}
