@@ -8,6 +8,7 @@ import { useCourses, usePopularCourses } from "@/app/hooks/useCourses";
 import { MagnifyingGlassIcon, FunnelIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
 import { StarIcon, ClockIcon, UsersIcon, PhotoIcon } from "@heroicons/react/24/solid";
 import LoadingSpinner from "@/app/components/shared/ui/loading-spinner";
+import { CourseListSkeleton, CourseCardSkeleton } from "@/app/components/shared/course-skeleton-loader";
 import { Brain } from "lucide-react";
 
 const categories = [
@@ -45,58 +46,29 @@ export default function CoursesListingClient() {
     fetchCourses,
   } = useCourses();
   
-  // Debug logging
-  useEffect(() => {
-    console.log('Debug - Courses state:', {
-      coursesLength: courses.length,
-      loading,
-      error,
-      totalCourses,
-      currentPage,
-      totalPages,
-      filters,
-      apiBase: process.env.NEXT_PUBLIC_CORE_SERVER_URL,
-      courseIds: courses.map(c => c.id).slice(0, 5) // Show first 5 IDs
-    });
-  }, [courses, loading, error, totalCourses, currentPage, totalPages, filters]);
-  
   // Re-enabled after fixing data structure
-  const { popularCourses } = usePopularCourses(4);
-  
-  // Additional debugging for popular courses
-  useEffect(() => {
-    console.log('Debug - Popular courses:', {
-      popularCoursesLength: popularCourses.length,
-      popularCoursesData: popularCourses
-    });
-  }, [popularCourses]);
-  
+  const { popularCourses, loading: popularLoading } = usePopularCourses(4);
+
   const [searchQuery, setSearchQuery] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const [localPriceRange, setLocalPriceRange] = useState<[number, number]>([0, 1000]);
   const [allCourses, setAllCourses] = useState<Course[]>([]);
   const [loadMorePage, setLoadMorePage] = useState(1);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [hasMorePages, setHasMorePages] = useState(true);
+  const [hasMorePages, setHasMorePages] = useState(false);
   
   // Initialize courses when data changes (first page or filters change)
-  useEffect(() => {
-    if (currentPage === 1 && courses.length > 0) {
-      setAllCourses(courses);
-      setLoadMorePage(2);
-      setHasMorePages(currentPage < totalPages);
-    }
-  }, [courses, currentPage, totalPages]);
+
 
   // Reset accumulated courses when filters change
   useEffect(() => {
-    setAllCourses([]);
-    setLoadMorePage(1);
-    setHasMorePages(true);
+
+    
   }, [filters.category, filters.searchQuery, filters.sortBy, filters.priceRange, filters.level]);
 
   // Load more courses function
   const loadMoreCourses = async () => {
+    
     if (isLoadingMore || !hasMorePages) return;
     
     setIsLoadingMore(true);
@@ -113,21 +85,23 @@ export default function CoursesListingClient() {
     }
   };
 
-  // Handle loading more courses when fetchCourses returns data for page > 1
   useEffect(() => {
-    if (currentPage > 1 && courses.length > 0 && !loading) {
-      // Append new courses to existing list
-      setAllCourses(prev => {
-        const existingIds = new Set(prev.map(c => c.id));
-        const newCourses = courses.filter(c => !existingIds.has(c.id));
-        return [...prev, ...newCourses];
-      });
-      
-      // Update pagination state
-      setLoadMorePage(currentPage + 1);
-      setHasMorePages(currentPage < totalPages);
-    }
-  }, [courses, currentPage, totalPages, loading]);
+    console.log("dispatching...", hasMorePages)
+    loadMoreCourses()
+  }, [loadMorePage]);
+
+  useEffect(()=>{
+    const withDuplicate = [...allCourses, ...courses]
+    const uniqueCourses = withDuplicate.reduce<Course[]>((acc, current) => {
+      if (!acc.some(item => item.id === current.id)) {
+        acc.push(current);
+      }
+      return acc;
+    }, []);
+    setAllCourses(uniqueCourses)
+    setHasMorePages(totalPages>loadMorePage);
+  },[courses])
+  
 
   // Debounced search effect - handle locally
   useEffect(() => {
@@ -136,7 +110,7 @@ export default function CoursesListingClient() {
     }, 500);
     
     return () => clearTimeout(timeoutId);
-  }, [searchQuery]); // Remove performSearch from deps to prevent loop
+  }, [searchQuery]);
 
   const handleCategoryChange = (category: string) => {
     updateFilters({ 
@@ -200,7 +174,7 @@ export default function CoursesListingClient() {
       </section>
 
       {/* Popular Courses Section */}
-      {popularCourses.length > 0 && !filters.searchQuery && !filters.category && (
+      {!filters.searchQuery && !filters.category && (
         <section className="container mx-auto px-4 py-12">
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-3xl font-bold">Popular Courses</h2>
@@ -210,9 +184,15 @@ export default function CoursesListingClient() {
           </div>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {popularCourses.slice(0, 4).map((course) => (
-              <CourseCard key={course.id} course={course} featured />
-            ))}
+            {popularLoading ? (
+              Array.from({ length: 4 }).map((_, i) => (
+                <CourseCardSkeleton key={i} />
+              ))
+            ) : popularCourses.length > 0 ? (
+              popularCourses.slice(0, 4).map((course) => (
+                <CourseCard key={course.id} course={course} featured />
+              ))
+            ) : null}
           </div>
         </section>
       )}
@@ -337,7 +317,9 @@ export default function CoursesListingClient() {
             </div>
 
             {/* Course Grid */}
-            {allCourses.length > 0 ? (
+            {loading && allCourses.length === 0 ? (
+              <CourseListSkeleton count={6} />
+            ) : allCourses.length > 0 ? (
               <>
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {allCourses.map((course) => (
@@ -349,14 +331,14 @@ export default function CoursesListingClient() {
                 {hasMorePages && (
                   <div className="flex justify-center mt-8">
                     <button
-                      onClick={loadMoreCourses}
+                      onClick={()=>setLoadMorePage(loadMorePage + 1)}
                       disabled={isLoadingMore}
                       className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                     >
                       {isLoadingMore ? (
                         <div className="flex items-center gap-2">
-                          <LoadingSpinner />
-                          <span>Loading more courses...</span>
+                          <LoadingSpinner  variant="small" />
+                          <span>Loading...</span>
                         </div>
                       ) : (
                         'Load More'
@@ -371,7 +353,7 @@ export default function CoursesListingClient() {
                   </div>
                 )}
               </>
-            ) : !loading ? (
+            ) : (
               <div className="text-center py-12">
                 <p className="text-gray-600 text-lg mb-4">No courses found matching your criteria</p>
                 <button
@@ -389,14 +371,9 @@ export default function CoursesListingClient() {
                   Clear filters and try again
                 </button>
               </div>
-            ) : null}
+            )}
           </div>
         </div>
-        {loading && (
-          <div className="flex justify-center items-center py-12">
-            <LoadingSpinner />
-          </div>
-        )}
       </section>
 
       {/* Footer */}
@@ -448,14 +425,6 @@ export default function CoursesListingClient() {
 
 function CourseCard({ course, featured = false }: { course: any; featured?: boolean }) {
   const [imageError, setImageError] = useState(false);
-  
-  // Debug: Check thumbnail data
-  console.log('Debug - Course thumbnail data:', {
-    courseId: course.id,
-    title: course.title,
-    thumbnail: course.thumbnail,
-    courseImage: course.courseImage
-  });
 
   // Use multiple fallbacks since the API response might use different field names
   const imageUrl = course.thumbnail || course.courseImage || (course as any).image || (course as any).thumbnail_url;
