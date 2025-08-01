@@ -61,13 +61,13 @@
   },
   "devDependencies": {
     "@next/bundle-analyzer": "^15.4.4",
-    "@tailwindcss/postcss": "^4.1.10",
-    "@types/node": "^20",
+    "@tailwindcss/postcss": "^4.1.11",
+    "@types/node": "20.19.9",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@typescript-eslint/eslint-plugin": "^8.38.0",
     "@typescript-eslint/parser": "^8.38.0",
-    "autoprefixer": "^10.4.20",
+    "autoprefixer": "^10.4.21",
     "eslint-config-next": "^15.4.4",
     "eslint-config-prettier": "^10.1.8",
     "glob": "^11.0.3",
@@ -75,6 +75,6 @@
     "postcss": "^8.5.6",
     "prettier": "^3.6.2",
     "tailwindcss": "^4.1.11",
-    "typescript": "^5"
+    "typescript": "5.9.2"
   }
 }
