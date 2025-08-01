@@ -5,9 +5,19 @@ import SEOStructuredData from "../../components/shared/seo-structured-data";
 import SEOBreadcrumb from "../../components/shared/seo-breadcrumb";
 import CourseDetailClient from "./course-detail-client";
 
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   try {
-    const course = await getCourseById(params.id);
+    const resolvedParams = await params;
+    
+    // Safe check for id
+    if (!resolvedParams?.id) {
+      return {
+        title: "Course Not Found - Unpuzzle",
+        description: "The requested course could not be found.",
+      };
+    }
+    
+    const course = await getCourseById(resolvedParams.id);
     
     if (!course) {
       return {

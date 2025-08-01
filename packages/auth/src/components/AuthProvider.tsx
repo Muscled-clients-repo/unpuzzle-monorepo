@@ -9,6 +9,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     async function loadUser() {
       const user = await getUser();
+      console.log('AuthProvider - User fetched:', user);
       dispatch(hydrateAuth(user));
     }
     loadUser();

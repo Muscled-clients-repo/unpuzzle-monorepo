@@ -3,8 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p ${PORT:-3000}",
-    "build": "next build",
+    "dev": "NODE_ENV=development next dev -p ${PORT:-3000}",
+    "build": "npm run build:css && next build",
+    "build:css": "tailwindcss -i ./input.css -o ./app/tailwind.css && cp ./app/tailwind.css ./public/tailwind.css",
     "build:no-lint": "SKIP_ENV_VALIDATION=1 next build --no-lint",
     "start": "next start",
     "lint": "next lint",
@@ -18,7 +19,8 @@
     "optimize:unused": "npx depcheck",
     "optimize:bundle": "npm run analyze",
     "lighthouse": "npx lighthouse http://localhost:3000 --view",
-    "perf": "npm run optimize:check"
+    "perf": "npm run optimize:check",
+    "tailwind":"npx @tailwindcss/cli -i ./input.css -o ./public/tailwind.css --watch"
   },
   "dependencies": {
     "@ffmpeg/ffmpeg": "^0.12.15",
@@ -35,6 +37,8 @@
     "@reduxjs/toolkit": "^2.8.2",
     "@stripe/react-stripe-js": "^3.7.0",
     "@stripe/stripe-js": "^7.4.0",
+    "@tailwindcss/cli": "^4.1.11",
+    "@tailwindcss/postcss": "^4.1.11",
     "@types/socket.io-client": "^1.4.36",
     "@wavesurfer/react": "^1.0.11",
     "axios": "^1.10.0",
@@ -53,28 +57,25 @@
     "react-redux": "^9.2.0",
     "react-toastify": "^11.0.5",
     "socket.io-client": "^4.8.1",
-    "tailwind-merge": "^3.3.1",
-    "tailwindcss-animate": "^1.0.7",
+    "tailwindcss": "^4.1.11",
     "uuid": "^11.1.0",
     "video-editing-timeline-react": "^1.0.0",
     "wavesurfer.js": "^7.9.9"
   },
   "devDependencies": {
     "@next/bundle-analyzer": "^15.4.4",
-    "@tailwindcss/postcss": "^4.1.10",
-    "@types/node": "^20",
+    "@types/node": "20.19.9",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@typescript-eslint/eslint-plugin": "^8.38.0",
     "@typescript-eslint/parser": "^8.38.0",
-    "autoprefixer": "^10.4.20",
+    "autoprefixer": "^10.4.21",
     "eslint-config-next": "^15.4.4",
     "eslint-config-prettier": "^10.1.8",
     "glob": "^11.0.3",
     "identity-obj-proxy": "^3.0.0",
     "postcss": "^8.5.6",
     "prettier": "^3.6.2",
-    "tailwindcss": "^4.1.11",
-    "typescript": "^5"
+    "typescript": "5.9.2"
   }
 }

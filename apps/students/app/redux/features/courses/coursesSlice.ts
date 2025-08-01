@@ -1,6 +1,11 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Course, Chapter } from '@/app/types/course.types';
 
+// Helper function to validate IDs
+const isValidId = (id: any): id is string => {
+  return id && typeof id === 'string' && id.trim() !== '';
+};
+
 export interface CourseFilters {
   category?: string;
   priceRange?: [number, number];
@@ -78,10 +83,16 @@ const coursesSlice = createSlice({
       state.currentCourse = action.payload;
     },
     updateCourse(state, action: PayloadAction<Partial<Course>>) {
-      if (state.currentCourse && action.payload.id === state.currentCourse.id) {
+      const courseId = action.payload.id;
+      if (!isValidId(courseId)) {
+        console.error('updateCourse: Invalid course ID');
+        return;
+      }
+      
+      if (state.currentCourse && state.currentCourse.id === courseId) {
         state.currentCourse = { ...state.currentCourse, ...action.payload };
       }
-      const index = state.courses.findIndex(c => c.id === action.payload.id);
+      const index = state.courses.findIndex(c => c.id === courseId);
       if (index !== -1) {
         state.courses[index] = { ...state.courses[index], ...action.payload };
       }
@@ -136,12 +147,18 @@ const coursesSlice = createSlice({
     
     // Chapter management
     addChapterToCourse(state, action: PayloadAction<{ courseId: string; chapter: Chapter }>) {
-      const course = state.courses.find(c => c.id === action.payload.courseId);
-      if (course) {
-        course.chapters.push(action.payload.chapter);
+      const { courseId, chapter } = action.payload;
+      if (!isValidId(courseId)) {
+        console.error('addChapterToCourse: Invalid course ID');
+        return;
       }
-      if (state.currentCourse?.id === action.payload.courseId) {
-        state.currentCourse.chapters.push(action.payload.chapter);
+      
+      const course = state.courses.find(c => c.id === courseId);
+      if (course) {
+        course.chapters.push(chapter);
+      }
+      if (state.currentCourse?.id === courseId) {
+        state.currentCourse.chapters.push(chapter);
       }
     },
     updateChapterInCourse(state, action: PayloadAction<{ 

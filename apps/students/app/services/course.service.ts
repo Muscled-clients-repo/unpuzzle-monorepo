@@ -2,6 +2,12 @@ import { Course } from "@/app/types/course.types";
 import { API_ENDPOINTS } from "@/app/config/api.config";
 
 export async function getCourseById(courseId: string): Promise<Course | null> {
+  // Validate courseId
+  if (!courseId || typeof courseId !== 'string' || courseId.trim() === '') {
+    console.error('getCourseById: Invalid courseId provided');
+    return null;
+  }
+  
   try {
     const response = await fetch(`${API_ENDPOINTS.COURSES}/${courseId}`, {
       next: { revalidate: 60 }, // Cache for 60 seconds

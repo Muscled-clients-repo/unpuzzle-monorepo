@@ -16,6 +16,7 @@ import {
   VideoCameraIcon,
   BellIcon
 } from '@heroicons/react/24/outline';
+import {UserButton} from "@unpuzzle/ui"
 
 const navigation = [
   { name: 'Home', href: '/', icon: HomeIcon },
@@ -107,9 +108,7 @@ export default function StudentHeader() {
             </button>
 
             {/* User Menu - Placeholder */}
-            <button className="p-2 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-full">
-              <Cog6ToothIcon className="h-6 w-6" />
-            </button>
+            <UserButton />
 
             {/* Mobile menu button */}
             <button

@@ -5,9 +5,16 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "echo 'use per-app build scripts instead'"
+    "build": "npm run build:students",
+    "dev": "npm run dev:students",
+    "build:students": "cd apps/students && npm run build",
+    "dev:students": "cd apps/students && npm run dev"
   },
   "devDependencies": {
-    "@types/node": "^24.1.0"
+    "@types/estree": "^1.0.8",
+    "@types/json-schema": "^7.0.15",
+    "@types/json5": "^0.0.30",
+    "@types/node": "^24.1.0",
+    "typescript": "^5.8.3"
   }
 }

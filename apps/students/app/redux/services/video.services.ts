@@ -18,11 +18,16 @@ export const videosApi = createApi({
 
     // Update Video
     updateVideo: builder.mutation<void, { id: string; userId: string; courseId: string }>({
-      query: ({ id, userId, courseId }) => ({
-        url: `videos/${id}`,
-        method: 'PUT',
-        body: { userId, courseId },
-      }),
+      query: ({ id, userId, courseId }) => {
+        if (!id || typeof id !== 'string') {
+          throw new Error('Invalid video id provided to updateVideo');
+        }
+        return {
+          url: `videos/${id}`,
+          method: 'PUT',
+          body: { userId, courseId },
+        };
+      },
       invalidatesTags: ['Videos'],
     }),
 
@@ -37,19 +42,29 @@ export const videosApi = createApi({
 
     // Get Video by ID
     getVideoById: builder.query<any, string>({
-      query: (id) => ({
-        url: `videos/${id}`,
-        method: 'GET',
-      }),
+      query: (id) => {
+        if (!id || typeof id !== 'string') {
+          throw new Error('Invalid video id provided to getVideoById');
+        }
+        return {
+          url: `videos/${id}`,
+          method: 'GET',
+        };
+      },
       providesTags: ['Videos'],
     }),
 
     // Delete Video
     deleteVideo: builder.mutation<void, string>({
-      query: (id) => ({
-        url: `videos/${id}`,
-        method: 'DELETE',
-      }),
+      query: (id) => {
+        if (!id || typeof id !== 'string') {
+          throw new Error('Invalid video id provided to deleteVideo');
+        }
+        return {
+          url: `videos/${id}`,
+          method: 'DELETE',
+        };
+      },
       invalidatesTags: ['Videos'],
     }),
   }),
