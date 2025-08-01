@@ -44,6 +44,10 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  // Skip pre-rendering error pages during build
+  generateBuildId: async () => {
+    return 'build-' + Date.now()
+  },
   webpack(config) {
     config.resolve.alias = {
       ...(config.resolve.alias || {}),

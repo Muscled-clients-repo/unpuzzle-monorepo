@@ -75,6 +75,14 @@ const CourseProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
   const getCourseById = useCallback(
     async (id: string, chapterIdParam?: string, videoIdParam?: string): Promise<Course | null> => {
+      // Validate id parameter
+      if (!id || typeof id !== 'string' || id.trim() === '') {
+        console.error('getCourseById: Invalid id provided:', id);
+        setError('Invalid course ID');
+        setLoading(false);
+        return null;
+      }
+      
       setLoading(true);
       setError(null);
       try {

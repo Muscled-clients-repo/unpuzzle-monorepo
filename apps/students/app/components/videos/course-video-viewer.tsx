@@ -41,7 +41,11 @@ const VideoScreen: React.FC = () => {
   const searchParams = useSearchParams(); // ?video-id=1234&chapter-id=5678
   const { course, chapter, video, loading, getCourseById } = useCourse();
 
-  const courseId = params?.id as string | undefined;
+  // Safe extraction of courseId with type safety
+  const courseId = params && typeof params === 'object' && 'id' in params && typeof params.id === 'string' 
+    ? params.id 
+    : undefined;
+    
   const queryVideoId = searchParams.get("video-id");
   const queryChapterId = searchParams.get("chapter-id");
 
@@ -87,7 +91,7 @@ const VideoScreen: React.FC = () => {
     );
   }
 
-  let rightSideContent = null;
+  let rightSideContent: React.ReactNode = null;
   if (path.includes("/student-view/")) {
     rightSideContent = (
       <div className="flex flex-col gap-2 w-[30%] border-l mx-auto p-6">

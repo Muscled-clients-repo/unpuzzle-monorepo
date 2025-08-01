@@ -60,20 +60,30 @@ export const courseApi = createApi({
       invalidatesTags: ['Courses'],
     }),
     deleteCourse: build.mutation({
-      query: ({ courseId, token }: { courseId: string; token?: string }) => ({
-        url: `/api/courses/${courseId}`,
-        method: 'DELETE',
-        ...(token && { token }),
-      }),
+      query: ({ courseId, token }: { courseId: string; token?: string }) => {
+        if (!courseId || typeof courseId !== 'string') {
+          throw new Error('Invalid courseId provided to deleteCourse');
+        }
+        return {
+          url: `/api/courses/${courseId}`,
+          method: 'DELETE',
+          ...(token && { token }),
+        };
+      },
       invalidatesTags: ['Courses'],
     }),
     updateCourse: build.mutation({
-      query: ({ courseId, updatedData, token }: { courseId: string; updatedData: any; token?: string }) => ({
-        url: `/api/courses/${courseId}`,
-        method: 'PUT',
-        body: updatedData,
-        ...(token && { token }),
-      }),
+      query: ({ courseId, updatedData, token }: { courseId: string; updatedData: any; token?: string }) => {
+        if (!courseId || typeof courseId !== 'string') {
+          throw new Error('Invalid courseId provided to updateCourse');
+        }
+        return {
+          url: `/api/courses/${courseId}`,
+          method: 'PUT',
+          body: updatedData,
+          ...(token && { token }),
+        };
+      },
       invalidatesTags: ['Courses'], // Ensure UI updates after update
     }),
   }),

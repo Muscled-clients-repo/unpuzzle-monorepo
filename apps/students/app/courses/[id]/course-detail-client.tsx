@@ -37,6 +37,12 @@ interface CourseDetailClientProps {
 
 export default function CourseDetailClient({ courseId }: CourseDetailClientProps) {
   const router = useRouter();
+  
+  // Safe check for courseId
+  if (!courseId || typeof courseId !== 'string') {
+    notFound();
+  }
+  
   const { course, loading, error } = useCourseDetails(courseId);
   const { enrollInCourse } = useCourses();
   const [isEnrolling, setIsEnrolling] = useState(false);
