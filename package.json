@@ -1,30 +1,13 @@
 {
-  "name": "unpuzzle-monorepo",
-  "version": "1.0.0",
   "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
-    "dev": "cd apps/students && npm run dev",
-    "build": "cd apps/students && npm install --production=false && npm run build",
-    "start": "cd apps/students && npm start",
-    "lint": "cd apps/students && npm run lint",
-    "dev:all": "concurrently \"npm run dev\" \"cd apps/instructor && npm run dev\"",
-    "build:all": "npm run build && cd apps/instructor && npm run build",
-    "build:instructor": "cd apps/instructor && npm install --production=false && npm run build",
-    "start:instructor": "cd apps/instructor && npm start",
-    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,md,json}\"",
-    "clean": "rm -rf node_modules apps/*/node_modules"
-  },
-  "dependencies": {
-    "@next/bundle-analyzer": "^15.4.4",
-    "next": "15.3.3"
+    "build": "echo 'use per-app build scripts instead'"
   },
   "devDependencies": {
-    "concurrently": "^8.2.0",
-    "eslint": "^8.57.0",
-    "prettier": "^3.2.5"
-  },
-  "engines": {
-    "node": ">=20.0.0",
-    "npm": ">=10.0.0"
+    "@types/node": "^24.1.0"
   }
 }

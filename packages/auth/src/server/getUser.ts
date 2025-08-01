@@ -1,5 +1,4 @@
 // packages/auth/src/server/getServerUser.ts
-import { IncomingMessage } from 'http';
 import { User } from '../types';
 import {config} from "@unpuzzle/config"
 
