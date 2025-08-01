@@ -16,6 +16,7 @@ import AnnotationViewHeader from "../components/shared/annotation-header";
 import { ToastContainer } from 'react-toastify';
 import ComponentErrorBoundary from "../components/shared/component-error-boundary";
 import { WebVitalsReporter } from "../components/web-vitals";
+import {AuthProvider} from "@unpuzzle/auth"
 
 
 const geistSans = Geist({
@@ -103,14 +104,16 @@ export default function RootLayout({
         <link rel="stylesheet" href="/tailwind.css" />
       </head>
       <body className="antialiased light" suppressHydrationWarning>
-      <ToastContainer />
-      <WebVitalsReporter />
+        <ToastContainer />
+        <WebVitalsReporter />
 
-        <Provider store={store}>
-          <VideoTimeProvider>
-            <LayoutContent>{children}</LayoutContent>
-          </VideoTimeProvider>
-        </Provider>
+          <Provider store={store}>
+            <AuthProvider>
+                <VideoTimeProvider>
+                  <LayoutContent>{children}</LayoutContent>
+                </VideoTimeProvider>
+            </AuthProvider>
+          </Provider>
       </body>
     </html>
   );

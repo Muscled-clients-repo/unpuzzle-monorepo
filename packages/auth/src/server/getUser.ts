@@ -11,8 +11,8 @@ export async function getUser(): Promise<User | null> {
 
     if (!res.ok) return null;
 
-    const data = await res.json();
-    return data.user as User;
+    const {body} = await res.json();
+    return body as User;
   } catch (error) {
     console.error('Error fetching user:', error);
     return null;

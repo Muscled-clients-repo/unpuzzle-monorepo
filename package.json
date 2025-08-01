@@ -16,7 +16,5 @@
     "@types/json5": "^0.0.30",
     "@types/node": "^24.1.0",
     "typescript": "^5.8.3"
-  },
-  "dependencies": {
   }
 }
