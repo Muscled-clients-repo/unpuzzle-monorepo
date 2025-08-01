@@ -5,7 +5,9 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "echo 'use per-app build scripts instead'"
+    "build": "echo 'use per-app build scripts instead'",
+    "build:students": "cd apps/students && npm run build",
+    "dev:students": "cd apps/students && npm run dev"
   },
   "devDependencies": {
     "@types/node": "^24.1.0"
