@@ -5,6 +5,7 @@ import { ArrowRight, BookOpen, Brain, Users, Sparkles, PlayCircle, CheckCircle }
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import SEOStructuredData from "./components/shared/seo-structured-data";
 import { generateOrganizationSchema } from "./utils/seo.utils";
+import {UserStatus} from "@unpuzzle/ui"
 
 export const metadata: Metadata = {
   title: "Unpuzzle - Transform Your Learning Experience",
@@ -149,6 +150,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <UserStatus />
 
       {/* Features Section */}
       <section className="py-20 bg-white">
