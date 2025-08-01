@@ -8,6 +8,8 @@ const withBundleAnalyzer = bundleAnalyzer({
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  // Allow cross-origin requests during development
+  allowedDevOrigins: ['dev.nazmulcodes.org', 'dev1.nazmulcodes.org', 'dev2.nazmulcodes.org'],
   images: {
     remotePatterns: [
       {
@@ -62,7 +64,8 @@ const nextConfig: NextConfig = {
     return config;
   },
   async rewrites() {
-    if (process.env.NODE_ENV !== "development") {
+    console.log(process.env.NODE_ENV)
+    if (process.env.NODE_ENV == "production") {
       return [];
     }
 

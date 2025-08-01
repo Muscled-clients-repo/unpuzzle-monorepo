@@ -1,7 +1,7 @@
 "use client";
 import { Geist, Geist_Mono } from "next/font/google";
 import type { Metadata } from "next";
-import "../assets/globals.css";
+// import "../tailwind.css";
 // import Header from "./Header";
 import { Provider } from "react-redux";
 import store from "../redux/store";
@@ -97,7 +97,11 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${geistSans.className} ${geistMono.className}`}
+      suppressHydrationWarning
     >
+      <head>
+        <link rel="stylesheet" href="/tailwind.css" />
+      </head>
       <body className="antialiased light" suppressHydrationWarning>
       <ToastContainer />
       <WebVitalsReporter />
