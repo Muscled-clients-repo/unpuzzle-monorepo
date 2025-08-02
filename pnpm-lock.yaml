@@ -349,6 +349,9 @@ importers:
 
   packages/auth:
     dependencies:
+      '@unpuzzle/config':
+        specifier: '*'
+        version: link:../config
       clsx:
         specifier: ^2.1.0
         version: 2.1.1
