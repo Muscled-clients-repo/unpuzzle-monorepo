@@ -1,3 +1,5 @@
+'use client';
+
 import Link from "next/link";
 import { Brain } from "lucide-react";
 export const Footer =()=>{
@@ -7,7 +9,7 @@ export const Footer =()=>{
           <div className="grid md:grid-cols-4 gap-8">
           <div>
             <div className="flex items-center space-x-2 mb-4">
-              <Brain className="h-8 w-8 text-white" />
+              <Brain className="h-8 w-8 text-white" aria-hidden="true" />
               <span className="text-xl font-bold text-white">Unpuzzle</span>
             </div>
             <p className="text-sm">

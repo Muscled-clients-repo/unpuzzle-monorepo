@@ -157,7 +157,7 @@ export default function Home() {
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center">
               <div className="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Sparkles className="h-8 w-8 text-blue-600" />
+                <Sparkles className="h-8 w-8 text-blue-600" aria-hidden="true" />
               </div>
               <h3 className="text-xl font-semibold mb-2">Interactive Learning</h3>
               <p className="text-gray-600">
@@ -166,7 +166,7 @@ export default function Home() {
             </div>
             <div className="text-center">
               <div className="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Brain className="h-8 w-8 text-blue-600" />
+                <Brain className="h-8 w-8 text-blue-600" aria-hidden="true" />
               </div>
               <h3 className="text-xl font-semibold mb-2">AI-Powered Assistance</h3>
               <p className="text-gray-600">
@@ -175,7 +175,7 @@ export default function Home() {
             </div>
             <div className="text-center">
               <div className="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Users className="h-8 w-8 text-blue-600" />
+                <Users className="h-8 w-8 text-blue-600" aria-hidden="true" />
               </div>
               <h3 className="text-xl font-semibold mb-2">Collaborative Learning</h3>
               <p className="text-gray-600">
@@ -251,7 +251,7 @@ export default function Home() {
                 className="block border rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:scale-105 cursor-pointer group"
               >
                 <div className="h-48 bg-gray-200 flex items-center justify-center relative overflow-hidden">
-                  <BookOpen className="h-16 w-16 text-gray-400 group-hover:text-blue-500 transition-colors" />
+                  <BookOpen className="h-16 w-16 text-gray-400 group-hover:text-blue-500 transition-colors" aria-hidden="true" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 </div>
                 <div className="p-6">
@@ -259,7 +259,7 @@ export default function Home() {
                   <p className="text-gray-600 text-sm mb-4">by {course.instructor}</p>
                   <div className="flex justify-between items-center mb-4">
                     <div className="flex items-center gap-1">
-                      <Users className="h-4 w-4 text-gray-500" />
+                      <Users className="h-4 w-4 text-gray-500" aria-hidden="true" />
                       <span className="text-sm text-gray-600">{course.students} students</span>
                     </div>
                     <div className="flex items-center gap-1">
@@ -279,7 +279,7 @@ export default function Home() {
               href="/courses" 
               className="text-blue-600 hover:text-blue-700 font-semibold inline-flex items-center gap-2"
             >
-              View All Courses <ArrowRight className="h-5 w-5" />
+              View All Courses <ArrowRight className="h-5 w-5" aria-hidden="true" />
             </Link>
           </div>
         </div>

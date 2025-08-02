@@ -12,7 +12,7 @@ export default function CrossAppNavigation() {
       rel="noopener noreferrer"
       className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
     >
-      <ExternalLink className="h-4 w-4" />
+      <ExternalLink className="h-4 w-4" aria-hidden="true" />
       <span>Instructor Portal</span>
     </Link>
   );

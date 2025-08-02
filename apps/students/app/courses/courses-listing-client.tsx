@@ -385,7 +385,7 @@ export default function CoursesListingClient() {
             ) : (
               <div className="text-center py-12">
                 <div className="mb-6">
-                  <Brain className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+                  <Brain className="h-16 w-16 text-gray-300 mx-auto mb-4" aria-hidden="true" />
                   <p className="text-gray-600 text-lg mb-4">
                     {error ? "Unable to load courses at the moment" : "No courses found matching your criteria"}
                   </p>
