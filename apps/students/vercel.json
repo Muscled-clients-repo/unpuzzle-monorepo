@@ -1,6 +1,6 @@
 {
-  "installCommand": "pnpm install",
-  "buildCommand": "pnpm run build",
-  "devCommand": "pnpm run dev",
-  "outputDirectory": ".next"
+  "installCommand": "pnpm install --frozen-lockfile",
+  "buildCommand": "pnpm --filter unpuzzle-student... run build",
+  "outputDirectory": "apps/students/.next",
+  "framework": "nextjs"
 }
