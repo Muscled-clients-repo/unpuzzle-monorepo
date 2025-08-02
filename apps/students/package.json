@@ -61,7 +61,8 @@
     "uuid": "^11.1.0",
     "video-editing-timeline-react": "^1.0.0",
     "wavesurfer.js": "^7.9.9",
-    "@unpuzzle/ui": "*"
+    "@unpuzzle/ui": "*",
+    "@unpuzzle/auth": "*"
   },
   "devDependencies": {
     "@next/bundle-analyzer": "^15.4.4",
