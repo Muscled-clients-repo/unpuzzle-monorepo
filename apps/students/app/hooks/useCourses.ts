@@ -352,14 +352,23 @@ export const useCourses = () => {
 };
 
 // Hook for single course details
-export const useCourseDetails = (courseId: string) => {
+export const useCourseDetails = (courseId: string, initialData?: any) => {
   const { currentCourse, fetchCourseById, loading, error } = useCourses();
+  const dispatch = useDispatch();
   
   useEffect(() => {
-    if (courseId && (!currentCourse || currentCourse.id !== courseId)) {
+    console.log('useCourseDetails effect:', { initialData, currentCourse, courseId });
+    // If we have initial data and no current course, set it immediately
+    if (initialData && (!currentCourse || currentCourse.id !== courseId)) {
+      console.log('Setting initial data to Redux:', initialData);
+      dispatch(setCourse(initialData));
+    }
+    // Only fetch if we don't have initial data and no matching current course
+    else if (!initialData && courseId && (!currentCourse || currentCourse.id !== courseId)) {
+      console.log('Fetching course by ID:', courseId);
       fetchCourseById(courseId);
     }
-  }, [courseId, currentCourse, fetchCourseById]);
+  }, [courseId, currentCourse, fetchCourseById, initialData, dispatch]);
   
   return {
     course: currentCourse,

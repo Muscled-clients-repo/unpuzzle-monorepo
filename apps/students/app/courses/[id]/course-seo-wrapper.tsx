@@ -1,13 +1,14 @@
 import { Metadata } from "next";
+import { headers } from "next/headers";
 import { getCourseById } from "../../services/course.service";
 import { generateSEOMetadata, generateCourseSchema } from "../../utils/seo.utils";
 import SEOStructuredData from "../../components/shared/seo-structured-data";
-import SEOBreadcrumb from "../../components/shared/seo-breadcrumb";
 import CourseDetailClient from "./course-detail-client";
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   try {
     const resolvedParams = await params;
+    const headersList = await headers();
     
     // Safe check for id
     if (!resolvedParams?.id) {
@@ -17,7 +18,23 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
       };
     }
     
-    const course = await getCourseById(resolvedParams.id);
+    // Extract cookies, authorization, and origin headers
+    const cookieHeader = headersList.get('cookie');
+    const authHeader = headersList.get('authorization');
+    const hostHeader = headersList.get('host');
+    
+    const forwardHeaders: HeadersInit = {};
+    if (cookieHeader) {
+      forwardHeaders['cookie'] = cookieHeader;
+    }
+    if (authHeader) {
+      forwardHeaders['authorization'] = authHeader;
+    }
+    if (hostHeader) {
+      forwardHeaders['origin'] = `https://${hostHeader}`;
+    }
+    
+    const course = await getCourseById(resolvedParams.id, forwardHeaders);
     
     if (!course) {
       return {
@@ -47,9 +64,28 @@ export default async function CourseSEOWrapper({ courseId }: { courseId: string 
   let breadcrumbItems = [
     { name: "Courses", url: "/courses" },
   ];
+  let course: any = null;
 
   try {
-    const course = await getCourseById(courseId);
+    const headersList = await headers();
+    
+    // Extract cookies, authorization, and origin headers
+    const cookieHeader = headersList.get('cookie');
+    const authHeader = headersList.get('authorization');
+    const hostHeader = headersList.get('host');
+    
+    const forwardHeaders: HeadersInit = {};
+    if (cookieHeader) {
+      forwardHeaders['cookie'] = cookieHeader;
+    }
+    if (authHeader) {
+      forwardHeaders['authorization'] = authHeader;
+    }
+    if (hostHeader) {
+      forwardHeaders['origin'] = `https://${hostHeader}`;
+    }
+    
+    course = await getCourseById(courseId, forwardHeaders);
     
     if (course) {
       courseSchema = generateCourseSchema({
@@ -76,12 +112,7 @@ export default async function CourseSEOWrapper({ courseId }: { courseId: string 
   return (
     <>
       {courseSchema && <SEOStructuredData data={courseSchema} />}
-      <div className="min-h-screen bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
-          <SEOBreadcrumb items={breadcrumbItems} />
-        </div>
-        <CourseDetailClient courseId={courseId} />
-      </div>
+      <CourseDetailClient courseId={courseId} initialCourseData={course} breadcrumbItems={breadcrumbItems} />
     </>
   );
 }

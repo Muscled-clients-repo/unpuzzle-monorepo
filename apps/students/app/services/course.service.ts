@@ -1,7 +1,7 @@
 import { Course } from "@/app/types/course.types";
 import { API_ENDPOINTS } from "@/app/config/api.config";
 
-export async function getCourseById(courseId: string): Promise<Course | null> {
+export async function getCourseById(courseId: string, customHeaders?: HeadersInit): Promise<Course | null> {
   // Validate courseId
   if (!courseId || typeof courseId !== 'string' || courseId.trim() === '') {
     console.error('getCourseById: Invalid courseId provided');
@@ -9,11 +9,24 @@ export async function getCourseById(courseId: string): Promise<Course | null> {
   }
   
   try {
+    // Convert Headers object to plain object if needed
+    const headersObj: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+    
+    if (customHeaders) {
+      if (customHeaders instanceof Headers) {
+        customHeaders.forEach((value, key) => {
+          headersObj[key] = value;
+        });
+      } else {
+        Object.assign(headersObj, customHeaders);
+      }
+    }
+    
     const response = await fetch(`${API_ENDPOINTS.COURSES}/${courseId}`, {
       next: { revalidate: 60 }, // Cache for 60 seconds
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: headersObj,
     });
 
     if (!response.ok) {
@@ -24,6 +37,7 @@ export async function getCourseById(courseId: string): Promise<Course | null> {
     }
 
     const result = await response.json();
+    console.log(result)
     return result.body || result;
   } catch (error) {
     console.error("Error fetching course:", error);
@@ -44,8 +58,8 @@ export async function getAllCourses(): Promise<Course[]> {
       throw new Error(`Failed to fetch courses: ${response.statusText}`);
     }
 
-    const result = await response.json();
-    return result.body?.data || result.data || [];
+    const {body} = await response.json();
+    return body
   } catch (error) {
     console.error("Error fetching courses:", error);
     return [];
