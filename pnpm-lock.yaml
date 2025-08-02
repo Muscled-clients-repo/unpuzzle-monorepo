@@ -234,6 +234,12 @@ importers:
       '@types/socket.io-client':
         specifier: ^1.4.36
         version: 1.4.36
+      '@unpuzzle/auth':
+        specifier: '*'
+        version: link:../../packages/auth
+      '@unpuzzle/ui':
+        specifier: '*'
+        version: link:../../packages/ui
       '@wavesurfer/react':
         specifier: ^1.0.11
         version: 1.0.11(react@19.1.1)(wavesurfer.js@7.10.1)
