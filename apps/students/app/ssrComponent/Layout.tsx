@@ -3,7 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import type { Metadata } from "next";
 import { Provider } from "react-redux";
 import store from "../redux/store";
-import PageLoadingSpinner from "../components/shared/loading-indicator";
+import { LayoutSkeleton } from "@unpuzzle/ui";
 import React, { useState, useEffect } from "react";
 import { VideoTimeProvider } from "../context/VideoTimeContext";
 import { ToastContainer } from 'react-toastify';
@@ -53,9 +53,7 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
         {/* Main Content */}
         <div className="min-h-screen bg-gray-50">
           {loading ? (
-            <div className="flex items-center justify-center min-h-[50vh]">
-              <PageLoadingSpinner />
-            </div>
+            <LayoutSkeleton />
           ) : (
             <ComponentErrorBoundary>
               {children}

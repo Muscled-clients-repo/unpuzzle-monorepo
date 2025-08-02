@@ -13,7 +13,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { CheckCircleIcon } from "@heroicons/react/24/solid";
 import { useMyCourses } from "@/app/hooks/useCourses";
-import LoadingSpinner from "@/app/components/shared/ui/loading-spinner";
+import { CourseListSkeleton } from "@unpuzzle/ui";
 import { Course } from "@/app/types/course.types";
 
 const categories = [
@@ -239,9 +239,7 @@ export default function MyCoursesClient() {
             
             {/* Loading State */}
             {myCoursesLoading && myCourses.length === 0 ? (
-              <div className="flex justify-center items-center py-12">
-                <LoadingSpinner />
-              </div>
+              <CourseListSkeleton count={6} />
             ) : myCourses.length > 0 ? (
               <>
                 {/* Course Grid */}

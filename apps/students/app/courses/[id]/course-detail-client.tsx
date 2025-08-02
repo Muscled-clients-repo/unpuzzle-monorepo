@@ -29,7 +29,7 @@ import {
   DevicePhoneMobileIcon
 } from "@heroicons/react/24/outline";
 import { StarIcon as StarSolidIcon, CheckBadgeIcon } from "@heroicons/react/24/solid";
-import LoadingSpinner from "@/app/components/shared/ui/loading-spinner";
+import { CourseDetailSkeleton } from "@unpuzzle/ui";
 
 interface CourseDetailClientProps {
   courseId: string;
@@ -68,11 +68,7 @@ export default function CourseDetailClient({ courseId }: CourseDetailClientProps
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <LoadingSpinner />
-      </div>
-    );
+    return <CourseDetailSkeleton />;
   }
 
   if (error || !course) {

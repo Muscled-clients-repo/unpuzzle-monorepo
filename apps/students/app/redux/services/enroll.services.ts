@@ -16,15 +16,6 @@ export const enrollApi = createApi({
       invalidatesTags: ['Enrolls'], // Refresh enrollments after creation
     }),
 
-    // Update Enroll
-    updateEnroll: builder.mutation<void, { id: string; userId: string; courseId: string }>({
-      query: ({ id, userId, courseId }) => ({
-        url: `enroll/${id}`,
-        method: 'PUT',
-        body: { userId, courseId },
-      }),
-      invalidatesTags: ['Enrolls'], // Refresh enrollments after update
-    }),
 
     // Get All Enrolls
     getAllEnrolls: builder.query<any[], void>({
@@ -44,7 +35,8 @@ export const enrollApi = createApi({
       providesTags: ['Enrolls'],
     }),
 
-    deleteEnroll: builder.mutation<void, string>({
+    // Cancel enrollment (delete enrollment)
+    cancelEnrollment: builder.mutation<void, string>({
       query: (id) => ({
         url: `enroll/${id}`,
         method: 'DELETE',
@@ -57,8 +49,7 @@ export const enrollApi = createApi({
 // Export hooks for usage in components
 export const {
   useCreateEnrollMutation,
-  useUpdateEnrollMutation,
   useGetAllEnrollsQuery,
   useGetEnrollByIdQuery,
-  useDeleteEnrollMutation,
+  useCancelEnrollmentMutation,
 } = enrollApi;
