@@ -1,11 +1,18 @@
 import { MetadataRoute } from 'next';
 import { getAllCourses } from './services/course.service';
+import { Course } from './types/course.types';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://unpuzzle.com';
+  const baseUrl = process.env.NEXT_PUBLIC_CORE_SERVER_URL || 'https://core.nazmulcodes.org';
   
-  // Get all courses
-  const courses = await getAllCourses();
+  // Get all courses - handle auth errors during build
+  let courses: Course[] = [];
+  try {
+    courses = await getAllCourses();
+  } catch (error) {
+    console.warn('Could not fetch courses for sitemap during build:', error);
+    courses = [];
+  }
   
   // Static pages
   const staticPages = [
