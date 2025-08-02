@@ -60,7 +60,7 @@ export default function RootLayout({
       className={`${geistSans.className} ${geistMono.className} overflow-hidden`}
     >
       <body className="antialiased light" suppressHydrationWarning>
-      <ToastContainer />
+        <ToastContainer />
         <Provider store={store}>
           <NavigationProvider>
             <VideoTimeProvider>

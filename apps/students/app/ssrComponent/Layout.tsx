@@ -1,13 +1,10 @@
 "use client";
 import { Geist, Geist_Mono } from "next/font/google";
 import type { Metadata } from "next";
-// import "../tailwind.css";
-// import Header from "./Header";
 import { Provider } from "react-redux";
 import store from "../redux/store";
-// import AuthenticatedSidebar from "../components/authenticated-sidebar"; // Removed - no sidebar needed
 import PageLoadingSpinner from "../components/shared/loading-indicator";
-import StudentHeader from "../components/shared/student-header";
+import {Header} from "@unpuzzle/ui";
 import React, { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { VideoTimeProvider } from "../context/VideoTimeContext";
@@ -50,7 +47,7 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
   const showSidebar = false;
 
   // Show AnnotationHeader for specific paths
-  const showAnnotationHeader = [
+  const showAnnotationHeader = pathname && [
     "/student-annotations",
     "/confusions-puzzlejourney", 
     "/annotations-puzzlejourney"
@@ -60,7 +57,7 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
     <>
       
       {/* Student Header */}
-      <StudentHeader />
+      <Header variant="student" />
       
       <main>
         {/* Annotation Header for specific paths */}
