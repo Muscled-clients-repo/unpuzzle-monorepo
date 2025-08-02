@@ -19,6 +19,10 @@
     {
       "source": "/course-video/:id",
       "destination": "https://core.nazmulcodes.org/course-video/:id"
+    },
+    {
+      "source": "/:path*",
+      "destination": "https://student.nazmulcodes.org/:path*"
     }
   ]
 }
