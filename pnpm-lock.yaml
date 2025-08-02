@@ -412,17 +412,17 @@ importers:
         specifier: ^24.1.0
         version: 24.1.0
       '@types/react':
-        specifier: ^18.2.0
-        version: 18.3.23
+        specifier: ^19
+        version: 19.1.9
       '@types/react-dom':
-        specifier: ^18.2.0
-        version: 18.3.7(@types/react@18.3.23)
+        specifier: ^19
+        version: 19.1.7(@types/react@19.1.9)
       eslint:
         specifier: ^8.57.0
         version: 8.57.1
       react:
-        specifier: ^18.2.0
-        version: 18.3.1
+        specifier: ^19.0.0
+        version: 19.1.1
       typescript:
         specifier: ^5.3.3
         version: 5.8.3

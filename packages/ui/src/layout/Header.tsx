@@ -16,17 +16,25 @@ import {
   VideoCameraIcon,
   BellIcon
 } from '@heroicons/react/24/outline';
-import {UserButton} from "@unpuzzle/ui"
+import {UserButton} from "../../index"
 
-const navigation = [
-  { name: 'Home', href: '/', icon: HomeIcon },
-  { name: 'Courses', href: '/courses', icon: BookOpenIcon },
-  { name: 'My Courses', href: '/my-courses', icon: AcademicCapIcon },
-  { name: 'Puzzle Content', href: '/puzzle-content', icon: PuzzlePieceIcon },
-  { name: 'Settings', href: '/settings', icon: Cog6ToothIcon },
-];
+const navigation = {
+    student:[
+        { name: 'Home', href: '/', icon: HomeIcon },
+        { name: 'Courses', href: '/courses', icon: BookOpenIcon },
+        { name: 'My Courses', href: '/my-courses', icon: AcademicCapIcon },
+        { name: 'Puzzle Content', href: '/puzzle-content', icon: PuzzlePieceIcon },
+        { name: 'Settings', href: '/settings', icon: Cog6ToothIcon },
+    ]
+};
 
-export default function StudentHeader() {
+type HeaderVariant = keyof typeof navigation;
+
+interface HeaderProps {
+  variant?: HeaderVariant;
+}
+
+export function Header({ variant = "student" }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const pathname = usePathname();
@@ -64,7 +72,7 @@ export default function StudentHeader() {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            {navigation.map((item) => {
+            {navigation[variant].map((item) => {
               const isActive = pathname === item.href || 
                 (item.href !== '/' && pathname.startsWith(item.href));
               
@@ -145,7 +153,7 @@ export default function StudentHeader() {
             </div>
 
             {/* Mobile Navigation Links */}
-            {navigation.map((item) => {
+            {navigation[variant].map((item) => {
               const isActive = pathname === item.href || 
                 (item.href !== '/' && pathname.startsWith(item.href));
               
