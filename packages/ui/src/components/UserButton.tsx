@@ -70,9 +70,9 @@ export const UserButton = () => {
         className="relative flex items-center justify-center w-10 h-10 bg-gray-100 rounded-full hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
         aria-label="User menu"
       >
-        {user?.avatar_url ? (
+        {user?.image_url ? (
           <img
-            src={user.avatar_url}
+            src={user.image_url}
             alt={user.first_name || 'User'}
             className="w-full h-full rounded-full object-cover"
           />
@@ -123,9 +123,9 @@ export const UserButton = () => {
             <div className="flex flex-col items-center">
               {/* Avatar */}
               <div className="w-24 h-24 mb-4">
-                {user?.avatar_url ? (
+                {user?.image_url ? (
                   <img
-                    src={user.avatar_url}
+                    src={user.image_url}
                     alt={user.first_name || 'User'}
                     className="w-full h-full rounded-full object-cover"
                   />

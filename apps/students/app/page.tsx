@@ -157,7 +157,7 @@ export default function Home() {
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center">
               <div className="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Sparkles className="h-8 w-8 text-blue-600" />
+                <Sparkles className="h-8 w-8 text-blue-600" aria-hidden="true" />
               </div>
               <h3 className="text-xl font-semibold mb-2">Interactive Learning</h3>
               <p className="text-gray-600">
@@ -166,7 +166,7 @@ export default function Home() {
             </div>
             <div className="text-center">
               <div className="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Brain className="h-8 w-8 text-blue-600" />
+                <Brain className="h-8 w-8 text-blue-600" aria-hidden="true" />
               </div>
               <h3 className="text-xl font-semibold mb-2">AI-Powered Assistance</h3>
               <p className="text-gray-600">
@@ -175,7 +175,7 @@ export default function Home() {
             </div>
             <div className="text-center">
               <div className="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Users className="h-8 w-8 text-blue-600" />
+                <Users className="h-8 w-8 text-blue-600" aria-hidden="true" />
               </div>
               <h3 className="text-xl font-semibold mb-2">Collaborative Learning</h3>
               <p className="text-gray-600">
@@ -251,7 +251,7 @@ export default function Home() {
                 className="block border rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:scale-105 cursor-pointer group"
               >
                 <div className="h-48 bg-gray-200 flex items-center justify-center relative overflow-hidden">
-                  <BookOpen className="h-16 w-16 text-gray-400 group-hover:text-blue-500 transition-colors" />
+                  <BookOpen className="h-16 w-16 text-gray-400 group-hover:text-blue-500 transition-colors" aria-hidden="true" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 </div>
                 <div className="p-6">
@@ -259,7 +259,7 @@ export default function Home() {
                   <p className="text-gray-600 text-sm mb-4">by {course.instructor}</p>
                   <div className="flex justify-between items-center mb-4">
                     <div className="flex items-center gap-1">
-                      <Users className="h-4 w-4 text-gray-500" />
+                      <Users className="h-4 w-4 text-gray-500" aria-hidden="true" />
                       <span className="text-sm text-gray-600">{course.students} students</span>
                     </div>
                     <div className="flex items-center gap-1">
@@ -279,7 +279,7 @@ export default function Home() {
               href="/courses" 
               className="text-blue-600 hover:text-blue-700 font-semibold inline-flex items-center gap-2"
             >
-              View All Courses <ArrowRight className="h-5 w-5" />
+              View All Courses <ArrowRight className="h-5 w-5" aria-hidden="true" />
             </Link>
           </div>
         </div>
@@ -306,48 +306,7 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="py-12 bg-gray-900 text-gray-400">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-4 gap-8">
-          <div>
-            <div className="flex items-center space-x-2 mb-4">
-              <Brain className="h-8 w-8 text-white" />
-              <span className="text-xl font-bold text-white">Unpuzzle</span>
-            </div>
-            <p className="text-sm">
-              Making learning interactive and engaging through puzzle-based education.
-            </p>
-          </div>
-          <div>
-            <h4 className="font-semibold text-white mb-4">Platform</h4>
-            <ul className="space-y-2 text-sm">
-              <li><Link href="/courses" className="hover:text-white">Browse Courses</Link></li>
-              <li><Link href="/pricing" className="hover:text-white">Pricing</Link></li>
-              <li><Link href="/courses" className="hover:text-white">Get Started</Link></li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="font-semibold text-white mb-4">Resources</h4>
-            <ul className="space-y-2 text-sm">
-              <li><a href="#" className="hover:text-white">Help Center</a></li>
-              <li><a href="#" className="hover:text-white">Community</a></li>
-              <li><a href="#" className="hover:text-white">Blog</a></li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="font-semibold text-white mb-4">Company</h4>
-            <ul className="space-y-2 text-sm">
-              <li><a href="#" className="hover:text-white">About Us</a></li>
-              <li><a href="#" className="hover:text-white">Contact</a></li>
-              <li><a href="#" className="hover:text-white">Privacy Policy</a></li>
-            </ul>
-          </div>
-          </div>
-          <div className="mt-8 pt-8 border-t border-gray-800 text-center text-sm">
-            <p>&copy; 2024 Unpuzzle. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
+      
       </div>
     </>
   );

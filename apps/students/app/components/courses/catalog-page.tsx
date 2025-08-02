@@ -5,7 +5,7 @@ import { useGetCoursesQuery } from "../../redux/hooks";
 import { EnrolledCourse } from '../../types/course.types';
 // import PageLoadingSpinner from "../shared/page-loading-spinner";
 import Image from "next/image";
-import { CourseGridSkeleton } from "../shared/content-skeleton-loader";
+import { CourseGridSkeleton } from "@unpuzzle/ui";
 
 // Dynamic imports for better code splitting
 const CourseCard = dynamic(() => import('./course-card').then(mod => ({ default: mod.CourseCard })), {

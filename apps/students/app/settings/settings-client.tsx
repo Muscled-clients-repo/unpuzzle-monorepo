@@ -19,10 +19,107 @@ import {
   CheckCircleIcon,
   ExclamationCircleIcon
 } from "@heroicons/react/24/outline";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/app/components/shared/ui/tab-navigator";
-import { Switch } from "@/app/components/shared/ui/toggle-switch";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/app/components/shared/ui/modal-dialog";
+// Using simplified inline components instead of deleted UI components
 import { useSettings } from "@/app/hooks/useSettings";
+
+// Simple inline UI components to replace deleted ones
+const TabsContext = React.createContext<{ activeTab: string; setActiveTab: (tab: string) => void } | null>(null);
+
+const Tabs = ({ value, onValueChange, children }: { value: string; onValueChange: (value: string) => void; children: React.ReactNode }) => {
+  const contextValue = {
+    activeTab: value,
+    setActiveTab: onValueChange
+  };
+  
+  return (
+    <TabsContext.Provider value={contextValue}>
+      <div>{children}</div>
+    </TabsContext.Provider>
+  );
+};
+
+const TabsList = ({ className, children }: { className?: string; children: React.ReactNode }) => {
+  return <div className={className}>{children}</div>;
+};
+
+const TabsTrigger = ({ value, className, children }: { value: string; className?: string; children: React.ReactNode }) => {
+  const context = React.useContext(TabsContext);
+  if (!context) throw new Error('TabsTrigger must be used within Tabs');
+  
+  const { activeTab, setActiveTab } = context;
+  const isActive = activeTab === value;
+  
+  return (
+    <button
+      className={`${className} ${isActive ? 'bg-blue-100 text-blue-700 border-blue-300' : 'bg-white text-gray-600 border-gray-200'} px-4 py-2 border rounded-lg transition-colors`}
+      onClick={() => setActiveTab(value)}
+    >
+      {children}
+    </button>
+  );
+};
+
+const TabsContent = ({ value, className, children }: { value: string; className?: string; children: React.ReactNode }) => {
+  const context = React.useContext(TabsContext);
+  if (!context) throw new Error('TabsContent must be used within Tabs');
+  
+  const { activeTab } = context;
+  const isVisible = activeTab === value;
+  
+  if (!isVisible) return null;
+  
+  return <div className={className}>{children}</div>;
+};
+
+const Switch = ({ checked, onCheckedChange, className }: { checked: boolean; onCheckedChange: (checked: boolean) => void; className?: string }) => {
+  return (
+    <button
+      onClick={() => onCheckedChange(!checked)}
+      className={`${className} relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+        checked ? 'bg-blue-600' : 'bg-gray-200'
+      }`}
+    >
+      <span
+        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+          checked ? 'translate-x-6' : 'translate-x-1'
+        }`}
+      />
+    </button>
+  );
+};
+
+const Dialog = ({ open, onOpenChange, children }: { open: boolean; onOpenChange: (open: boolean) => void; children: React.ReactNode }) => {
+  if (!open) return null;
+  
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="fixed inset-0 bg-black/50" onClick={() => onOpenChange(false)} />
+      <div className="relative bg-white rounded-lg p-6 max-w-md w-full mx-4 shadow-xl">
+        {children}
+      </div>
+    </div>
+  );
+};
+
+const DialogContent = ({ children }: { children: React.ReactNode }) => {
+  return <>{children}</>;
+};
+
+const DialogHeader = ({ children }: { children: React.ReactNode }) => {
+  return <div className="mb-4">{children}</div>;
+};
+
+const DialogTitle = ({ children }: { children: React.ReactNode }) => {
+  return <h2 className="text-lg font-semibold">{children}</h2>;
+};
+
+const DialogDescription = ({ children }: { children: React.ReactNode }) => {
+  return <p className="text-sm text-gray-500 mt-2">{children}</p>;
+};
+
+const DialogFooter = ({ children }: { children: React.ReactNode }) => {
+  return <div className="flex justify-end gap-2 mt-6">{children}</div>;
+};
 
 interface SettingsState {
   // Profile settings

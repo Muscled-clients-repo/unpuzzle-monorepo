@@ -7,9 +7,9 @@ import { Course } from "@/app/types/course.types";
 import { useCourses, usePopularCourses } from "@/app/hooks/useCourses";
 import { MagnifyingGlassIcon, FunnelIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
 import { StarIcon, ClockIcon, UsersIcon, PhotoIcon } from "@heroicons/react/24/solid";
-import LoadingSpinner from "@/app/components/shared/ui/loading-spinner";
-import { CourseListSkeleton, CourseCardSkeleton } from "@/app/components/shared/course-skeleton-loader";
+import { CourseListSkeleton, CourseCardSkeleton } from "@unpuzzle/ui";
 import { Brain } from "lucide-react";
+import SEOBreadcrumb from "../components/shared/seo-breadcrumb";
 
 const categories = [
   "All Categories",
@@ -62,8 +62,8 @@ export default function CoursesListingClient() {
 
   // Reset accumulated courses when filters change
   useEffect(() => {
-
-    
+    setAllCourses([]);
+    setLoadMorePage(1);
   }, [filters.category, filters.searchQuery, filters.sortBy, filters.priceRange, filters.level]);
 
   // Load more courses function
@@ -86,21 +86,32 @@ export default function CoursesListingClient() {
   };
 
   useEffect(() => {
-    console.log("dispatching...", hasMorePages)
-    loadMoreCourses()
+    if (loadMorePage > 1) {
+      console.log("dispatching...", hasMorePages)
+      loadMoreCourses()
+    }
   }, [loadMorePage]);
 
   useEffect(()=>{
-    const withDuplicate = [...allCourses, ...courses]
-    const uniqueCourses = withDuplicate.reduce<Course[]>((acc, current) => {
-      if (!acc.some(item => item.id === current.id)) {
-        acc.push(current);
+    if (courses.length > 0) {
+      if (loadMorePage === 1) {
+        // First page or filter change - replace all courses
+        setAllCourses(courses);
+      } else {
+        // Additional pages - merge with existing courses
+        setAllCourses(prevAll => {
+          const withDuplicate = [...prevAll, ...courses]
+          return withDuplicate.reduce<Course[]>((acc, current) => {
+            if (!acc.some(item => item.id === current.id)) {
+              acc.push(current);
+            }
+            return acc;
+          }, []);
+        });
       }
-      return acc;
-    }, []);
-    setAllCourses(uniqueCourses)
-    setHasMorePages(totalPages>loadMorePage);
-  },[courses])
+      setHasMorePages(totalPages > loadMorePage);
+    }
+  },[courses, loadMorePage, totalPages])
   
 
   // Debounced search effect - handle locally
@@ -173,9 +184,14 @@ export default function CoursesListingClient() {
         </div>
       </section>
 
+      {/* Breadcrumb Section */}
+      <section className="container mx-auto px-4 pt-8 pb-4">
+        <SEOBreadcrumb items={[{ name: "Courses", url: "/courses" }]} />
+      </section>
+
       {/* Popular Courses Section */}
       {!filters.searchQuery && !filters.category && (
-        <section className="container mx-auto px-4 py-12">
+        <section className="container mx-auto px-4 pt-4 pb-12">
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-3xl font-bold">Popular Courses</h2>
             <Link href="/courses?sort=popular" className="text-blue-600 hover:underline">
@@ -319,6 +335,16 @@ export default function CoursesListingClient() {
             {/* Course Grid */}
             {loading && allCourses.length === 0 ? (
               <CourseListSkeleton count={6} />
+            ) : error ? (
+              <div className="text-center py-12">
+                <p className="text-red-600 text-lg mb-4">Error loading courses: {error}</p>
+                <button
+                  onClick={() => refreshCourses()}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                >
+                  Try Again
+                </button>
+              </div>
             ) : allCourses.length > 0 ? (
               <>
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -337,7 +363,10 @@ export default function CoursesListingClient() {
                     >
                       {isLoadingMore ? (
                         <div className="flex items-center gap-2">
-                          <LoadingSpinner  variant="small" />
+                          <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
                           <span>Loading...</span>
                         </div>
                       ) : (
@@ -355,70 +384,46 @@ export default function CoursesListingClient() {
               </>
             ) : (
               <div className="text-center py-12">
-                <p className="text-gray-600 text-lg mb-4">No courses found matching your criteria</p>
-                <button
-                  onClick={() => {
-                    updateFilters({
-                      category: undefined,
-                      priceRange: undefined,
-                      searchQuery: undefined,
-                    });
-                    setSearchQuery("");
-                    setLocalPriceRange([0, 1000]);
-                  }}
-                  className="text-blue-600 hover:underline"
-                >
-                  Clear filters and try again
-                </button>
+                <div className="mb-6">
+                  <Brain className="h-16 w-16 text-gray-300 mx-auto mb-4" aria-hidden="true" />
+                  <p className="text-gray-600 text-lg mb-4">
+                    {error ? "Unable to load courses at the moment" : "No courses found matching your criteria"}
+                  </p>
+                  {error && (
+                    <p className="text-sm text-gray-500 mb-4">
+                      Our servers might be experiencing issues. Please try again later.
+                    </p>
+                  )}
+                </div>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <button
+                    onClick={() => refreshCourses()}
+                    className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all"
+                  >
+                    Retry Loading
+                  </button>
+                  {!error && (
+                    <button
+                      onClick={() => {
+                        updateFilters({
+                          category: undefined,
+                          priceRange: undefined,
+                          searchQuery: undefined,
+                        });
+                        setSearchQuery("");
+                        setLocalPriceRange([0, 1000]);
+                      }}
+                      className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all"
+                    >
+                      Clear Filters
+                    </button>
+                  )}
+                </div>
               </div>
             )}
           </div>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="py-12 bg-gray-900 text-gray-400">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-4 gap-8">
-            <div>
-              <div className="flex items-center space-x-2 mb-4">
-                <Brain className="h-8 w-8 text-white" />
-                <span className="text-xl font-bold text-white">Unpuzzle</span>
-              </div>
-              <p className="text-sm">
-                Making learning interactive and engaging through puzzle-based education.
-              </p>
-            </div>
-            <div>
-              <h4 className="font-semibold text-white mb-4">Platform</h4>
-              <ul className="space-y-2 text-sm">
-                <li><Link href="/courses" className="hover:text-white">Browse Courses</Link></li>
-                <li><Link href="/pricing" className="hover:text-white">Pricing</Link></li>
-                <li><Link href="/sign-up" className="hover:text-white">Sign Up</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold text-white mb-4">Resources</h4>
-              <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-white">Help Center</a></li>
-                <li><a href="#" className="hover:text-white">Community</a></li>
-                <li><a href="#" className="hover:text-white">Blog</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold text-white mb-4">Company</h4>
-              <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-white">About Us</a></li>
-                <li><a href="#" className="hover:text-white">Contact</a></li>
-                <li><a href="#" className="hover:text-white">Privacy Policy</a></li>
-              </ul>
-            </div>
-          </div>
-          <div className="mt-8 pt-8 border-t border-gray-800 text-center text-sm">
-            <p>&copy; 2024 Unpuzzle. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }
@@ -432,7 +437,7 @@ function CourseCard({ course, featured = false }: { course: any; featured?: bool
 
   return (
     <Link 
-      href={`/course-video/${course.id}`} 
+      href={`/courses/${course.id}`} 
       className={`group bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden ${
         featured ? 'ring-2 ring-blue-500' : ''
       }`}

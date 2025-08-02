@@ -27,7 +27,7 @@ export default function SEOBreadcrumb({ items }: SEOBreadcrumbProps) {
           </li>
           {items.map((item, index) => (
             <li key={index} className="flex items-center">
-              <ChevronRight className="w-4 h-4 text-gray-400 mx-1" />
+              <ChevronRight className="w-4 h-4 text-gray-400 mx-1" aria-hidden="true" />
               {index === items.length - 1 ? (
                 <span className="text-gray-900 font-medium">{item.name}</span>
               ) : (

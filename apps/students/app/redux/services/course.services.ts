@@ -50,46 +50,10 @@ export const courseApi = createApi({
       }),
       providesTags: ['Courses'],
     }),
-    createCourse: build.mutation({
-      query: ({ coursePayload, token }: { coursePayload: any; token?: string }) => ({
-        url: '/api/courses',
-        method: 'POST',
-        body: coursePayload,
-        ...(token && { token }),
-      }),
-      invalidatesTags: ['Courses'],
-    }),
-    deleteCourse: build.mutation({
-      query: ({ courseId, token }: { courseId: string; token?: string }) => {
-        if (!courseId || typeof courseId !== 'string') {
-          throw new Error('Invalid courseId provided to deleteCourse');
-        }
-        return {
-          url: `/api/courses/${courseId}`,
-          method: 'DELETE',
-          ...(token && { token }),
-        };
-      },
-      invalidatesTags: ['Courses'],
-    }),
-    updateCourse: build.mutation({
-      query: ({ courseId, updatedData, token }: { courseId: string; updatedData: any; token?: string }) => {
-        if (!courseId || typeof courseId !== 'string') {
-          throw new Error('Invalid courseId provided to updateCourse');
-        }
-        return {
-          url: `/api/courses/${courseId}`,
-          method: 'PUT',
-          body: updatedData,
-          ...(token && { token }),
-        };
-      },
-      invalidatesTags: ['Courses'], // Ensure UI updates after update
-    }),
   }),
 });
 
-export const { useGetCoursesQuery, useCreateCourseMutation, useDeleteCourseMutation, useUpdateCourseMutation } = courseApi;
+export const { useGetCoursesQuery } = courseApi;
 
 // Usage:
 // 1. After login, dispatch setToken(token) to Redux.

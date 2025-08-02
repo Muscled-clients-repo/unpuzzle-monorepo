@@ -1,50 +1,8 @@
 import React from 'react';
+import { Skeleton } from '../components/Skeleton';
 
-interface SkeletonProps {
-  className?: string;
-  variant?: 'text' | 'circular' | 'rectangular' | 'rounded';
-  width?: string | number;
-  height?: string | number;
-  animation?: 'pulse' | 'wave' | 'none';
-}
-
-export const Skeleton: React.FC<SkeletonProps> = ({
-  className = '',
-  variant = 'text',
-  width,
-  height,
-  animation = 'pulse'
-}) => {
-  const baseClasses = 'bg-gray-200 dark:bg-gray-700';
-  
-  const variantClasses = {
-    text: 'rounded',
-    circular: 'rounded-full',
-    rectangular: '',
-    rounded: 'rounded-lg'
-  };
-
-  const animationClasses = {
-    pulse: 'animate-pulse',
-    wave: 'animate-shimmer',
-    none: ''
-  };
-
-  const style = {
-    width: width || '100%',
-    height: height || (variant === 'text' ? '1em' : '100%')
-  };
-
-  return (
-    <div
-      className={`${baseClasses} ${variantClasses[variant]} ${animationClasses[animation]} ${className}`}
-      style={style}
-    />
-  );
-};
-
-// Course Card Skeleton
-export const CourseCardSkeleton: React.FC = () => {
+// Content Card Skeleton
+export const ContentCardSkeleton: React.FC = () => {
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 space-y-4">
       <Skeleton variant="rectangular" height={200} className="mb-4" />
@@ -59,12 +17,12 @@ export const CourseCardSkeleton: React.FC = () => {
   );
 };
 
-// Course Grid Skeleton
+// Course Grid Skeleton (renamed to ContentGridSkeleton to avoid conflict)
 export const CourseGridSkeleton: React.FC<{ count?: number }> = ({ count = 6 }) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {Array.from({ length: count }).map((_, index) => (
-        <CourseCardSkeleton key={index} />
+        <ContentCardSkeleton key={index} />
       ))}
     </div>
   );

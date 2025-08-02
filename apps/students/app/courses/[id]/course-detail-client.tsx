@@ -29,13 +29,15 @@ import {
   DevicePhoneMobileIcon
 } from "@heroicons/react/24/outline";
 import { StarIcon as StarSolidIcon, CheckBadgeIcon } from "@heroicons/react/24/solid";
-import LoadingSpinner from "@/app/components/shared/ui/loading-spinner";
+import { CourseDetailSkeleton, CourseEnrollButton } from "@unpuzzle/ui";
 
 interface CourseDetailClientProps {
   courseId: string;
+  initialCourseData?: any;
+  breadcrumbItems?: Array<{ name: string; url: string }>;
 }
 
-export default function CourseDetailClient({ courseId }: CourseDetailClientProps) {
+export default function CourseDetailClient({ courseId, initialCourseData, breadcrumbItems }: CourseDetailClientProps) {
   const router = useRouter();
   
   // Safe check for courseId
@@ -43,44 +45,35 @@ export default function CourseDetailClient({ courseId }: CourseDetailClientProps
     notFound();
   }
   
-  const { course, loading, error } = useCourseDetails(courseId);
+  const { course, loading, error } = useCourseDetails(courseId, initialCourseData);
   const { enrollInCourse } = useCourses();
-  const [isEnrolling, setIsEnrolling] = useState(false);
   const [expandedChapter, setExpandedChapter] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<"overview" | "curriculum" | "instructor" | "reviews">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "curriculum">("overview");
 
-  const handleEnroll = async () => {
-    // Authentication check removed
+  console.log('Client component state:', { course, loading, error, initialCourseData });
+  console.log('initialCourseData details:', initialCourseData);
 
-    if (!course) return;
-
-    setIsEnrolling(true);
-    try {
-      const result = await enrollInCourse(course.id);
-      if (result.success) {
-        router.push(`/courses/${course.id}/learn`);
-      }
-    } catch (error) {
-      console.error("Enrollment failed:", error);
-    } finally {
-      setIsEnrolling(false);
+  const handleEnrollment = async (courseId: string) => {
+    const result = await enrollInCourse(courseId);
+    if (result.success) {
+      router.push(`/courses/${courseId}/learn`);
     }
+    return result;
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <LoadingSpinner />
-      </div>
-    );
+    return <CourseDetailSkeleton />;
   }
 
-  if (error || !course) {
+  // Use initialCourseData as fallback if Redux course is null
+  const effectiveCourse = course || initialCourseData;
+  
+  if (error || !effectiveCourse) {
     notFound();
   }
 
-  const totalVideos = course.chapters?.reduce((acc, chapter) => acc + (chapter.videos?.length || 0), 0) || 0;
-  const totalDuration = course.duration || "0h";
+  const totalVideos = effectiveCourse.chapters?.reduce((acc, chapter) => acc + (chapter.videos?.length || 0), 0) || 0;
+  const totalDuration = effectiveCourse.duration || "0h";
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
@@ -99,11 +92,26 @@ export default function CourseDetailClient({ courseId }: CourseDetailClientProps
               {/* Enhanced Breadcrumb */}
               <nav className="text-sm">
                 <ul className="flex items-center space-x-2 text-gray-300">
-                  <li><Link href="/courses" className="hover:text-white transition-colors">Courses</Link></li>
-                  <li className="flex items-center">
-                    <ArrowRightIcon className="w-4 h-4 mx-2" />
-                    <span className="text-white">{course.category || "General"}</span>
-                  </li>
+                  {breadcrumbItems ? (
+                    breadcrumbItems.map((item, index) => (
+                      <li key={index} className="flex items-center">
+                        {index > 0 && <ArrowRightIcon className="w-4 h-4 mx-2" />}
+                        {index === breadcrumbItems.length - 1 ? (
+                          <span className="text-white">{item.name}</span>
+                        ) : (
+                          <Link href={item.url} className="hover:text-white transition-colors">{item.name}</Link>
+                        )}
+                      </li>
+                    ))
+                  ) : (
+                    <>
+                      <li><Link href="/courses" className="hover:text-white transition-colors">Courses</Link></li>
+                      <li className="flex items-center">
+                        <ArrowRightIcon className="w-4 h-4 mx-2" />
+                        <span className="text-white">{effectiveCourse.category || "General"}</span>
+                      </li>
+                    </>
+                  )}
                 </ul>
               </nav>
               
@@ -119,12 +127,12 @@ export default function CourseDetailClient({ courseId }: CourseDetailClientProps
                 </div>
                 
                 <h1 className="text-4xl lg:text-6xl font-bold leading-tight bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent">
-                  {course.title}
+                  {effectiveCourse.title}
                 </h1>
               </div>
               
               <p className="text-lg lg:text-xl text-gray-200 leading-relaxed">
-                {course.description}
+                {effectiveCourse.description}
               </p>
 
               {/* Enhanced Stats */}
@@ -154,19 +162,11 @@ export default function CourseDetailClient({ courseId }: CourseDetailClientProps
 
               {/* Enhanced CTA Buttons */}
               <div className="flex flex-wrap items-center gap-4 pt-4">
-                <button
-                  onClick={handleEnroll}
-                  disabled={isEnrolling || course.enrolled}
-                  className="group px-8 py-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-bold rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-xl hover:shadow-2xl transform hover:scale-105"
-                >
-                  <span className="flex items-center gap-2">
-                    {isEnrolling ? "Processing..." : course.enrolled ? (
-                      <>Continue Learning <ArrowRightIcon className="w-5 h-5 group-hover:translate-x-1 transition-transform" /></>
-                    ) : (
-                      <>Enroll for ${course.price} <SparklesIcon className="w-5 h-5" /></>
-                    )}
-                  </span>
-                </button>
+                <CourseEnrollButton 
+                  course={effectiveCourse}
+                  onEnroll={handleEnrollment}
+                  variant="primary"
+                />
                 <button className="p-4 bg-white/10 backdrop-blur-sm border-2 border-white/30 rounded-xl hover:bg-white/20 hover:border-white/50 transition-all group">
                   <PlayCircleIcon className="w-6 h-6 group-hover:scale-110 transition-transform" />
                 </button>
@@ -179,13 +179,13 @@ export default function CourseDetailClient({ courseId }: CourseDetailClientProps
               <div className="flex items-center gap-4 pt-4">
                 <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400 to-purple-400 flex items-center justify-center">
                   <span className="text-white font-bold text-lg">
-                    {course.courseAuthor?.charAt(0) || "U"}
+                    {effectiveCourse.courseAuthor?.charAt(0) || "U"}
                   </span>
                 </div>
                 <div>
                   <p className="text-sm text-gray-300">Created by</p>
                   <p className="font-semibold flex items-center gap-2">
-                    {course.courseAuthor || "Unpuzzle Team"}
+                    {effectiveCourse.courseAuthor || "Unpuzzle Team"}
                     <CheckBadgeIcon className="w-5 h-5 text-blue-400" />
                   </p>
                 </div>
@@ -196,8 +196,8 @@ export default function CourseDetailClient({ courseId }: CourseDetailClientProps
             <div className="relative group">
               <div className="relative aspect-video rounded-2xl overflow-hidden shadow-2xl transform transition-transform group-hover:scale-105">
                 <Image
-                  src={course.thumbnail || "/assets/courseThumbnail.svg"}
-                  alt={course.title}
+                  src={effectiveCourse.thumbnail || "/assets/courseThumbnail.svg"}
+                  alt={effectiveCourse.title}
                   fill
                   className="object-cover"
                   priority
@@ -236,7 +236,7 @@ export default function CourseDetailClient({ courseId }: CourseDetailClientProps
             {/* Tabs */}
             <div className="bg-white rounded-xl shadow-sm overflow-hidden">
               <div className="flex border-b">
-                {["overview", "curriculum", "instructor", "reviews"].map((tab) => (
+                {["overview", "curriculum"].map((tab) => (
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab as any)}
@@ -352,6 +352,88 @@ export default function CourseDetailClient({ courseId }: CourseDetailClientProps
                         </li>
                       </ul>
                     </div>
+
+                    {/* Instructor Section */}
+                    {effectiveCourse.courseAuthor && (
+                      <div className="bg-white p-8 rounded-2xl shadow-sm">
+                        <h2 className="text-2xl font-bold mb-6">About the Instructor</h2>
+                        <div className="flex items-start gap-6">
+                          <div className="w-24 h-24 rounded-full bg-gray-200 flex-shrink-0" />
+                          <div className="space-y-2">
+                            <h3 className="text-xl font-semibold">{effectiveCourse.courseAuthor}</h3>
+                            <p className="text-gray-600">Expert Instructor</p>
+                            <div className="flex items-center gap-4 text-sm text-gray-600">
+                              <span className="flex items-center gap-1">
+                                <StarIcon className="w-4 h-4" />
+                                4.8 Instructor Rating
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <UsersIcon className="w-4 h-4" />
+                                25,000 Students
+                              </span>
+                            </div>
+                            <p className="text-gray-700 pt-2">
+                              Experienced educator with over 10 years of teaching experience. 
+                              Passionate about making complex topics accessible through interactive learning.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Reviews Section */}
+                    <div className="bg-white p-8 rounded-2xl shadow-sm">
+                      <h2 className="text-2xl font-bold mb-6">Student Reviews</h2>
+                      <div className="flex items-center gap-6 pb-6 border-b">
+                        <div className="text-center">
+                          <div className="text-5xl font-bold">4.8</div>
+                          <div className="flex items-center gap-1 mt-2">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <StarSolidIcon key={star} className={`w-5 h-5 ${star <= 4 ? "text-yellow-400" : "text-gray-300"}`} />
+                            ))}
+                          </div>
+                          <p className="text-sm text-gray-600 mt-1">Course Rating</p>
+                        </div>
+                        <div className="flex-1 space-y-2">
+                          {[5, 4, 3, 2, 1].map((rating) => (
+                            <div key={rating} className="flex items-center gap-3">
+                              <span className="text-sm w-3">{rating}</span>
+                              <StarSolidIcon className="w-4 h-4 text-yellow-400" />
+                              <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                                <div 
+                                  className="h-full bg-yellow-400"
+                                  style={{ width: `${rating === 5 ? 70 : rating === 4 ? 20 : 10}%` }}
+                                />
+                              </div>
+                              <span className="text-sm text-gray-600 w-10 text-right">
+                                {rating === 5 ? "70%" : rating === 4 ? "20%" : "10%"}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      {/* Sample Reviews */}
+                      <div className="space-y-4 mt-6">
+                        {[1, 2, 3].map((review) => (
+                          <div key={review} className="border-b pb-4 last:border-b-0">
+                            <div className="flex items-center gap-2 mb-2">
+                              <div className="flex">
+                                {[1, 2, 3, 4, 5].map((star) => (
+                                  <StarSolidIcon key={star} className="w-4 h-4 text-yellow-400" />
+                                ))}
+                              </div>
+                              <span className="text-sm text-gray-600">2 days ago</span>
+                            </div>
+                            <h4 className="font-semibold mb-1">Great course for beginners!</h4>
+                            <p className="text-gray-700">
+                              This course exceeded my expectations. The interactive puzzles really helped me understand the concepts better.
+                            </p>
+                            <p className="text-sm text-gray-600 mt-2">- Student {review}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 )}
 
@@ -359,7 +441,7 @@ export default function CourseDetailClient({ courseId }: CourseDetailClientProps
                 {activeTab === "curriculum" && (
                   <div className="space-y-4">
                     <h2 className="text-2xl font-bold mb-4">Course Curriculum</h2>
-                    {course.chapters?.map((chapter, chapterIndex) => (
+                    {effectiveCourse.chapters?.map((chapter, chapterIndex) => (
                       <div key={chapter.id} className="border rounded-lg overflow-hidden">
                         <button
                           onClick={() => setExpandedChapter(expandedChapter === chapter.id ? null : chapter.id)}
@@ -394,7 +476,7 @@ export default function CourseDetailClient({ courseId }: CourseDetailClientProps
                                       <p className="text-sm text-gray-600">Video • {Math.floor(video.duration / 60)}:{(video.duration % 60).toString().padStart(2, '0')}</p>
                                     </div>
                                   </div>
-                                  {course.enrolled && (
+                                  {effectiveCourse.enrolled && (
                                     <CheckCircleIcon className="w-5 h-5 text-green-500" />
                                   )}
                                 </div>
@@ -407,89 +489,6 @@ export default function CourseDetailClient({ courseId }: CourseDetailClientProps
                   </div>
                 )}
 
-                {/* Instructor Tab */}
-                {activeTab === "instructor" && course.courseAuthor && (
-                  <div className="space-y-6">
-                    <h2 className="text-2xl font-bold mb-4">About the Instructor</h2>
-                    <div className="flex items-start gap-6">
-                      <div className="w-24 h-24 rounded-full bg-gray-200 flex-shrink-0" />
-                      <div className="space-y-2">
-                        <h3 className="text-xl font-semibold">{course.courseAuthor}</h3>
-                        <p className="text-gray-600">Expert Instructor</p>
-                        <div className="flex items-center gap-4 text-sm text-gray-600">
-                          <span className="flex items-center gap-1">
-                            <StarIcon className="w-4 h-4" />
-                            4.8 Instructor Rating
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <UsersIcon className="w-4 h-4" />
-                            25,000 Students
-                          </span>
-                        </div>
-                        <p className="text-gray-700 pt-2">
-                          Experienced educator with over 10 years of teaching experience. 
-                          Passionate about making complex topics accessible through interactive learning.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Reviews Tab */}
-                {activeTab === "reviews" && (
-                  <div className="space-y-6">
-                    <h2 className="text-2xl font-bold mb-4">Student Reviews</h2>
-                    <div className="flex items-center gap-6 pb-6 border-b">
-                      <div className="text-center">
-                        <div className="text-5xl font-bold">4.8</div>
-                        <div className="flex items-center gap-1 mt-2">
-                          {[1, 2, 3, 4, 5].map((star) => (
-                            <StarSolidIcon key={star} className={`w-5 h-5 ${star <= 4 ? "text-yellow-400" : "text-gray-300"}`} />
-                          ))}
-                        </div>
-                        <p className="text-sm text-gray-600 mt-1">Course Rating</p>
-                      </div>
-                      <div className="flex-1 space-y-2">
-                        {[5, 4, 3, 2, 1].map((rating) => (
-                          <div key={rating} className="flex items-center gap-3">
-                            <span className="text-sm w-3">{rating}</span>
-                            <StarSolidIcon className="w-4 h-4 text-yellow-400" />
-                            <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-                              <div 
-                                className="h-full bg-yellow-400"
-                                style={{ width: `${rating === 5 ? 70 : rating === 4 ? 20 : 10}%` }}
-                              />
-                            </div>
-                            <span className="text-sm text-gray-600 w-10 text-right">
-                              {rating === 5 ? "70%" : rating === 4 ? "20%" : "10%"}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                    
-                    {/* Sample Reviews */}
-                    <div className="space-y-4">
-                      {[1, 2, 3].map((review) => (
-                        <div key={review} className="border-b pb-4">
-                          <div className="flex items-center gap-2 mb-2">
-                            <div className="flex">
-                              {[1, 2, 3, 4, 5].map((star) => (
-                                <StarSolidIcon key={star} className="w-4 h-4 text-yellow-400" />
-                              ))}
-                            </div>
-                            <span className="text-sm text-gray-600">2 days ago</span>
-                          </div>
-                          <h4 className="font-semibold mb-1">Great course for beginners!</h4>
-                          <p className="text-gray-700">
-                            This course exceeded my expectations. The interactive puzzles really helped me understand the concepts better.
-                          </p>
-                          <p className="text-sm text-gray-600 mt-2">- Student {review}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
           </div>
@@ -502,9 +501,9 @@ export default function CourseDetailClient({ courseId }: CourseDetailClientProps
                 {/* Price Header */}
                 <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-6 text-white">
                   <div className="flex items-baseline justify-between mb-2">
-                    <span className="text-4xl font-bold">${course.price}</span>
-                    {course.price > 0 && (
-                      <span className="text-lg line-through opacity-75">${(course.price * 1.5).toFixed(2)}</span>
+                    <span className="text-4xl font-bold">${effectiveCourse.price}</span>
+                    {effectiveCourse.price > 0 && (
+                      <span className="text-lg line-through opacity-75">${(effectiveCourse.price * 1.5).toFixed(2)}</span>
                     )}
                   </div>
                   <div className="flex items-center gap-2">
@@ -517,27 +516,12 @@ export default function CourseDetailClient({ courseId }: CourseDetailClientProps
 
                 <div className="p-6 space-y-6">
                   {/* CTA Button */}
-                  <button
-                    onClick={handleEnroll}
-                    disabled={isEnrolling || course.enrolled}
-                    className="w-full py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-105"
-                  >
-                    {isEnrolling ? (
-                      <span className="flex items-center justify-center gap-2">
-                        <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                        </svg>
-                        Processing...
-                      </span>
-                    ) : course.enrolled ? (
-                      <span className="flex items-center justify-center gap-2">
-                        Continue Learning <ArrowRightIcon className="w-5 h-5" />
-                      </span>
-                    ) : (
-                      "Enroll Now"
-                    )}
-                  </button>
+                  <CourseEnrollButton 
+                    course={effectiveCourse}
+                    onEnroll={handleEnrollment}
+                    variant="secondary"
+                    fullWidth={true}
+                  />
 
                   {/* Guarantees */}
                   <div className="space-y-3">
@@ -596,18 +580,18 @@ export default function CourseDetailClient({ courseId }: CourseDetailClientProps
               </div>
 
               {/* Instructor Card */}
-              {course.courseAuthor && (
+              {effectiveCourse.courseAuthor && (
                 <div className="bg-white rounded-2xl shadow-lg p-6">
                   <h3 className="text-lg font-bold mb-4">Your Instructor</h3>
                   <div className="flex items-center gap-4">
                     <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-400 to-purple-400 flex items-center justify-center">
                       <span className="text-white font-bold text-xl">
-                        {course.courseAuthor.charAt(0)}
+                        {effectiveCourse.courseAuthor.charAt(0)}
                       </span>
                     </div>
                     <div className="flex-1">
                       <p className="font-semibold flex items-center gap-2">
-                        {course.courseAuthor}
+                        {effectiveCourse.courseAuthor}
                         <CheckBadgeIcon className="w-5 h-5 text-blue-500" />
                       </p>
                       <p className="text-sm text-gray-600">Expert Instructor</p>
