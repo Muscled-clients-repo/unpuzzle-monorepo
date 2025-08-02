@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { Skeleton } from '../components/Skeleton';
+import { Skeleton } from '../Skeleton';
 
 export function CourseCardSkeleton() {
   return (

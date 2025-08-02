@@ -20,6 +20,12 @@
     "clsx": "^2.1.0",
     "tailwind-merge": "^2.2.0",
     "@unpuzzle/config":"*",
-    "@unpuzzle/auth":"*"
+    "@unpuzzle/auth":"*",
+    "@radix-ui/react-dialog": "^1.0.5",
+    "@radix-ui/react-progress": "^1.0.3",
+    "@radix-ui/react-switch": "^1.0.3",
+    "@heroicons/react": "^2.0.18",
+    "lucide-react": "^0.462.0",
+    "next": "^15.1.0"
   }
 }

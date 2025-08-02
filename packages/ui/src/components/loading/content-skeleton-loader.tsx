@@ -1,5 +1,5 @@
 import React from 'react';
-import { Skeleton } from '../components/Skeleton';
+import { Skeleton } from '../Skeleton';
 
 // Content Card Skeleton
 export const ContentCardSkeleton: React.FC = () => {

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import SEOStructuredData from "./seo-structured-data";
-import { generateBreadcrumbSchema } from "../../utils/seo.utils";
+import { generateBreadcrumbSchema } from "../utils/seo.utils";
 
 interface BreadcrumbItem {
   name: string;

@@ -9,7 +9,7 @@ import { MagnifyingGlassIcon, FunnelIcon, ChevronDownIcon } from "@heroicons/rea
 import { StarIcon, ClockIcon, UsersIcon, PhotoIcon } from "@heroicons/react/24/solid";
 import { CourseListSkeleton, CourseCardSkeleton } from "@unpuzzle/ui";
 import { Brain } from "lucide-react";
-import SEOBreadcrumb from "../components/shared/seo-breadcrumb";
+import { SEOBreadcrumb } from "@unpuzzle/ui";
 
 const categories = [
   "All Categories",
