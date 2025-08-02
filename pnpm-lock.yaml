@@ -392,6 +392,12 @@ importers:
 
   packages/ui:
     dependencies:
+      '@unpuzzle/auth':
+        specifier: '*'
+        version: link:../auth
+      '@unpuzzle/config':
+        specifier: '*'
+        version: link:../config
       clsx:
         specifier: ^2.1.0
         version: 2.1.1
