@@ -21,3 +21,6 @@ export * from './Card'
 export * from './Dialog'
 export * from './Progress'
 export * from './Switch'
+
+// Course Components
+export { default as EnrollmentFeature } from './EnrollmentFeature'

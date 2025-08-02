@@ -29,7 +29,7 @@ import {
   DevicePhoneMobileIcon
 } from "@heroicons/react/24/outline";
 import { StarIcon as StarSolidIcon, CheckBadgeIcon } from "@heroicons/react/24/solid";
-import { CourseDetailSkeleton, CourseEnrollButton } from "@unpuzzle/ui";
+import { CourseDetailSkeleton, EnrollmentFeature } from "@unpuzzle/ui";
 
 interface CourseDetailClientProps {
   courseId: string;
@@ -162,10 +162,12 @@ export default function CourseDetailClient({ courseId, initialCourseData, breadc
 
               {/* Enhanced CTA Buttons */}
               <div className="flex flex-wrap items-center gap-4 pt-4">
-                <CourseEnrollButton 
+                <EnrollmentFeature 
                   course={effectiveCourse}
                   onEnroll={handleEnrollment}
                   variant="primary"
+                  fullWidth={false}
+                  size="lg"
                 />
                 <button className="p-4 bg-white/10 backdrop-blur-sm border-2 border-white/30 rounded-xl hover:bg-white/20 hover:border-white/50 transition-all group">
                   <PlayCircleIcon className="w-6 h-6 group-hover:scale-110 transition-transform" />
@@ -516,11 +518,12 @@ export default function CourseDetailClient({ courseId, initialCourseData, breadc
 
                 <div className="p-6 space-y-6">
                   {/* CTA Button */}
-                  <CourseEnrollButton 
+                  <EnrollmentFeature 
                     course={effectiveCourse}
                     onEnroll={handleEnrollment}
                     variant="secondary"
                     fullWidth={true}
+                    size="md"
                   />
 
                   {/* Guarantees */}

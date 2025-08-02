@@ -72,10 +72,12 @@ export const EnrollmentButton: React.FC<EnrollmentButtonProps> = ({
     try {
       const result = await onEnroll(course.id);
       if (!result.success) {
-        console.error("Enrollment failed");
+        // Use a more gentle warning instead of error
+        console.warn("Enrollment was not successful:", result);
       }
     } catch (error) {
-      console.error("Enrollment failed:", error);
+      // Use a more gentle warning instead of error
+      console.warn("Enrollment failed:", error);
     } finally {
       setIsEnrolling(false);
     }
