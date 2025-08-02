@@ -3,15 +3,9 @@
  * Centralized exports for all SEO-related functionality
  */
 
-// Import SEO components
-import SEOBreadcrumb from '../components/seo-breadcrumb'
-import SEOStructuredData from '../components/seo-structured-data'
+// Export all utilities (server-side compatible)
+export * from './utils';
 
-// Re-export SEO utilities
-export * from '../utils/seo.utils'
-
-// Export SEO components
-export {
-  SEOBreadcrumb,
-  SEOStructuredData
-}
+// Export components (client-side)
+export { SEOBreadcrumb, SEOStructuredData } from './components';
+export { default } from './components';
