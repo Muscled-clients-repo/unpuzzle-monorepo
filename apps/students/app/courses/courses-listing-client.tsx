@@ -63,8 +63,8 @@ export default function CoursesListingClient() {
 
   // Reset accumulated courses when filters change
   useEffect(() => {
-
-    
+    setAllCourses([]);
+    setLoadMorePage(1);
   }, [filters.category, filters.searchQuery, filters.sortBy, filters.priceRange, filters.level]);
 
   // Load more courses function
@@ -87,21 +87,32 @@ export default function CoursesListingClient() {
   };
 
   useEffect(() => {
-    console.log("dispatching...", hasMorePages)
-    loadMoreCourses()
+    if (loadMorePage > 1) {
+      console.log("dispatching...", hasMorePages)
+      loadMoreCourses()
+    }
   }, [loadMorePage]);
 
   useEffect(()=>{
-    const withDuplicate = [...allCourses, ...courses]
-    const uniqueCourses = withDuplicate.reduce<Course[]>((acc, current) => {
-      if (!acc.some(item => item.id === current.id)) {
-        acc.push(current);
+    if (courses.length > 0) {
+      if (loadMorePage === 1) {
+        // First page or filter change - replace all courses
+        setAllCourses(courses);
+      } else {
+        // Additional pages - merge with existing courses
+        setAllCourses(prevAll => {
+          const withDuplicate = [...prevAll, ...courses]
+          return withDuplicate.reduce<Course[]>((acc, current) => {
+            if (!acc.some(item => item.id === current.id)) {
+              acc.push(current);
+            }
+            return acc;
+          }, []);
+        });
       }
-      return acc;
-    }, []);
-    setAllCourses(uniqueCourses)
-    setHasMorePages(totalPages>loadMorePage);
-  },[courses])
+      setHasMorePages(totalPages > loadMorePage);
+    }
+  },[courses, loadMorePage, totalPages])
   
 
   // Debounced search effect - handle locally
@@ -325,6 +336,16 @@ export default function CoursesListingClient() {
             {/* Course Grid */}
             {loading && allCourses.length === 0 ? (
               <CourseListSkeleton count={6} />
+            ) : error ? (
+              <div className="text-center py-12">
+                <p className="text-red-600 text-lg mb-4">Error loading courses: {error}</p>
+                <button
+                  onClick={() => refreshCourses()}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                >
+                  Try Again
+                </button>
+              </div>
             ) : allCourses.length > 0 ? (
               <>
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -361,21 +382,41 @@ export default function CoursesListingClient() {
               </>
             ) : (
               <div className="text-center py-12">
-                <p className="text-gray-600 text-lg mb-4">No courses found matching your criteria</p>
-                <button
-                  onClick={() => {
-                    updateFilters({
-                      category: undefined,
-                      priceRange: undefined,
-                      searchQuery: undefined,
-                    });
-                    setSearchQuery("");
-                    setLocalPriceRange([0, 1000]);
-                  }}
-                  className="text-blue-600 hover:underline"
-                >
-                  Clear filters and try again
-                </button>
+                <div className="mb-6">
+                  <Brain className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+                  <p className="text-gray-600 text-lg mb-4">
+                    {error ? "Unable to load courses at the moment" : "No courses found matching your criteria"}
+                  </p>
+                  {error && (
+                    <p className="text-sm text-gray-500 mb-4">
+                      Our servers might be experiencing issues. Please try again later.
+                    </p>
+                  )}
+                </div>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <button
+                    onClick={() => refreshCourses()}
+                    className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all"
+                  >
+                    Retry Loading
+                  </button>
+                  {!error && (
+                    <button
+                      onClick={() => {
+                        updateFilters({
+                          category: undefined,
+                          priceRange: undefined,
+                          searchQuery: undefined,
+                        });
+                        setSearchQuery("");
+                        setLocalPriceRange([0, 1000]);
+                      }}
+                      className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all"
+                    >
+                      Clear Filters
+                    </button>
+                  )}
+                </div>
               </div>
             )}
           </div>
