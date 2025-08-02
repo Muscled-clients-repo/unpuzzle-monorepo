@@ -89,11 +89,7 @@ const nextConfig: NextConfig = {
       {
         source: "/course-video/:id",
         destination: "https://dev1.nazmulcodes.org/course-video/:id",
-      },
-      {
-        source: "/(.*)",
-        destination: "https://dev.nazmulcodes.org/$1",
-      },
+      }
     ];
   },
 };

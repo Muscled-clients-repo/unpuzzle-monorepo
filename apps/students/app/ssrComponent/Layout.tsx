@@ -4,7 +4,6 @@ import type { Metadata } from "next";
 import { Provider } from "react-redux";
 import store from "../redux/store";
 import PageLoadingSpinner from "../components/shared/loading-indicator";
-import {Header} from "@unpuzzle/ui";
 import React, { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { VideoTimeProvider } from "../context/VideoTimeContext";
@@ -14,6 +13,7 @@ import { ToastContainer } from 'react-toastify';
 import ComponentErrorBoundary from "../components/shared/component-error-boundary";
 import { WebVitalsReporter } from "../components/web-vitals";
 import {AuthProvider} from "@unpuzzle/auth"
+import {Header, Footer} from "@unpuzzle/ui";
 
 
 const geistSans = Geist({
@@ -82,6 +82,8 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
           )}
         </div>
       </main>
+
+      <Footer />
     </>
   );
 }

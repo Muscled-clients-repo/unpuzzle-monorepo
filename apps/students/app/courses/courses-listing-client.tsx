@@ -10,6 +10,7 @@ import { StarIcon, ClockIcon, UsersIcon, PhotoIcon } from "@heroicons/react/24/s
 import LoadingSpinner from "@/app/components/shared/ui/loading-spinner";
 import { CourseListSkeleton, CourseCardSkeleton } from "@/app/components/shared/course-skeleton-loader";
 import { Brain } from "lucide-react";
+import SEOBreadcrumb from "../components/shared/seo-breadcrumb";
 
 const categories = [
   "All Categories",
@@ -173,9 +174,14 @@ export default function CoursesListingClient() {
         </div>
       </section>
 
+      {/* Breadcrumb Section */}
+      <section className="container mx-auto px-4 pt-8 pb-4">
+        <SEOBreadcrumb items={[{ name: "Courses", url: "/courses" }]} />
+      </section>
+
       {/* Popular Courses Section */}
       {!filters.searchQuery && !filters.category && (
-        <section className="container mx-auto px-4 py-12">
+        <section className="container mx-auto px-4 pt-4 pb-12">
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-3xl font-bold">Popular Courses</h2>
             <Link href="/courses?sort=popular" className="text-blue-600 hover:underline">
@@ -375,50 +381,6 @@ export default function CoursesListingClient() {
           </div>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="py-12 bg-gray-900 text-gray-400">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-4 gap-8">
-            <div>
-              <div className="flex items-center space-x-2 mb-4">
-                <Brain className="h-8 w-8 text-white" />
-                <span className="text-xl font-bold text-white">Unpuzzle</span>
-              </div>
-              <p className="text-sm">
-                Making learning interactive and engaging through puzzle-based education.
-              </p>
-            </div>
-            <div>
-              <h4 className="font-semibold text-white mb-4">Platform</h4>
-              <ul className="space-y-2 text-sm">
-                <li><Link href="/courses" className="hover:text-white">Browse Courses</Link></li>
-                <li><Link href="/pricing" className="hover:text-white">Pricing</Link></li>
-                <li><Link href="/sign-up" className="hover:text-white">Sign Up</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold text-white mb-4">Resources</h4>
-              <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-white">Help Center</a></li>
-                <li><a href="#" className="hover:text-white">Community</a></li>
-                <li><a href="#" className="hover:text-white">Blog</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold text-white mb-4">Company</h4>
-              <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-white">About Us</a></li>
-                <li><a href="#" className="hover:text-white">Contact</a></li>
-                <li><a href="#" className="hover:text-white">Privacy Policy</a></li>
-              </ul>
-            </div>
-          </div>
-          <div className="mt-8 pt-8 border-t border-gray-800 text-center text-sm">
-            <p>&copy; 2024 Unpuzzle. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }
@@ -432,7 +394,7 @@ function CourseCard({ course, featured = false }: { course: any; featured?: bool
 
   return (
     <Link 
-      href={`/course-video/${course.id}`} 
+      href={`/courses/${course.id}`} 
       className={`group bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden ${
         featured ? 'ring-2 ring-blue-500' : ''
       }`}

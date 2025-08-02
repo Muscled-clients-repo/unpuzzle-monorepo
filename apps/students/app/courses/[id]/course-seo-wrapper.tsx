@@ -43,7 +43,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 }
 
 export default async function CourseSEOWrapper({ courseId }: { courseId: string }) {
-  let courseSchema = null;
+  let courseSchema: ReturnType<typeof generateCourseSchema> | null = null;
   let breadcrumbItems = [
     { name: "Courses", url: "/courses" },
   ];
@@ -56,12 +56,12 @@ export default async function CourseSEOWrapper({ courseId }: { courseId: string 
         id: course.id,
         title: course.title,
         description: course.description || "",
-        instructor: course.instructor?.name || "Unpuzzle Instructor",
+        instructor: course.courseAuthor || course.created_by || "Unpuzzle Instructor",
         price: course.price,
         rating: course.rating,
-        studentsCount: course.studentsCount,
+        studentsCount: course.reviewCount,
         duration: course.duration,
-        level: course.level,
+        level: course.category,
       });
 
       breadcrumbItems.push({
