@@ -20,7 +20,7 @@
     "optimize:bundle": "npm run analyze",
     "lighthouse": "npx lighthouse http://localhost:3000 --view",
     "perf": "npm run optimize:check",
-    "tailwind":"npx @tailwindcss/cli -i ./input.css -o ./public/tailwind.css --watch"
+    "tailwind": "npx @tailwindcss/cli -i ./input.css -o ./public/tailwind.css --watch"
   },
   "dependencies": {
     "@ffmpeg/ffmpeg": "^0.12.15",
@@ -76,6 +76,6 @@
     "identity-obj-proxy": "^3.0.0",
     "postcss": "^8.5.6",
     "prettier": "^3.6.2",
-    "typescript": "5.9.2"
+    "typescript": "5.8.3"
   }
 }
