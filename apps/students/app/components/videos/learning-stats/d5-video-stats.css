@@ -1,9 +1,0 @@
-.d5-tab-container::-webkit-scrollbar{
-    display: none !important;
-  }
-  .d5-tab-container{
-    scroll-snap-type: x mandatory;
-  }
-  .d5-tab-container .d5-tab-button{
-    scroll-snap-align: start;
-  }

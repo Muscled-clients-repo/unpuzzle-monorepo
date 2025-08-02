@@ -4,16 +4,12 @@ import type { Metadata } from "next";
 import { Provider } from "react-redux";
 import store from "../redux/store";
 import PageLoadingSpinner from "../components/shared/loading-indicator";
-import {Header} from "@unpuzzle/ui";
 import React, { useState, useEffect } from "react";
-import { usePathname } from "next/navigation";
 import { VideoTimeProvider } from "../context/VideoTimeContext";
-import ClientSideWrapper from "../components/shared/client-side-wrapper";
-import AnnotationViewHeader from "../components/shared/annotation-header";
 import { ToastContainer } from 'react-toastify';
 import ComponentErrorBoundary from "../components/shared/component-error-boundary";
-import { WebVitalsReporter } from "../components/web-vitals";
 import {AuthProvider} from "@unpuzzle/auth"
+import {Header, Footer} from "@unpuzzle/ui";
 
 
 const geistSans = Geist({
@@ -34,24 +30,17 @@ export const metadata: Metadata = {
 function LayoutContent({ children }: { children: React.ReactNode }) {
   // const user = useSelector((state: RootState) => state.user); // Not currently used
   const [loading, setLoading] = useState<boolean>(true);
-  const pathname = usePathname();
 
   // Environment variables are properly configured
 
   useEffect(() => {
-    // Content will not be displayed if loading is always true.
-    setLoading(false);
+    // Add a small delay to ensure all providers are initialized
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 100);
+    return () => clearTimeout(timer);
   }, []);
 
-  // Disable sidebar completely for all paths
-  const showSidebar = false;
-
-  // Show AnnotationHeader for specific paths
-  const showAnnotationHeader = pathname && [
-    "/student-annotations",
-    "/confusions-puzzlejourney", 
-    "/annotations-puzzlejourney"
-  ].includes(pathname);
 
   return (
     <>
@@ -60,14 +49,6 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
       <Header variant="student" />
       
       <main>
-        {/* Annotation Header for specific paths */}
-        {showAnnotationHeader && (
-          <div className="sticky top-16 z-40">
-            <ClientSideWrapper fallback={null}>
-              {() => <AnnotationViewHeader />}
-            </ClientSideWrapper>
-          </div>
-        )}
 
         {/* Main Content */}
         <div className="min-h-screen bg-gray-50">
@@ -82,6 +63,8 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
           )}
         </div>
       </main>
+
+      <Footer />
     </>
   );
 }
@@ -102,7 +85,6 @@ export default function RootLayout({
       </head>
       <body className="antialiased light" suppressHydrationWarning>
         <ToastContainer />
-        <WebVitalsReporter />
 
           <Provider store={store}>
             <AuthProvider>

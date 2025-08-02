@@ -2,12 +2,7 @@ import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { menuItemsStudents } from "../../../lib/menu-list";
-import { useDispatch, useSelector } from 'react-redux';
-import { showSidebar, hideSidebar } from '../../../redux/features/sidebarSlice/sidebarSlice';
-import { SidebarProps } from '../../../types/layout.types'
-import { RootState } from "../../../redux/store";
 import { MenuItem } from "../../../types/lib.types";
-import { togglePopover } from "../../../redux/features/recording/recordingSlice";
 import logo from '../assets/logo.svg';
 import LogoutIcon from "../assets/logout.svg";
 import Image from "next/image";
