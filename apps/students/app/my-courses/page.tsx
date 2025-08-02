@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import MyCoursesClient from "./my-courses-client";
-import SEOBreadcrumb from "../components/shared/seo-breadcrumb";
+import { SEOBreadcrumb } from "@unpuzzle/ui";
 
 export const metadata: Metadata = {
   title: "My Courses - Unpuzzle Learning Platform",

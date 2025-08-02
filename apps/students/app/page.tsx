@@ -3,8 +3,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, BookOpen, Brain, Users, Sparkles, PlayCircle, CheckCircle } from "lucide-react";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
-import SEOStructuredData from "./components/shared/seo-structured-data";
-import { generateOrganizationSchema } from "./utils/seo.utils";
+import { SEOStructuredData } from "@unpuzzle/ui";
+import { generateOrganizationSchema } from "@unpuzzle/ui";
 
 export const metadata: Metadata = {
   title: "Unpuzzle - Transform Your Learning Experience",

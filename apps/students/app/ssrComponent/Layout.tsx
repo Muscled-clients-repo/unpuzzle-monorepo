@@ -7,7 +7,7 @@ import { LayoutSkeleton } from "@unpuzzle/ui";
 import React, { useState, useEffect } from "react";
 import { VideoTimeProvider } from "../context/VideoTimeContext";
 import { ToastContainer } from 'react-toastify';
-import ComponentErrorBoundary from "../components/shared/component-error-boundary";
+import { ComponentErrorBoundary } from "@unpuzzle/ui";
 import {AuthProvider} from "@unpuzzle/auth"
 import {Header, Footer} from "@unpuzzle/ui";
 
