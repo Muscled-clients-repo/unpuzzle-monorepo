@@ -71,4 +71,7 @@ const Table = ({
   );
 };
 
+// Backward compatibility alias
+export const DataTable = Table;
+
 export default Table;

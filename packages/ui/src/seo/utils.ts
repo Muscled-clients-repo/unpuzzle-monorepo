@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 
+// ============= SEO Metadata Generation =============
 interface SEOConfig {
   title: string;
   description: string;
@@ -19,6 +20,8 @@ export function generateSEOMetadata(config: SEOConfig): Metadata {
     type = "website",
   } = config;
 
+  const metadataType = type === "product" ? "website" : type;
+
   return {
     title,
     description,
@@ -27,7 +30,7 @@ export function generateSEOMetadata(config: SEOConfig): Metadata {
       title,
       description,
       url,
-      type,
+      type: metadataType as "website" | "article",
       siteName: "Unpuzzle",
       locale: "en_US",
       images: [
@@ -59,6 +62,7 @@ export function generateSEOMetadata(config: SEOConfig): Metadata {
   };
 }
 
+// ============= Schema Generation Functions =============
 export function generateOrganizationSchema() {
   return {
     "@context": "https://schema.org",
@@ -182,5 +186,82 @@ export function generateFAQSchema(faqs: Array<{ question: string; answer: string
         text: faq.answer,
       },
     })),
+  };
+}
+
+export function generateProductSchema(product: {
+  id: string;
+  name: string;
+  description: string;
+  image: string;
+  price: number;
+  currency?: string;
+  availability?: "InStock" | "OutOfStock" | "PreOrder";
+  rating?: number;
+  reviewCount?: number;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "@id": `${process.env.NEXT_PUBLIC_APP_URL || "https://unpuzzle.com"}/products/${product.id}`,
+    name: product.name,
+    description: product.description,
+    image: product.image,
+    offers: {
+      "@type": "Offer",
+      price: product.price,
+      priceCurrency: product.currency || "USD",
+      availability: `https://schema.org/${product.availability || "InStock"}`,
+    },
+    ...(product.rating && {
+      aggregateRating: {
+        "@type": "AggregateRating",
+        ratingValue: product.rating,
+        bestRating: "5",
+        worstRating: "1",
+        reviewCount: product.reviewCount || 1,
+      },
+    }),
+  };
+}
+
+export function generateArticleSchema(article: {
+  title: string;
+  description: string;
+  author: string;
+  datePublished: string;
+  dateModified?: string;
+  image?: string;
+  url: string;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: article.title,
+    description: article.description,
+    author: {
+      "@type": "Person",
+      name: article.author,
+    },
+    datePublished: article.datePublished,
+    dateModified: article.dateModified || article.datePublished,
+    publisher: {
+      "@type": "Organization",
+      name: "Unpuzzle",
+      logo: {
+        "@type": "ImageObject",
+        url: `${process.env.NEXT_PUBLIC_APP_URL || "https://unpuzzle.com"}/assets/logo.png`,
+      },
+    },
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": article.url,
+    },
+    ...(article.image && {
+      image: {
+        "@type": "ImageObject",
+        url: article.image,
+      },
+    }),
   };
 }
