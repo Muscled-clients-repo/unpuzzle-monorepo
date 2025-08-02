@@ -19,7 +19,7 @@ export const Skeleton: React.FC<SkeletonProps> = ({
   height,
   animation = 'pulse'
 }) => {
-  const baseClasses = 'bg-gray-200 dark:bg-gray-700';
+  const baseClasses = 'bg-gray-200 dark:bg-gray-650';
   
   const variantClasses = {
     text: 'rounded',
@@ -252,6 +252,171 @@ export const CourseListSkeleton = ListSkeleton;
 export const CourseDetailSkeleton = DetailPageSkeleton;
 export const LayoutSkeleton = PageLayoutSkeleton;
 
+// ============= Home Page Section Skeletons =============
+export const HeroSectionSkeleton: React.FC = () => {
+  return (
+    <section className="relative bg-gray-50 py-16 lg:py-24">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid lg:grid-cols-2 gap-12 items-center">
+          {/* Left Content */}
+          <div className="max-w-xl">
+            {/* Main Heading - matches text-4xl lg:text-5xl */}
+            <Skeleton variant="text" height={56} width="85%" className="mb-6" />
+            
+            {/* Description - matches text-lg lg:text-xl with 2 lines */}
+            <div className="mb-8 space-y-2">
+              <Skeleton variant="text" height={24} width="100%" />
+              <Skeleton variant="text" height={24} width="95%" />
+              <Skeleton variant="text" height={24} width="80%" />
+            </div>
+            
+            {/* Search Bar - matches exact size px-6 py-4 */}
+            <div className="mb-8">
+              <Skeleton variant="rounded" height={64} className="w-full border border-gray-300" />
+            </div>
+            
+            {/* CTA Buttons - matches exact layout flex-col sm:flex-row */}
+            <div className="flex flex-col sm:flex-row gap-4 mb-12">
+              <Skeleton variant="rounded" height={48} width={140} />
+              <Skeleton variant="rounded" height={48} width={160} />
+            </div>
+            
+            {/* Trust Indicators - matches exact layout with dividers */}
+            <div className="flex items-center gap-8">
+              <div>
+                <Skeleton variant="text" height={32} width={56} className="mb-1" />
+                <Skeleton variant="text" height={16} width={96} />
+              </div>
+              <div className="h-12 w-px bg-gray-300"></div>
+              <div>
+                <Skeleton variant="text" height={32} width={56} className="mb-1" />
+                <Skeleton variant="text" height={16} width={116} />
+              </div>
+              <div className="h-12 w-px bg-gray-300"></div>
+              <div>
+                <Skeleton variant="text" height={32} width={56} className="mb-1" />
+                <Skeleton variant="text" height={16} width={96} />
+              </div>
+            </div>
+          </div>
+          
+          {/* Right Image - matches exact styling */}
+          <div className="relative hidden lg:block">
+            <div className="relative z-10">
+              <Skeleton variant="rounded" width={600} height={400} className="rounded-2xl" />
+              {/* Decorative elements */}
+              <div className="absolute -top-4 -right-4 w-72 h-72 bg-blue-100 rounded-full filter blur-3xl opacity-70 -z-10"></div>
+              <div className="absolute -bottom-8 -left-8 w-72 h-72 bg-purple-100 rounded-full filter blur-3xl opacity-70 -z-10"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export const FeaturesSectionSkeleton: React.FC = () => {
+  return (
+    <section className="py-20 bg-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <Skeleton variant="text" height={36} width={400} className="mx-auto mb-12 text-center" />
+        <div className="grid md:grid-cols-3 gap-8">
+          {Array.from({ length: 3 }).map((_, index) => (
+            <div key={index} className="text-center">
+              <Skeleton variant="circular" width={64} height={64} className="mx-auto mb-4" />
+              <Skeleton variant="text" height={24} width={180} className="mx-auto mb-2" />
+              <div className="space-y-2">
+                <Skeleton variant="text" height={16} />
+                <Skeleton variant="text" height={16} width="90%" className="mx-auto" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export const StatsSectionSkeleton: React.FC = () => {
+  return (
+    <section className="py-20 bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid md:grid-cols-4 gap-8 text-center">
+          {Array.from({ length: 4 }).map((_, index) => (
+            <div key={index}>
+              <Skeleton variant="text" height={48} width={120} className="mx-auto mb-2" />
+              <Skeleton variant="text" height={20} width={140} className="mx-auto" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export const CoursePreviewSectionSkeleton: React.FC = () => {
+  return (
+    <section className="py-20 bg-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <Skeleton variant="text" height={36} width={300} className="mx-auto mb-12 text-center" />
+        <div className="grid md:grid-cols-3 gap-8">
+          {Array.from({ length: 3 }).map((_, index) => (
+            <div key={index} className="border rounded-lg overflow-hidden">
+              <Skeleton variant="rectangular" height={192} />
+              <div className="p-6">
+                <Skeleton variant="text" height={24} className="mb-2" />
+                <Skeleton variant="text" height={16} width={150} className="mb-4" />
+                <div className="flex justify-between items-center mb-4">
+                  <Skeleton variant="text" height={16} width={120} />
+                  <Skeleton variant="text" height={16} width={80} />
+                </div>
+                <div className="flex justify-between items-center">
+                  <Skeleton variant="text" height={32} width={80} />
+                  <Skeleton variant="text" height={16} width={120} />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="text-center mt-12">
+          <Skeleton variant="text" height={20} width={180} className="mx-auto" />
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export const CTASectionSkeleton: React.FC = () => {
+  return (
+    <section className="py-20 bg-blue-600">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto text-center">
+          <Skeleton variant="text" height={36} width={400} className="mx-auto mb-4 bg-blue-400 bg-opacity-80" />
+          <div className="space-y-2 mb-8">
+            <Skeleton variant="text" height={20} width={500} className="mx-auto bg-blue-400 bg-opacity-80" />
+            <Skeleton variant="text" height={20} width={300} className="mx-auto bg-blue-400 bg-opacity-80" />
+          </div>
+          <div className="flex gap-4 justify-center">
+            <Skeleton variant="rounded" height={48} width={160} className="bg-blue-400 bg-opacity-80" />
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export const HomePageSkeleton: React.FC = () => {
+  return (
+    <div className="min-h-screen">
+      <HeroSectionSkeleton />
+      <FeaturesSectionSkeleton />
+      <StatsSectionSkeleton />
+      <CoursePreviewSectionSkeleton />
+      <CTASectionSkeleton />
+    </div>
+  );
+};
+
 // CSS for shimmer animation (add to your global CSS)
 export const shimmerKeyframes = `
 @keyframes shimmer {
@@ -265,7 +430,7 @@ export const shimmerKeyframes = `
 
 .animate-shimmer {
   animation: shimmer 2s infinite linear;
-  background: linear-gradient(to right, #f0f0f0 4%, #e0e0e0 25%, #f0f0f0 36%);
+  background: linear-gradient(to right, #f3f4f6 4%, #e5e7eb 25%, #f3f4f6 36%);
   background-size: 1000px 100%;
 }
 `;
