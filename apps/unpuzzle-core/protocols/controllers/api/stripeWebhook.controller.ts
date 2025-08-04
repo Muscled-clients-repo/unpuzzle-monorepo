@@ -88,7 +88,7 @@ class StripeWebhookController extends StripeService{
             } catch (error) {
                 logger.warn('Could not check/record webhook event (webhook_events table might not exist)', {
                     eventId: event.id,
-                    error: error.message
+                    error: error instanceof Error ? error.message : String(error)
                 });
                 // Continue processing even if event tracking fails
             }
