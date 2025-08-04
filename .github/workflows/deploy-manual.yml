@@ -33,11 +33,11 @@ jobs:
         with:
           node-version: '18'
       
-      - name: Deploy unpuzzle-core to Heroku
+      - name: Deploy unpuzzle-core to Heroku (unpuzzle-ai-backend)
         uses: akhileshns/heroku-deploy@v3.12.14
         with:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-          heroku_app_name: ${{secrets.HEROKU_CORE_APP_NAME}}
+          heroku_app_name: "unpuzzle-ai-backend"
           heroku_email: ${{secrets.HEROKU_EMAIL}}
           appdir: "apps/unpuzzle-core"
           buildpack: "heroku/nodejs"
@@ -54,11 +54,11 @@ jobs:
         with:
           node-version: '18'
       
-      - name: Deploy unpuzzle-m1 to Heroku
+      - name: Deploy unpuzzle-m1 to Heroku (unpuzzle-m1)
         uses: akhileshns/heroku-deploy@v3.12.14
         with:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-          heroku_app_name: ${{secrets.HEROKU_M1_APP_NAME}}
+          heroku_app_name: "unpuzzle-m1"
           heroku_email: ${{secrets.HEROKU_EMAIL}}
           appdir: "apps/unpuzzle-m1"
           buildpack: "heroku/nodejs"

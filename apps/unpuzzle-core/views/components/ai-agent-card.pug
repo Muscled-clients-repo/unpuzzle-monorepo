@@ -1,0 +1,18 @@
+//- - var title = "Puzzle Hint"
+//- - var description = "Having trouble? Maybe a hint could help!"
+//- - var type = "split-card"
+
+include ./media.pug
+
+div(class=` flex ${type === 'split-card' ? 'flex-row w-full gap-[12px] rounded-lg' : 'flex-col w-[104px] bg-white shadow gap-[8px]'} justify-center items-center   h-[95px] cursor-pointer relative`)
+    if type === 'split-card'
+        div(class="rounded-lg shadow p-[15px]")
+            +media('image', `${ASSET_ORIGIN}/img/ai-avatar.png`, 'AI Agent', 'w-[32.79px] h-[48px] mx-auto pointer-events-none')
+    else
+        +media('image', `${ASSET_ORIGIN}/img/ai-avatar.png`, 'AI Agent', 'w-[32.79px] h-[48px] mx-auto pointer-events-none')
+
+    div(class=`flex flex-col gap-[4px] ${type === 'split-card' ? 'flex-grow' : ''}`)
+        h3(class=`text-sm ${type === 'split-card' ? 'tex-left' : 'text-center'}  text-gray-500 pointer-events-none`) #{ title || "Puzzle Hint" }
+        if description
+            p(class=`text-xs ${type === 'split-card' ? 'text-left' : 'text-center'} text-gray-500 pointer-events-none`) #{ description }
+

@@ -1,0 +1,14 @@
+{
+  "name": "unpuzzle-m1",
+  "description": "Unpuzzle M1 Video Service",
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    }
+  ],
+  "env": {
+    "NPM_CONFIG_PRODUCTION": {
+      "value": "false"
+    }
+  }
+}

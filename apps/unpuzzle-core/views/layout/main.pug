@@ -1,0 +1,49 @@
+doctype html
+html(lang="en")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    title Unpuzzle
+    
+    //- Styles
+    block styles
+    link(rel="stylesheet", href=`${ASSET_ORIGIN}/css/style.css`)
+    link(rel="stylesheet", href=`${ASSET_ORIGIN}/css/container.css`)
+    link(rel="stylesheet", href=`${ASSET_ORIGIN}/css/grid.css`)
+    link(rel="stylesheet", type="text/tailwindcss", href=`${ASSET_ORIGIN}/css/tailwind.css`)
+    link(rel="stylesheet", href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css",type="text/css")
+
+    if isProduction
+      script(src=`${ASSET_ORIGIN}/js/core/preventInspect.js`)
+
+    //- Clerk Script
+    script(
+      async,
+      crossorigin="anonymous",
+      data-clerk-publishable-key=clerkPublishableKey,
+      src="https://above-goldfish-15.clerk.accounts.dev/npm/@clerk/clerk-js@5/dist/clerk.browser.js",
+      type="text/javascript"
+    )
+
+    //- Socket.IO Script
+    script(src="https://cdn.socket.io/4.0.1/socket.io.min.js")
+    
+    //- Backend URL Configuration
+    script.
+      window.ASSET_ORIGIN = '#{ASSET_ORIGIN}';
+      window.SOCKET_IO_URL = '#{SOCKET_IO_URL}';
+      window.USER_ID = '#{user ? user.id : ""}';
+    script(src=`${ASSET_ORIGIN}/js/config.js`)
+    script(src=`${ASSET_ORIGIN}/js/utils/auth.js`, type="module")
+
+    script(src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4")
+      
+  body
+    include ./header
+    main(class="min-h-[calc(100vh-78.59px-57.59px)]")
+      block content
+    footer
+      p &copy; 2024 Unpuzzle. All rights reserved.
+    script(src=`${ASSET_ORIGIN}/js/main.js`, type="module")
+    script(src=`${ASSET_ORIGIN}/js/components/header.js`)
+    block scripts

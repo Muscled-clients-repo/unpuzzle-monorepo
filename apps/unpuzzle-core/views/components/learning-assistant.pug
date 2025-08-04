@@ -1,0 +1,73 @@
+include ./media.pug
+
+div(class="lg:block lg:w-[474px] p-8 pr-0")
+    div(class="flex justify-between items-center")
+        button(class="btn-primary text-sm") 
+            | Confused At 
+            span(class="video-playback-time", id="confused-at")
+                | 00:00
+
+        //- p(class="text-sm text-gray-500 total-duration")
+        //-     | 00:00
+
+    div(class="flex justify-between items-center my-4 relative")
+        p(class="text-sm text-gray-900 font-semibold")
+            | AI Agents
+
+        div(class="flex items-center ml-2 ")
+            input(id="puzzle-pieces-switch" type="checkbox" class="hidden" checked)    
+            label(for="puzzle-pieces-switch" class="cursor-pointer flex items-center gap-2 active")
+                div(class="switch-wrapper")
+                    div(class="w-4 h-4 bg-[#ffffff] rounded-full")
+
+
+    div(class="main-agent-wrapper")
+
+        div(class="absolute hidden right-0 top-10 w-full bg-white z-10 h-full min-h-[50vh]")
+            - 
+                var agents = [
+                    { title: "Puzzle Hint" },
+                    { title: "Puzzle Check" },
+                    { title: "Puzzle Reflect" },
+                    { title: "Puzzle Path" }
+                ]
+            
+            each agent, index  in agents
+                - var title = agent.title
+                div(class=`${index == 0 ? "border border-[#00AFF0] rounded-lg" : "rounded-lg"}`)
+                    include ../components/ai-agent-card.pug
+
+        div(class="w-full overflow-x-auto pb-4 draggable-scroll-x")
+            div(class="flex flex-row w-fit gap-2 ")
+                - 
+                    var agents = [
+                        { title: "Puzzle Hint", type: "hint" },
+                        { title: "Puzzle Check", type: "check" },
+                        { title: "Puzzle Reflect", type: "reflect" },
+                        { title: "Puzzle Path", type: "path" }
+                    ]
+                each agent, index in agents
+                    - var title = agent.title
+                    div(class=`${false ? "active" : "disabled"} agent-button rounded-lg overflow-hidden`, agent=`agent_button_${agent.type}`)
+                        include ../components/ai-agent-card.pug
+
+        div(class="agent-reply-wrapper min-h-[40vh]")
+            div(class="agent-hint")
+                include ../components/card-hint.pug
+
+            div(class="agent-check")
+                include ../components/card-check.pug
+
+            div(class="agent-reflect")
+                include ../components/card-reflect.pug
+
+            div(class="agent-path")
+                include ../components/card-path.pug
+
+        //- div(class="hidden lg:block")
+        //-     include ../components/user-activity.pug
+
+    // Course Content
+    include ../components/course-content
+
+

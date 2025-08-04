@@ -1,0 +1,14 @@
+{
+  "name": "unpuzzle-core",
+  "description": "Unpuzzle Core API Service",
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    }
+  ],
+  "env": {
+    "NPM_CONFIG_PRODUCTION": {
+      "value": "false"
+    }
+  }
+}

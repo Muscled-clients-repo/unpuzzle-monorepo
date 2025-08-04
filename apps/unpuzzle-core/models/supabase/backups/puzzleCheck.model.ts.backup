@@ -1,0 +1,125 @@
+import supabase from "./client";
+import { PuzzleCheck } from "../../types/puzzleCheck.type";
+import PuzzleCheckSchema from "../validator/puzzleCheck.validator";
+
+class PuzzleCheckModel extends PuzzleCheckSchema{
+  constructor(){
+    super()
+  }
+  getAllPuzzleChecks=async(page = 1, limit = 10)=> {
+    const from = (page - 1) * limit;
+    const to = from + limit - 1;
+
+    try{
+      const { data, error } = await supabase
+        .from("puzzlechecks")
+        .select("*", { count: "exact" })
+        .order("order_index", { ascending: true })
+        .range(from, to);
+  
+      if (error) {
+        throw new Error(error.message)
+      }
+      return data;
+    }catch(error){
+      throw error
+    }
+  }
+
+  getPuzzleCheckById=async(id: string)=> {
+    try{
+      const { data, error } = await supabase
+        .from("puzzlechecks")
+        .select("*")
+        .eq("id", id)
+        .maybeSingle();
+  
+      if (error) {
+        throw new Error(error.message)
+      }
+      return data;
+    }catch(error){
+      throw error
+    }
+  }
+
+  getPuzzleChecksByPath=async(puzzle_path_id: string)=> {
+    try{
+      const { data, error } = await supabase
+        .from("puzzlechecks")
+        .select("*")
+        .eq("puzzle_path_id", puzzle_path_id)
+        .order("order_index", { ascending: true });
+  
+      if (error) {
+        throw new Error(error.message)
+      };
+      return data;
+    }catch(error){
+      throw error
+    }
+  }
+
+  createPuzzleCheck = async(body: PuzzleCheck)=> {
+    try{
+      this.validate(body);
+      const { data, error } = await supabase
+        .from("puzzlechecks")
+        .insert([body])
+        .select()
+        .single();
+  
+      if (error) {
+        throw new Error(error.message)
+      }
+      return data;
+    }catch(error){
+      throw error
+    }
+  }
+
+  updatePuzzleCheck=async(id: string, body: Partial<PuzzleCheck>)=> {
+    try{
+      this.validate(body, 1);
+      const { data, error } = await supabase
+      .from("puzzlechecks")
+      .update(body)
+      .eq("id", id)
+      .select()
+      .single();
+
+      if (error) {
+        throw new Error(error.message)
+      }
+      return data;
+    }catch(error){
+      throw error
+    }
+  }
+
+  getPuzzleChecksByDuration=async(video_id: string, startTime: number, endTime: number)=> {
+    try{
+      const { data, error } = await supabase.from("puzzlechecks").select("*").eq("video_id", video_id).gte("duration", startTime).lte("duration", endTime+5).limit(5);
+      if (error){
+        throw new Error(error.message)
+      }
+      return data;
+    }catch(error){
+      throw error
+    }
+  }
+
+  deletePuzzleCheck=async(id: string)=> {
+    try{
+      const { error } = await supabase.from("puzzlechecks").delete().eq("id", id);
+      if (error) {
+        throw new Error(error.message)
+      }
+      return { success: true, message: "Resource Deleted Successfully!" };
+    }catch(error){
+      throw error
+    }
+  }
+}
+
+export default new PuzzleCheckModel();

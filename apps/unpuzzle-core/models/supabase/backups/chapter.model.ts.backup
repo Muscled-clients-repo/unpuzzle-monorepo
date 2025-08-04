@@ -1,0 +1,119 @@
+import supabase from "./client";
+import { Chapter } from "../../types/chapter.type";
+import ChapterSchema from "../validator/chapter.validator";
+
+class ChapterModel extends ChapterSchema {
+  // Get all chapters with pagination
+  getAllChapters=async(page = 1,limit = 10)=>{
+    const from = (page - 1) * limit;
+    const to = from + limit - 1;
+
+    try{
+      const { data, error } = await supabase
+        .from("chapters")
+        .select("*", { count: "exact" })
+        .order("order_index", { ascending: true })
+        .range(from, to);
+
+      console.log(data)
+  
+      if (error) {
+        throw new Error(error.message)
+      };
+      return data;
+    }catch(error){
+      throw error
+    }
+  }
+
+  // Get chapter by ID
+  getChapterById=async(id: string)=> {
+
+    try{
+      const { data, error } = await supabase
+        .from("chapters")
+        .select("*")
+        .eq("id", id)
+        .maybeSingle();
+  
+      if (error){
+        throw new Error(error.message)
+      };
+      return data ;
+    }catch(error){
+      throw error
+    }
+  }
+
+  // Get chapters by course ID
+  getChaptersByCourse=async(id: string)=>{
+    try{
+      const { data, error } = await supabase
+        .from("chapters")
+        .select("*")
+        .eq("course_id", id)
+        .order("order_index", { ascending: true });
+  
+      if (error) {
+        throw new Error(error.message)
+      };
+      return data;
+    }catch(error){
+      throw error
+    }
+  }
+
+  // Create a new chapter
+  createChapter=async(body: Chapter)=> {
+    try{
+      this.validate(body);
+      const { data, error } = await supabase
+        .from("chapters")
+        .insert([body])
+        .select()
+        .single();
+  
+      if (error){
+        throw new Error(error.message)
+      }
+      return data;
+    }catch(error){
+      throw error
+    }
+  }
+
+  // Update chapter
+  updateChapter=async(id: string, body: Partial<Chapter>)=>{
+    try{
+      this.validate(body, 1);
+      const { data, error } = await supabase
+        .from("chapters")
+        .update(body)
+        .eq("id", id)
+        .select()
+        .single();
+  
+      if (error) {
+        throw new Error(error.message)
+      };
+      return data;
+    }catch(error){
+      throw error
+    }
+  }
+
+  // Delete chapter
+  deleteChapter=async(id: string)=>{
+    try{
+      const { error } = await supabase.from("chapters").delete().eq("id", id);
+      if (error){
+        throw new Error(error.message)
+      };
+      return { success: true, message: "Resource Deleetd Successfully!" };
+    }catch(error){
+      throw error
+    }
+  }
+}
+
+export default new ChapterModel();

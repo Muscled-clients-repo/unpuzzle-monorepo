@@ -1,0 +1,81 @@
+import supabase from "./client";
+import { Orders } from "../../types/orders.type";
+import OrdersSchema from "../validator/orders.validator";
+
+class OrdersModel extends OrdersSchema{
+  constructor(){
+    super();
+  }
+  getAllOrders=async(page = 1,limit = 10)=> {
+    const from = (page - 1) * limit;
+    const to = from + limit - 1;
+
+    const { data, error, count } = await supabase
+      .from("orders")
+      .select("*", { count: "exact" })
+      .order("created_at", { ascending: false })
+      .range(from, to);
+
+    if (error) return { success: false, error: error.message };
+    return { success: true, data: data || [], total: count || 0 };
+  }
+
+  getProductById=async(id: string)=> {
+    const { data, error } = await supabase
+      .from("orders")
+      .select("*")
+      .eq("id", id)
+      .maybeSingle();
+
+    if (error) return { success: false, error: error.message };
+    return { success: true, data };
+  }
+
+  createOrder=async(body:Orders)=> {
+    try{
+      this.validate(body);
+    const { data, error } = await supabase
+      .from("orders")
+      .insert([body])
+      .select("*")
+      .single();
+
+      if (error) {
+        throw new Error(error.message);
+      }
+      return data;
+    }catch(error){
+      throw error
+    }
+  }
+
+  updateOrder=async(id: string, body: Partial<Orders>)=> {
+    try{
+      this.validate(body);
+
+    const { data, error } = await supabase
+      .from("orders")
+      .update(body)
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) {
+      throw new Error(error.message);
+    }
+    return data;
+    }catch(error){
+      throw error
+    }
+  }
+
+  deleteOrder=async(id: string)=> {
+    const { error } = await supabase.from("orders").delete().eq("id", id);
+    if (error) {
+      throw new Error(error.message);
+    }
+    return { id: id, message: "Resource Deleted Successfully!" };
+  }
+}
+
+export default OrdersModel;

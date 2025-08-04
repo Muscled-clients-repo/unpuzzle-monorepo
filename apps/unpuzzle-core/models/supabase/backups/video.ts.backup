@@ -1,0 +1,152 @@
+import supabase from "./client";
+import { Video } from "../../types/video.type";
+import VideoSchema from "../validator/VideoValidator";
+
+class VideoModel extends VideoSchema{
+  constructor(){
+    super()
+  }
+  // Get all videos
+  getAllVideos=async()=> {
+    try {
+      const { data, error, count } = await supabase
+        .from("videos")
+        .select("*", { count: "exact" })
+        .order("created_at", { ascending: false });
+
+      if (error){
+        throw new Error(error.message)
+      };
+
+      return data;
+    } catch (error) {
+      throw error
+    }
+  }
+  // Get video by ID
+  getVideoById = async (id: string, includeTranscripts = false) => {
+    try{
+      const { data, error } = await supabase
+        .from("videos")
+        .select(`*${includeTranscripts?",transcripts(*)":""}`)
+        .eq("id", id)
+        .maybeSingle();
+      if (error){
+        throw new Error(error.message)
+      };
+      return data;
+
+    }catch(error){
+      throw error
+    }
+  };
+  // Get video by ID
+  getVideoByURL = async (videoURL: string,includeTranscripts = false) => {
+    try{
+      const { data, error } = await supabase
+        .from("videos")
+        .select(`*${includeTranscripts?",transcripts(*)":""}`)
+        .eq("video_url", videoURL)
+        .maybeSingle();
+      if (error){
+        throw new Error(error.message)
+      };
+      return data;
+
+    }catch(error){
+      throw error
+    }
+  };
+
+  // Create a new video
+  createVideo = async (body: Video) => {
+    try{
+      this.validate(body);
+      const { data, error } = await supabase
+        .from("videos")
+        .insert([body])
+        .select()
+        .single();
+  
+      if (error) {
+        throw new Error(error.message);
+      }
+      return data;
+    }catch(error){
+      throw error
+    }
+  };
+
+  updateVideo = async (id: string, body: Partial<Video>) => {
+    try{
+      this.validate(body,1);
+      const { data, error } = await supabase
+        .from("videos")
+        .update(body)
+        .eq("id", id)
+        .select()
+        .single();
+  
+      if (error) {
+        throw new Error(error.message);
+      }
+      return data;
+    }catch(error){
+      throw error
+    }
+  };
+
+  // Delete a video
+  deleteVideo = async (youtube_video_id: string) => {
+    try{
+      const { error } = await supabase
+        .from("videos")
+        .delete()
+        .eq("youtube_video_id", youtube_video_id);
+        
+      if (error){
+        throw new Error(error.message)
+      };
+      return { success: true, message: "Resource Deleted Successfully!" };
+    }catch(error){
+      throw error
+    }
+  };
+  // finds videos based on keyword
+  findVideos = async ({keywords, getOne = false,includeTranscripts = false}:{keywords: string[], getOne: boolean, includeTranscripts: boolean}) => {
+    try {
+      const orFilter = keywords.map((kw:string) => `title.ilike.%${kw}%`).join(",");
+      const { data, error } = await supabase
+          .from("videos")
+          .select(`*${includeTranscripts?",transcripts(*)":""}`)
+          .or(`${orFilter}`);
+
+      if (error){
+        throw new Error(error.message)
+      };
+      return data;
+    } catch (error) {
+      throw error;
+    }
+  };
+  // Check if a YouTube video with the given Youtube Video ID exists in the database
+  checkVideoExistsById = async (videoId: string): Promise<boolean> => {
+    try {
+      const { data, error } = await supabase
+        .from("videos")
+        .select("id") // only selecting id for performance
+        .ilike("url", `%v=${videoId}%`); // looks for the videoId in the URL
+
+      if (error){
+        throw new Error(error.message)
+      };
+
+      return data.length > 0;
+    } catch (error) {
+      console.error("Error in checkVideoExistsById:", error);
+      throw error;
+    }
+  };
+}
+
+export default new VideoModel();

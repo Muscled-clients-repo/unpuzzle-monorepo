@@ -1,0 +1,81 @@
+import { Request, Response, NextFunction } from "express";
+import { BindMethods } from "../../utility/BindMethods";
+import ResponseHandler from "../../utility/ResponseHandler";
+import ProductModel from "../../../models/supabase/product.model";
+
+
+class ProductController {
+    constructor() {}
+
+    getAllProducts= async(req: any,res: Response, next: NextFunction)=>{
+        const responseHandler = new ResponseHandler(res, next);
+        const productModel = new ProductModel()
+        
+        try {
+            const page = req.query.page || 1
+            const limit = req.query.limit || 10
+            const data = await productModel.getAllProducts(page, limit)
+            responseHandler.success(data);
+        } catch (error: any) {
+            console.log(error);
+            responseHandler.error(error);
+        }
+    }
+
+    getProductById= async(req: any,res: Response, next: NextFunction)=>{
+        const responseHandler = new ResponseHandler(res, next);
+        const productModel = new ProductModel()
+        
+        try {
+            const data = await productModel.getProductById(req.params.id)
+            responseHandler.success(data);
+        } catch (error: any) {
+            console.log(error);
+            responseHandler.error(error);
+        }
+    }
+
+    createProduct= async(req: any,res: Response, next: NextFunction)=>{
+        const responseHandler = new ResponseHandler(res, next);
+        const productModel = new ProductModel()
+        
+        try {
+            console.log(req.body)
+            const data = await productModel.createProduct(req.body)
+            responseHandler.success(data);
+        } catch (error: any) {
+            console.log(error);
+            responseHandler.error(error);
+        }
+    }
+
+    updateProduct= async(req: any,res: Response, next: NextFunction)=>{
+        const responseHandler = new ResponseHandler(res, next);
+        const productModel = new ProductModel()
+        
+        try {
+            const data = await productModel.updateProduct(req.params.id, req.body)
+            responseHandler.success(data);
+        } catch (error: any) {
+            console.log(error);
+            responseHandler.error(error);
+        }
+    }
+
+    deleteProduct= async(req: any,res: Response, next: NextFunction)=>{
+        const responseHandler = new ResponseHandler(res, next);
+        const productModel = new ProductModel()
+        
+        try {
+            const data = await productModel.deleteProduct(req.params.id)
+            responseHandler.success(data);
+        } catch (error: any) {
+            console.log(error);
+            responseHandler.error(error);
+        }
+    }
+
+}
+
+const binding = new BindMethods(new ProductController());
+export default binding.bindMethods();

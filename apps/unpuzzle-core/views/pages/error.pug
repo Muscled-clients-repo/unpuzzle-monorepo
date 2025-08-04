@@ -1,0 +1,47 @@
+extends ../layout/main
+
+block content
+  .error-container
+    h1.error-title Oops! Something went wrong
+    if message
+      p.error-message= message
+    if error
+      pre.error-details= error
+    a.button(href='/') Return to Homepage
+
+block styles
+  style.
+    .error-container {
+      max-width: 600px;
+      margin: 4rem auto;
+      padding: 2rem;
+      text-align: center;
+    }
+    .error-title {
+      color: #e74c3c;
+      margin-bottom: 1rem;
+    }
+    .error-message {
+      color: #666;
+      margin-bottom: 1.5rem;
+    }
+    .error-details {
+      background: #f8f9fa;
+      padding: 1rem;
+      border-radius: 4px;
+      text-align: left;
+      overflow-x: auto;
+      margin-bottom: 2rem;
+    }
+    .button {
+      display: inline-block;
+      padding: 0.8rem 1.5rem;
+      background: #3498db;
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+      transition: background 0.3s ease;
+    }
+    .button:hover {
+      background: #2980b9;
+    } 

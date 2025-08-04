@@ -1,0 +1,224 @@
+extends ../layout/main
+
+block content
+  div(class="container mx-auto px-4 py-8")
+    // Header
+    div(class="mb-8")
+      h1(class="text-3xl font-bold text-gray-900 mb-2") Book a Meeting with an Instructor
+      p(class="text-gray-600") Connect with expert instructors for personalized learning sessions
+    
+    // Instructor Selection
+    div(class="mb-8")
+      h2(class="text-2xl font-semibold mb-4") Available Instructors
+      div(id="instructors-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6")
+        // Instructors will be loaded here dynamically
+    
+    // My Meetings Section
+    div(class="mb-8")
+      h2(class="text-2xl font-semibold mb-4") My Meetings
+      button(onclick="meetingBooking.viewMyMeetings()" class="btn btn-primary mb-4") Refresh My Meetings
+      div(id="my-meetings-container" class="space-y-4")
+        // Meetings will be loaded here dynamically
+
+  // Booking Modal
+  div(id="booking-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50")
+    div(class="flex items-center justify-center min-h-screen p-4")
+      div(class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-screen overflow-y-auto")
+        div(class="p-6")
+          h3(class="text-2xl font-bold mb-4") Book a Meeting
+          
+          form(id="booking-form" class="space-y-4")
+            input(type="hidden" id="instructor-id" name="instructor_id")
+            
+            div(class="grid grid-cols-1 md:grid-cols-2 gap-4")
+              div
+                label(for="meeting-date" class="block text-sm font-medium text-gray-700 mb-1") Date
+                input(type="date" id="meeting-date" name="meeting_date" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500")
+              
+              div
+                label(for="meeting-time" class="block text-sm font-medium text-gray-700 mb-1") Time
+                input(type="time" id="meeting-time" name="meeting_time" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500")
+            
+            div
+              label(for="meeting-duration" class="block text-sm font-medium text-gray-700 mb-1") Duration (minutes)
+              select(id="meeting-duration" name="meeting_duration" required onchange="meetingBooking.updatePriceEstimate()" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500")
+                option(value="15") 15 minutes
+                option(value="30") 30 minutes
+                option(value="45") 45 minutes
+                option(value="60" selected) 1 hour
+                option(value="90") 1.5 hours
+                option(value="120") 2 hours
+            
+            div
+              label(for="meeting-notes" class="block text-sm font-medium text-gray-700 mb-1") Notes (optional)
+              textarea(id="meeting-notes" name="meeting_notes" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="What would you like to discuss?")
+            
+            div(class="bg-gray-50 p-4 rounded-md")
+              h4(class="font-semibold mb-2") Instructor Availability
+              div(id="availability-calendar" class="grid grid-cols-7 gap-2 text-sm")
+                // Calendar will be loaded here dynamically
+            
+            div(class="bg-blue-50 p-4 rounded-md")
+              p(class="text-sm text-blue-800")
+                strong Estimated Cost: 
+                span(id="price-estimate" class="text-lg font-bold") $0.00
+            
+            div(class="flex justify-end space-x-3 pt-4")
+              button(type="button" onclick="document.getElementById('booking-modal').style.display='none'" class="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50") Cancel
+              button(type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700") Book Meeting
+
+  // Payment Modal
+  div(id="payment-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50")
+    div(class="flex items-center justify-center min-h-screen p-4")
+      div(class="bg-white rounded-lg shadow-xl max-w-md w-full")
+        div(class="p-6")
+          h3(class="text-2xl font-bold mb-4") Complete Payment
+          
+          form(id="payment-form" class="space-y-4")
+            div
+              label(for="cardholder-name" class="block text-sm font-medium text-gray-700 mb-1") Cardholder Name
+              input(type="text" id="cardholder-name" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500")
+            
+            div
+              label(class="block text-sm font-medium text-gray-700 mb-1") Card Details
+              div(id="card-element" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500")
+            
+            div(class="flex justify-end space-x-3 pt-4")
+              button(type="button" onclick="document.getElementById('payment-modal').style.display='none'" class="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50") Cancel
+              button(type="submit" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700") Pay Now
+
+  // Confirmation Modal
+  div(id="confirmation-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50")
+    div(class="flex items-center justify-center min-h-screen p-4")
+      div(class="bg-white rounded-lg shadow-xl max-w-md w-full")
+        div(class="p-6 text-center")
+          div(id="meeting-details")
+            // Meeting details will be loaded here dynamically
+
+  // Meeting Session Modal
+  div(id="meeting-session-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50")
+    div(class="flex items-center justify-center min-h-screen p-4")
+      div(class="bg-white rounded-lg shadow-xl max-w-lg w-full")
+        div(class="p-6 text-center")
+          h3(class="text-2xl font-bold mb-4") Meeting in Progress
+          
+          div(class="mb-6")
+            p(class="text-lg mb-2") Session Timer:
+            p(id="session-timer" class="text-3xl font-mono font-bold text-blue-600") 0:00
+          
+          div(class="mb-6")
+            p(id="meeting-status" class="text-lg font-semibold text-green-600") IN PROGRESS
+          
+          div(class="space-y-3")
+            button(id="start-meeting-btn" class="w-full px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700") Start Meeting
+            button(id="end-meeting-btn" class="w-full px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700") End Meeting
+
+  // Summary Modal
+  div(id="summary-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50")
+    div(class="flex items-center justify-center min-h-screen p-4")
+      div(class="bg-white rounded-lg shadow-xl max-w-md w-full")
+        div(class="p-6 text-center")
+          div(id="summary-content")
+            // Summary content will be loaded here dynamically
+
+block scripts
+  script(src="https://js.stripe.com/v3/")
+  script(src="/js/core/meeting-booking.js")
+
+block styles
+  style.
+    .instructor-card {
+      @apply bg-white rounded-lg shadow-md p-6 border border-gray-200 hover:shadow-lg transition-shadow;
+    }
+    
+    .instructor-avatar img {
+      @apply w-16 h-16 rounded-full object-cover mx-auto mb-4;
+    }
+    
+    .instructor-info h3 {
+      @apply text-xl font-semibold text-gray-900 mb-2 text-center;
+    }
+    
+    .instructor-bio {
+      @apply text-gray-600 text-sm mb-3 text-center;
+    }
+    
+    .instructor-rate {
+      @apply text-lg font-bold text-green-600 mb-3 text-center;
+    }
+    
+    .instructor-expertise {
+      @apply flex flex-wrap gap-2 justify-center mb-4;
+    }
+    
+    .skill-tag {
+      @apply px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full;
+    }
+    
+    .book-btn {
+      @apply w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors;
+    }
+    
+    .meeting-card {
+      @apply bg-white rounded-lg shadow-md p-6 border-l-4;
+    }
+    
+    .meeting-card.scheduled {
+      @apply border-l-blue-500;
+    }
+    
+    .meeting-card.in_progress {
+      @apply border-l-green-500;
+    }
+    
+    .meeting-card.completed {
+      @apply border-l-gray-500;
+    }
+    
+    .meeting-card.cancelled {
+      @apply border-l-red-500;
+    }
+    
+    .meeting-header {
+      @apply flex justify-between items-center mb-4;
+    }
+    
+    .status-badge {
+      @apply px-2 py-1 text-xs font-semibold rounded-full;
+    }
+    
+    .status-badge.scheduled {
+      @apply bg-blue-100 text-blue-800;
+    }
+    
+    .status-badge.in_progress {
+      @apply bg-green-100 text-green-800;
+    }
+    
+    .status-badge.completed {
+      @apply bg-gray-100 text-gray-800;
+    }
+    
+    .status-badge.cancelled {
+      @apply bg-red-100 text-red-800;
+    }
+    
+    .meeting-details {
+      @apply space-y-2 mb-4;
+    }
+    
+    .meeting-actions {
+      @apply flex space-x-2;
+    }
+    
+    .calendar-day {
+      @apply p-2 text-center border rounded;
+    }
+    
+    .calendar-day.available {
+      @apply bg-green-50 border-green-200;
+    }
+    
+    .calendar-day.unavailable {
+      @apply bg-gray-50 border-gray-200 text-gray-500;
+    } 

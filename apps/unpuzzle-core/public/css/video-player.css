@@ -1,0 +1,13 @@
+.video-player{
+    width: 100%;
+    height: 100%;
+    max-width: 100vw;
+    max-height: 560px !important;
+}
+#player-control-overlay .ytwPlayerFullscreenActionMenuHost, .ytp-pause-overlay-container{
+    display: none !important;
+}
+
+.video-player-container:hover .controll-wrapper{
+    display: block;
+}
