@@ -9,7 +9,7 @@ interface PageProps {
 
 // Generate static params for build time - returns empty array for dynamic generation
 export async function generateStaticParams() {
-  // Return empty array to allow all dynamic routes
+  // Return empty array to allow all dynamic routes at build time
   return [];
 }
 
