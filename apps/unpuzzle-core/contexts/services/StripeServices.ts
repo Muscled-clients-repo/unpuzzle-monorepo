@@ -8,16 +8,48 @@ export class StripeService {
     this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
   }
 
-  // Create a Payment Intent
-  createPaymentIntent=async(amount: number): Promise<Stripe.PaymentIntent> =>{
+  // Create a Payment Intent with metadata
+  createPaymentIntent=async(params: {
+    amount: number;
+    metadata?: Record<string, string>;
+    description?: string;
+  }): Promise<Stripe.PaymentIntent> =>{
     try {
       const paymentIntent = await this.stripe.paymentIntents.create({
-        amount,
+        amount: params.amount,
         currency: 'usd',
+        metadata: params.metadata || {},
+        description: params.description,
+        automatic_payment_methods: {
+          enabled: true,
+        },
       });
       return paymentIntent;
     } catch (err: any) {
       throw new Error(`Payment Intent Creation Failed: ${err.message}`);
+    }
+  }
+
+  // Create Payment Intent for Course Purchase
+  createCoursePaymentIntent = async (params: {
+    userId: string;
+    courseId: string;
+    courseTitle: string;
+    priceInCents: number;
+  }): Promise<Stripe.PaymentIntent> => {
+    try {
+      return await this.createPaymentIntent({
+        amount: params.priceInCents,
+        description: `Course purchase: ${params.courseTitle}`,
+        metadata: {
+          userId: params.userId,
+          courseId: params.courseId,
+          courseTitle: params.courseTitle,
+          type: 'course_purchase'
+        }
+      });
+    } catch (err: any) {
+      throw new Error(`Course Payment Intent Creation Failed: ${err.message}`);
     }
   }
 
@@ -88,7 +120,7 @@ export class StripeService {
     }
   }
 
-  // Create Checkout Session for Course Purchase
+  // Create Checkout Session for Course Purchase (Embedded)
   createCourseCheckoutSession = async (params: {
     userId: string;
     courseId: string;
@@ -99,6 +131,7 @@ export class StripeService {
   }): Promise<Stripe.Checkout.Session> => {
     try {
       const session = await this.stripe.checkout.sessions.create({
+        ui_mode: 'embedded',  // Enable embedded checkout
         payment_method_types: ['card'],
         line_items: [
           {
@@ -114,8 +147,7 @@ export class StripeService {
           },
         ],
         mode: 'payment',
-        success_url: params.successUrl,
-        cancel_url: params.cancelUrl,
+        return_url: params.successUrl,  // Use return_url for embedded mode
         metadata: {
           userId: params.userId,
           courseId: params.courseId,

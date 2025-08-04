@@ -40,12 +40,13 @@ export const useStripeCheckout = (apiBaseUrl: string) => {
     setError(null);
 
     try {
-      const response = await axios.post<CheckoutSessionResponse>(
+      const response = await axios.post<any>(
         `${apiBaseUrl}/api/stripe/create-course-checkout-session`,
         params
       );
       
-      return response.data;
+      // Handle wrapped response format { success: true, body: data }
+      return response.data.body || response.data;
     } catch (err) {
       const errorMessage = err instanceof AxiosError 
         ? err.response?.data?.message || err.message 
@@ -67,12 +68,13 @@ export const useStripeCheckout = (apiBaseUrl: string) => {
     setError(null);
 
     try {
-      const response = await axios.post<CheckoutSessionResponse>(
+      const response = await axios.post<any>(
         `${apiBaseUrl}/api/stripe/create-checkout-session`,
         params
       );
       
-      return response.data;
+      // Handle wrapped response format { success: true, body: data }
+      return response.data.body || response.data;
     } catch (err) {
       const errorMessage = err instanceof AxiosError 
         ? err.response?.data?.message || err.message 

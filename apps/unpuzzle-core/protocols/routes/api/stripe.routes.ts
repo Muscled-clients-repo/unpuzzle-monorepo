@@ -9,6 +9,9 @@ router.post('/create-checkout-session', StripeWebhookController.handleCreateChec
 // Create checkout session for course purchase
 router.post('/create-course-checkout-session', StripeWebhookController.handleCreateCourseCheckoutSession);
 
+// Create payment intent for course purchase (for custom checkout)
+router.post('/create-course-payment-intent', StripeWebhookController.handleCreateCoursePaymentIntent);
+
 // Single Stripe webhook endpoint for all events
 // IMPORTANT: Raw body parsing is handled in index.ts before this route
 router.post('/webhook', StripeWebhookController.webhookHandler);

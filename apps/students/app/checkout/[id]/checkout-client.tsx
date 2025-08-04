@@ -9,7 +9,8 @@ import { LoadingButton } from "@/app/components/navigation/LoadingButton";
 import { useNavigationLoading } from "@/app/context/NavigationLoadingContext";
 import { useCourseDetails } from "@/app/hooks/useCourses";
 import { useCreateEnrollMutation } from "@/app/redux/services/enroll.services";
-import { StripeProvider, StripeCheckoutForm, useStripeCheckout } from "@unpuzzle/stripe-integration";
+import { CustomCheckout, useStripeCheckout } from "@unpuzzle/stripe-integration";
+import axios from "axios";
 import { API_ENDPOINTS } from "@/app/config/api.config";
 import { 
   CheckCircleIcon, 
@@ -39,6 +40,7 @@ export default function CheckoutClient({ courseId }: CheckoutClientProps) {
   const [processingPayment, setProcessingPayment] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [isRedirecting, setIsRedirecting] = useState(false);
   
   const { 
     createCourseCheckoutSession, 
@@ -52,42 +54,48 @@ export default function CheckoutClient({ courseId }: CheckoutClientProps) {
     }
   }, [courseId]);
 
-  // Create Stripe checkout session when course loads
+  // Create Stripe payment intent when course loads
   useEffect(() => {
-    if (course && course.price > 0 && !clientSecret && !isCreatingSession) {
-      handleCreateStripeSession();
+    if (course && course.price > 0 && !clientSecret) {
+      handleCreatePaymentIntent();
     }
-  }, [course, clientSecret, isCreatingSession]);
+  }, [course, clientSecret]);
 
-  const handleCreateStripeSession = async () => {
-    if (!course) return;
+  const handleCreatePaymentIntent = async () => {
+    if (!course || isRedirecting) return;
     
-    const session = await createCourseCheckoutSession({
-      userId: 'current-user-id', // Replace with actual user ID from auth
-      courseId: course.id,
-      successUrl: `${window.location.origin}/checkout/success?course_id=${courseId}`,
-      cancelUrl: `${window.location.origin}/checkout/cancel?course_id=${courseId}`,
-    });
+    try {
+      console.log('Creating payment intent for course:', course.id);
+      
+      const response = await axios.post(
+        `${API_ENDPOINTS.BASE}/stripe/create-course-payment-intent`,
+        {
+          userId: 'current-user-id', // Replace with actual user ID from auth
+          courseId: course.id
+        }
+      );
 
-    if (session) {
-      if (session.sessionUrl || session.checkoutUrl) {
-        // For Stripe Checkout (redirect)
-        redirectToCheckout(session.sessionUrl || session.checkoutUrl || '');
-      } else if (session.clientSecret) {
-        // For Stripe Elements (embedded)
-        setClientSecret(session.clientSecret);
+      const data = response.data.body || response.data;
+      console.log('Payment intent response:', data);
+
+      if (data.clientSecret) {
+        setClientSecret(data.clientSecret);
+      } else {
+        console.error('No client secret received:', data);
+        setErrors({ payment: 'Failed to initialize payment. Please try again.' });
       }
-    } else {
-      setErrors({ payment: 'Failed to initialize payment. Please try again.' });
+    } catch (error: any) {
+      console.error('Failed to create payment intent:', error);
+      setErrors({ payment: error.response?.data?.message || 'Failed to initialize payment.' });
     }
   };
 
-  if (loading) {
+  if (loading || isRedirecting) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <ArrowPathIcon className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
-          <p className="text-gray-600">Loading checkout...</p>
+          <p className="text-gray-600">{isRedirecting ? 'Redirecting to payment...' : 'Loading checkout...'}</p>
         </div>
       </div>
     );
@@ -210,18 +218,28 @@ export default function CheckoutClient({ courseId }: CheckoutClientProps) {
                     </div>
                   )}
 
-                  {/* Stripe Payment Form */}
-                  <StripeProvider 
-                    publishableKey={process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!}
-                    clientSecret={clientSecret || undefined}
-                  >
-                    <StripeCheckoutForm
-                      onSuccess={handlePaymentSuccess}
-                      onError={handlePaymentError}
-                      amount={course.price}
-                      title={course.title}
+                  {/* Custom Stripe Checkout - Only render if we have a clientSecret */}
+                  {clientSecret ? (
+                    <CustomCheckout
+                      publishableKey={process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!}
+                      clientSecret={clientSecret}
+                      amount={course.price * 100} // Convert to cents
+                      courseTitle={course.title}
+                      onSuccess={async (paymentIntent) => {
+                        console.log('Payment successful:', paymentIntent);
+                        await handlePaymentSuccess();
+                      }}
+                      onError={(error) => {
+                        console.error('Payment error:', error);
+                        handlePaymentError(error);
+                      }}
                     />
-                  </StripeProvider>
+                  ) : (
+                    <div className="text-center py-8">
+                      <ArrowPathIcon className="w-8 h-8 text-blue-600 animate-spin mx-auto mb-3" />
+                      <p className="text-gray-600">Preparing secure checkout...</p>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

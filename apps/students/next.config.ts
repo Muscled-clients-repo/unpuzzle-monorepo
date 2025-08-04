@@ -8,6 +8,10 @@ const withBundleAnalyzer = bundleAnalyzer({
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  // Enable trailing slash for better routing
+  trailingSlash: false,
+  // Ensure dynamic routes work in production
+  output: 'standalone',
   // Allow cross-origin requests during development
   allowedDevOrigins: ['dev.nazmulcodes.org', 'dev1.nazmulcodes.org', 'dev2.nazmulcodes.org'],
   images: {

@@ -51,6 +51,29 @@ class StripeWebhookController extends StripeService{
 
             // Handle different event types
             switch (event.type) {
+                case 'payment_intent.succeeded':
+                    const paymentIntent = event.data.object as any;
+                    const piMetadata = paymentIntent.metadata || {};
+                    
+                    if (piMetadata.type === 'course_purchase') {
+                        return await this.handleCoursePurchase({
+                            ...paymentIntent,
+                            metadata: piMetadata,
+                            amount_total: paymentIntent.amount,
+                            customer_email: paymentIntent.receipt_email,
+                            payment_status: 'paid'
+                        }, res);
+                    } else if (piMetadata.type === 'credit_purchase') {
+                        return await this.handleCreditPurchase({
+                            ...paymentIntent,
+                            metadata: piMetadata,
+                            amount_total: paymentIntent.amount,
+                            customer_email: paymentIntent.receipt_email,
+                            payment_status: 'paid'
+                        }, res);
+                    }
+                    break;
+                    
                 case 'checkout.session.completed':
                     const session = event.data.object as any;
                     const { type, userId, creditAmount, courseId } = session.metadata || {};
@@ -514,6 +537,64 @@ class StripeWebhookController extends StripeService{
         }
     }
 
+    handleCreateCoursePaymentIntent = async(req: Request, res: Response, next: NextFunction) => {
+        const responseHandler = new ResponseHandler(res, next);
+        
+        try {
+            const { userId, courseId } = req.body;
+            
+            // Validate required fields
+            if (!userId || !courseId) {
+                throw new Error('Missing required fields: userId, courseId');
+            }
+            
+            // Get course details
+            const course = await CourseModel.getCourseById(courseId);
+            if (!course) {
+                throw new Error('Course not found');
+            }
+            
+            // Check if user is already enrolled
+            const existingEnrollment = await EnrollmentModel.getEnrollmentByUserAndCourse(userId, courseId);
+            if (existingEnrollment) {
+                throw new Error('User is already enrolled in this course');
+            }
+            
+            // Convert price to cents
+            const priceInCents = Math.round(course.price * 100);
+            
+            // Create payment intent
+            const paymentIntent = await this.createCoursePaymentIntent({
+                userId,
+                courseId,
+                courseTitle: course.title,
+                priceInCents
+            });
+            
+            logger.info('Course payment intent created successfully', {
+                paymentIntentId: paymentIntent.id,
+                userId,
+                courseId,
+                courseTitle: course.title,
+                priceInCents
+            });
+            
+            responseHandler.success({
+                clientSecret: paymentIntent.client_secret,
+                paymentIntentId: paymentIntent.id,
+                amount: priceInCents,
+                courseTitle: course.title
+            });
+            
+        } catch (error: any) {
+            logger.error('Failed to create course payment intent', {
+                error: error.message,
+                body: req.body
+            });
+            responseHandler.error(error);
+        }
+    }
+
     handleCreateCourseCheckoutSession = async(req: Request, res: Response, next: NextFunction) => {
         const responseHandler = new ResponseHandler(res, next);
         
@@ -555,11 +636,13 @@ class StripeWebhookController extends StripeService{
                 userId,
                 courseId,
                 courseTitle: course.title,
-                priceInCents
+                priceInCents,
+                hasClientSecret: !!session.client_secret
             });
             
             responseHandler.success({
                 sessionId: session.id,
+                clientSecret: session.client_secret,  // For embedded checkout
                 checkoutUrl: session.url,
                 sessionUrl: session.url
             });

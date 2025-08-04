@@ -1,0 +1,4 @@
+# Netlify redirects file
+# Handle dynamic routes for client-side routing
+/checkout/* /checkout/[id] 200
+/* /index.html 200
