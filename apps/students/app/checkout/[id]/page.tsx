@@ -7,9 +7,11 @@ interface PageProps {
   params: Promise<{ id: string }>;
 }
 
-// Force dynamic rendering for checkout pages
-export const dynamic = 'force-dynamic';
-export const dynamicParams = true;
+// Generate static params for build time - returns empty array for dynamic generation
+export async function generateStaticParams() {
+  // Return empty array to allow all dynamic routes
+  return [];
+}
 
 export default async function CheckoutPage({ params }: PageProps) {
   try {
