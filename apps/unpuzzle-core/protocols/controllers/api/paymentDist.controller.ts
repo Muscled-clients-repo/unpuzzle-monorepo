@@ -12,7 +12,10 @@ class PaymentDistController {
         const stripeService = new StripeService()
         
         try {
-            const data = await stripeService.createPaymentIntent(2000)
+            const data = await stripeService.createPaymentIntent({ 
+                amount: 2000,
+                description: "Balance check payment intent"
+            })
             responseHandler.success(data);
         } catch (error: any) {
             console.log(error);
@@ -25,7 +28,10 @@ class PaymentDistController {
         const stripeService = new StripeService()
         
         try {
-            const data = await stripeService.createPaymentIntent(2000)
+            const data = await stripeService.createPaymentIntent({ 
+                amount: 2000,
+                description: "Withdrawal payment intent"
+            })
             responseHandler.success(data);
         } catch (error: any) {
             console.log(error);
@@ -38,7 +44,10 @@ class PaymentDistController {
         const stripeService = new StripeService()
         
         try {
-            const data = await stripeService.createPaymentIntent(2000)
+            const data = await stripeService.createPaymentIntent({ 
+                amount: 2000,
+                description: "Bank account connection payment intent"
+            })
             responseHandler.success(data);
         } catch (error: any) {
             console.log(error);

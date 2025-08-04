@@ -4,9 +4,17 @@ import { API_ENDPOINTS } from "@/app/config/api.config";
 export async function getCourseById(courseId: string, customHeaders?: HeadersInit): Promise<Course | null> {
   // Validate courseId
   if (!courseId || typeof courseId !== 'string' || courseId.trim() === '') {
-    console.error('getCourseById: Invalid courseId provided');
+    console.error('getCourseById: Invalid courseId provided:', courseId);
     return null;
   }
+
+  // Check if we received a literal "[id]" string (build-time issue)
+  if (courseId === '[id]') {
+    console.error('getCourseById: Received literal "[id]" instead of actual course ID - this is a build/routing issue');
+    return null;
+  }
+  
+  console.log('getCourseById: Fetching course with ID:', courseId);
   
   try {
     // Convert Headers object to plain object if needed
@@ -24,9 +32,14 @@ export async function getCourseById(courseId: string, customHeaders?: HeadersIni
       }
     }
     
-    const response = await fetch(`${API_ENDPOINTS.COURSES}/${courseId}`, {
+    // Construct URL carefully to avoid template literal issues
+    const apiUrl = `${API_ENDPOINTS.COURSES}/${encodeURIComponent(courseId)}`;
+    console.log('getCourseById: Fetching from URL:', apiUrl);
+    
+    const response = await fetch(apiUrl, {
       next: { revalidate: 60 }, // Cache for 60 seconds
       headers: headersObj,
+      signal: AbortSignal.timeout(10000), // 10 second timeout
     });
 
     if (!response.ok) {

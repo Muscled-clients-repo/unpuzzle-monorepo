@@ -1,10 +1,11 @@
 {
   "name": "unpuzzle-student",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "scripts": {
     "dev": "NODE_ENV=development next dev -p ${PORT:-3000}",
-    "build": "next build",
+    "build": "pnpm run build:deps && next build",
+    "build:deps": "cd ../../packages/stripe-integration && pnpm build",
     "build:css": "tailwindcss -i ./input.css -o ./app/tailwind.css && cp ./app/tailwind.css ./public/tailwind.css",
     "build:no-lint": "SKIP_ENV_VALIDATION=1 next build --no-lint",
     "start": "next start",

@@ -1,10 +1,6 @@
 {
-  "rewrites": [
-    {
-      "source": "/checkout/(.*)",
-      "destination": "/checkout/[id]"
-    }
-  ],
+  "buildCommand": "cd ../.. && pnpm build --filter=unpuzzle-student",
+  "installCommand": "cd ../.. && pnpm install",
   "functions": {
     "app/checkout/[id]/page.tsx": {
       "maxDuration": 10
