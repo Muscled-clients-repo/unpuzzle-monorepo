@@ -8,6 +8,7 @@ import CreditTrackModel from "../../../models/supabase/creditTrack.model";
 import CreditTransactionModel from "../../../models/supabase/creditTransaction.model";
 import EnrollmentModel from "../../../models/supabase/enrollment.model";
 import CourseModel from "../../../models/supabase/course.model";
+import WebhookEventsModel from "../../../models/supabase/webhookEvents.model";
 import { logger } from "../../../utils/logger";
 
 
@@ -48,6 +49,49 @@ class StripeWebhookController extends StripeService{
             );
 
             logger.info(`Stripe webhook event: ${event.type}`, { eventId: event.id });
+            
+            // IDEMPOTENCY: Check if we've already processed this event
+            try {
+                const existingEvent = await WebhookEventsModel.getEventByStripeId(event.id);
+                if (existingEvent) {
+                    logger.info('Webhook event already processed', {
+                        eventId: event.id,
+                        eventType: event.type,
+                        processedAt: existingEvent.processed_at
+                    });
+                    return res.status(200).json({ 
+                        received: true, 
+                        message: 'Event already processed',
+                        eventId: event.id 
+                    });
+                }
+                
+                // Record that we're processing this event
+                const eventRecord = await WebhookEventsModel.createEvent({
+                    stripe_event_id: event.id,
+                    event_type: event.type,
+                    payload: event,
+                    status: 'processing'
+                });
+                
+                if (eventRecord.alreadyProcessed) {
+                    logger.info('Event was already being processed (race condition handled)', {
+                        eventId: event.id,
+                        eventType: event.type
+                    });
+                    return res.status(200).json({ 
+                        received: true, 
+                        message: 'Event already being processed',
+                        eventId: event.id 
+                    });
+                }
+            } catch (error) {
+                logger.warn('Could not check/record webhook event (webhook_events table might not exist)', {
+                    eventId: event.id,
+                    error: error.message
+                });
+                // Continue processing even if event tracking fails
+            }
 
             // Handle different event types
             switch (event.type) {
@@ -249,7 +293,24 @@ class StripeWebhookController extends StripeService{
         }
 
         try {
-            // Check if already enrolled
+            // IDEMPOTENCY CHECK 1: Check for existing order with same payment_id
+            const paymentId = session.payment_intent as string || session.id;
+            const existingOrder = await OrdersModel.getOrderByPaymentId(paymentId);
+            
+            if (existingOrder.success && existingOrder.data) {
+                logger.info('Order already exists for this payment', {
+                    paymentId,
+                    orderId: existingOrder.data.id,
+                    sessionId: session.id
+                });
+                return res.status(200).json({ 
+                    received: true,
+                    message: 'Order already processed',
+                    orderId: existingOrder.data.id
+                });
+            }
+
+            // IDEMPOTENCY CHECK 2: Check if already enrolled
             const existingEnrollment = await EnrollmentModel.getEnrollmentByUserAndCourse(userId, courseId);
             
             if (existingEnrollment) {
@@ -257,6 +318,29 @@ class StripeWebhookController extends StripeService{
                     sessionId: session.id,
                     enrollmentId: existingEnrollment.id
                 });
+                
+                // Even if enrolled, check if we need to create the order record
+                if (!existingOrder.data) {
+                    // Create order record for accounting purposes
+                    const coursePrice = (await CourseModel.getCourseById(courseId))?.price || 0;
+                    const amountPaid = session.amount_total ? session.amount_total / 100 : coursePrice;
+                    
+                    await OrdersModel.createOrder({
+                        user_id: userId,
+                        total_amount: amountPaid,
+                        items: [{
+                            product_id: courseId,
+                            quantity: 1
+                        }],
+                        payment_status: 'paid',
+                        payment_method: 'stripe',
+                        payment_amount: amountPaid,
+                        payment_currency: 'USD',
+                        payment_date: new Date(),
+                        payment_id: paymentId
+                    } as any);
+                }
+                
                 return res.status(200).json({ 
                     received: true,
                     message: 'User already enrolled',
@@ -291,13 +375,14 @@ class StripeWebhookController extends StripeService{
                 });
             }
 
-            // Create enrollment (no amount needed here)
+            // Use database transaction if possible, or handle race conditions
+            // Create enrollment first (this is the critical part)
             const enrollment = await EnrollmentModel.createEnrollment({
                 user_id: userId,
                 course_id: courseId
             } as any);
             
-            // Create order record with required fields matching the validator
+            // Then create order record (for accounting/history)
             const order = await OrdersModel.createOrder({
                 user_id: userId,
                 total_amount: amountPaid,
@@ -310,7 +395,7 @@ class StripeWebhookController extends StripeService{
                 payment_amount: amountPaid,
                 payment_currency: 'USD',
                 payment_date: new Date(),
-                payment_id: session.payment_intent as string || session.id
+                payment_id: paymentId
             } as any);
             
             logger.info('Course enrollment created successfully', {

@@ -31,6 +31,19 @@ class OrdersModel extends OrdersSchema{
     return { success: true, data };
   }
 
+  getOrderByPaymentId=async(paymentId: string)=> {
+    const { data, error } = await supabase
+      .from("orders")
+      .select("*")
+      .eq("payment_id", paymentId)
+      .maybeSingle();
+
+    if (error && error.code !== 'PGRST116') { // PGRST116 is "no rows found"
+      return { success: false, error: error.message };
+    }
+    return { success: true, data };
+  }
+
   createOrder=async(body:Orders)=> {
     try{
       this.validate(body);
