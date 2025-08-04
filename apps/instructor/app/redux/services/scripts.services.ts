@@ -1,8 +1,12 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { createApi } from '@reduxjs/toolkit/query/react';
+import { createApiClientBaseQuery } from './baseQuery';
+
+// Use centralized API client with automatic token handling
+const baseQuery = createApiClientBaseQuery();
 
 export const scriptsApi = createApi({
   reducerPath: 'scriptsApi',
-  baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:3001/api' }),
+  baseQuery: baseQuery,
   endpoints: (builder) => ({
     createScript: builder.mutation({
       query: ({ userId, courseId }) => {

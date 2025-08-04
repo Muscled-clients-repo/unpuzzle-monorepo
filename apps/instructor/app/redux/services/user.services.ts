@@ -1,10 +1,12 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { createApi } from '@reduxjs/toolkit/query/react';
+import { createApiClientBaseQuery } from './baseQuery';
 
-const BASE_URL = 'http://localhost:3001';
+// Use centralized API client with automatic token handling
+const baseQuery = createApiClientBaseQuery();
 
 export const userApi = createApi({
   reducerPath: 'userApi',
-  baseQuery: fetchBaseQuery({ baseUrl: BASE_URL }),
+  baseQuery: baseQuery,
   endpoints: (build) => ({
     createUser: build.mutation({
       query: (userPayload) => ({

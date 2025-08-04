@@ -1,7 +1,7 @@
 import { format, isThisWeek, isToday, isYesterday } from "date-fns";
 
 
-export function formatDateTime(dateString: string) {
+export function formatDateTime(dateString) {
     const date = new Date(dateString);
   
     if (isToday(date)) {

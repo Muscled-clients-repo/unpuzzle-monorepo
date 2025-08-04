@@ -8,8 +8,8 @@ import notificationReducer from "./features/notifications/notificationSlice";
 import previewReducer from './features/previewSlice/previewSlice';
 import sidebarReducer from './features/sidebarSlice/sidebarSlice';
 import annotaionReducer from './features/annotationSlice';
+
 import selectedIndexReducer from "./features/selectedCourse/selectedIndexSlice"
-import videoEditorReducer from "./features/videoEditor/videoEditorSlice";
 import { pokemonApi } from './services/pokemon.services';
 import { enrollApi } from './services/enroll.services';
 import { permissionApi } from './services/permission.services';
@@ -32,7 +32,6 @@ const rootReducer = combineReducers({
     sidebar: sidebarReducer,
     teacherAnnotations: annotaionReducer,
     selectedIndex: selectedIndexReducer,
-    videoEditor: videoEditorReducer,
     [pokemonApi.reducerPath]: pokemonApi.reducer,
     [enrollApi.reducerPath]: enrollApi.reducer,
     [permissionApi.reducerPath]: permissionApi.reducer,

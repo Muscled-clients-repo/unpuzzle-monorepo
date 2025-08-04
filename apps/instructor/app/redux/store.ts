@@ -9,6 +9,12 @@ import { puzzlepiecesApi } from './services/puzzlePieces.services';
 import { courseApi } from './services/course.services';
 import { setupListeners } from '@reduxjs/toolkit/query';
 import { quizzApi } from './services/quizzes.services';
+import { aiAgentApi } from './services/aiAgent.services';
+import { stripeApi } from './services/stripe.services';
+import { meetingApi } from './services/meeting.services';
+import { activityLogsApi } from './services/activityLogs.services';
+import { puzzleAgentsApi } from './services/puzzleAgents.services';
+import { creditsApi } from './services/credits.services';
 
 import recordingReducer from "./features/recording/recordingSlice";
 import userReducer from "./features/user/userSlice";
@@ -19,7 +25,11 @@ import previewReducer from './features/previewSlice/previewSlice';
 import sidebarReducer from './features/sidebarSlice/sidebarSlice';
 import annotaionReducer from './features/annotationSlice';
 import selectedIndexReducer from "./features/selectedCourse/selectedIndexSlice";
-import videoEditorReducer from "./features/videoEditor/videoEditorSlice";
+import aiAgentReducer from './features/aiAgent/aiAgentSlice';
+import stripeReducer from './features/stripe/stripeSlice';
+import puzzleAgentsReducer from './features/puzzleAgents/puzzleAgentsSlice';
+import courseReducer from './features/course/courseSlice';
+import videoTimeReducer from './features/videoTime/videoTimeSlice';
 
 import { createSlice } from '@reduxjs/toolkit';
 
@@ -47,7 +57,11 @@ const store = configureStore({
     sidebar: sidebarReducer,
     teacherAnnotations: annotaionReducer,
     selectedIndex: selectedIndexReducer,
-    videoEditor: videoEditorReducer,
+    aiAgent: aiAgentReducer,
+    stripe: stripeReducer,
+    puzzleAgents: puzzleAgentsReducer,
+    course: courseReducer,
+    videoTime: videoTimeReducer,
     [pokemonApi.reducerPath]: pokemonApi.reducer,
     [enrollApi.reducerPath]: enrollApi.reducer,
     [permissionApi.reducerPath]: permissionApi.reducer,
@@ -57,6 +71,12 @@ const store = configureStore({
     [courseApi.reducerPath]: courseApi.reducer,
     [puzzlepiecesApi.reducerPath]: puzzlepiecesApi.reducer,
     [quizzApi.reducerPath]: quizzApi.reducer,
+    [aiAgentApi.reducerPath]: aiAgentApi.reducer,
+    [stripeApi.reducerPath]: stripeApi.reducer,
+    [meetingApi.reducerPath]: meetingApi.reducer,
+    [activityLogsApi.reducerPath]: activityLogsApi.reducer,
+    [puzzleAgentsApi.reducerPath]: puzzleAgentsApi.reducer,
+    [creditsApi.reducerPath]: creditsApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -68,17 +88,23 @@ const store = configureStore({
       userPermissionApi.middleware,
       courseApi.middleware,
       puzzlepiecesApi.middleware,
-      quizzApi.middleware
+      quizzApi.middleware,
+      aiAgentApi.middleware,
+      stripeApi.middleware,
+      meetingApi.middleware,
+      activityLogsApi.middleware,
+      puzzleAgentsApi.middleware,
+      creditsApi.middleware
     ),
 });
 
 setupListeners(store.dispatch);
 
+export default store;
+
 // Export types
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
-
-export default store;
 
 // In your AuthTokenProvider, dispatch setToken(token) when the token is fetched.
 // Example:
