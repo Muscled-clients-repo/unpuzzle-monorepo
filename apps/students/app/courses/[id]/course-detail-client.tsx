@@ -571,13 +571,13 @@ export default function CourseDetailClient({ courseId, initialCourseData, breadc
 
                   {/* Action Buttons */}
                   <div className="grid grid-cols-2 gap-3">
-                    <button className="py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-all flex items-center justify-center gap-2">
+                    <button className="py-3 px-4 bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 border border-blue-200 hover:border-blue-300 rounded-xl transition-all transform hover:scale-105 hover:shadow-md flex items-center justify-center gap-2 text-blue-700 hover:text-blue-800 cursor-pointer">
                       <ShareIcon className="w-4 h-4" />
-                      Share
+                      <span className="font-medium">Share</span>
                     </button>
-                    <button className="py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-all flex items-center justify-center gap-2">
+                    <button className="py-3 px-4 bg-gradient-to-r from-purple-50 to-pink-50 hover:from-purple-100 hover:to-pink-100 border border-purple-200 hover:border-purple-300 rounded-xl transition-all transform hover:scale-105 hover:shadow-md flex items-center justify-center gap-2 text-purple-700 hover:text-purple-800 cursor-pointer">
                       <GiftIcon className="w-4 h-4" />
-                      Gift
+                      <span className="font-medium">Gift</span>
                     </button>
                   </div>
                 </div>
