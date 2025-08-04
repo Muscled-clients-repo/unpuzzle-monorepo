@@ -5,6 +5,7 @@ import { Provider } from "react-redux";
 import store from "../redux/store";
 import React from "react";
 import { VideoTimeProvider } from "../context/VideoTimeContext";
+import { NavigationLoadingProvider } from "../context/NavigationLoadingContext";
 import { ToastContainer } from 'react-toastify';
 import { ComponentErrorBoundary } from "@unpuzzle/ui";
 import {AuthProvider} from "@unpuzzle/auth"
@@ -71,9 +72,11 @@ export default function RootLayout({
 
           <Provider store={store}>
             <AuthProvider>
+              <NavigationLoadingProvider>
                 <VideoTimeProvider>
                   <LayoutContent>{children}</LayoutContent>
                 </VideoTimeProvider>
+              </NavigationLoadingProvider>
             </AuthProvider>
           </Provider>
       </body>
