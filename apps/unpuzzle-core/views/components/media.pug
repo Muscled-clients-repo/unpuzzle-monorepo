@@ -1,0 +1,15 @@
+//- Media Component for Images and Icons
+//- Usage:
+//-   +media({
+//-     type: 'image', // or 'icon'
+//-     src: 'path/to/image.jpg',
+//-     alt: 'Description',
+//-     className: 'custom-class',
+//-     iconSize: '24px' // for icons only
+//-   })
+
+mixin media(type, src, alt, className)
+  if type === 'image'
+    img(src=src, alt=alt, class=className, loading="lazy")
+  else if type === 'icon'
+    i(class=`${src} ${className}`, aria-hidden='true')

@@ -1,0 +1,26 @@
+include ./media.pug
+
+//- Mixin to format duration
+mixin formatDuration(seconds)
+  - const minutes = Math.floor(seconds / 60)
+  - const remainingSeconds = Math.floor(seconds % 60)
+  - const formattedTime = `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`
+  = formattedTime
+
+//- Course Contents Component
+div(class="bg-white rounded-xl py-6 w-full card-course-content max-h-[fit-content]")
+  h3.text-lg.font-semibold.mb-4 Course Content
+  each chapter in course.chapters
+    div(class="shadow-sm rounded-lg mb-4 dropdown-wrapper open")
+      button(class="font-semibold w-full text-[16px] mb-2 px-[12px] py-[16px] bg-[#F2F2F2] text-[#0F0F0F] flex items-center gap-[12px] dropdown-button")
+        +media('image', `${ASSET_ORIGIN}/img/dropdown.svg`, 'AI Agent', 'w-[16px] h-[16px] rotate-180 dropdown-icon')
+        span(class="text-left w-full") 
+          | #{chapter.title}
+      ul(class="dropdown-details hidden w-full")
+        each video in chapter.videos
+          //- video has puzzle path content
+          li(class="cursor-pointer w-full" course-video-id=video.id)
+            div(class="flex justify-between items-center px-2 py-2 hover:bg-gray-200 cursor-pointer gap-2")
+              span(class="text-[14px] text-gray-500 w-full grow")= video.title
+              span(class="text-[14px] text-gray-500 shrink-0")
+                +formatDuration(video.duration)

@@ -1,0 +1,72 @@
+import { Request, Response, NextFunction } from "express";
+import { BindMethods } from "../../utility/BindMethods";
+import ResponseHandler from "../../utility/ResponseHandler";
+import CreditTrackModel from "../../../models/supabase/creditTrack.model"
+import { CreditTrack } from "../../../types/creditTrack.type";
+
+
+class CreditTrackController {
+    constructor() {}
+
+    increaseCredit= async(req: any)=>{
+        const creditTrackService = new CreditTrackModel()
+        try {
+            const body = req.body
+
+            // payment verification
+
+            // add credit if paid
+            const {user_id} = body
+            const credit_track = await creditTrackService.getCreditTrackById(user_id)
+            if(!credit_track){
+                const newCreditTrack = await creditTrackService.createCreditTrack({
+                    user_id,
+                    available_credit: 0
+                })
+                return newCreditTrack
+            }
+            credit_track.available_credit += 10000
+            const updatedCreditTrack = await creditTrackService.updateCreditTrack(user_id,credit_track as Partial<CreditTrack>)
+            return updatedCreditTrack
+        } catch (error: any) {
+            throw error
+        }
+    }
+
+    reduceCredit= async(req: any)=>{
+        const creditTrackService = new CreditTrackModel()
+        try {
+            const body = req.body
+            const {user_id} = body
+            const credit_track = await creditTrackService.getCreditTrackById(user_id)
+            if(!credit_track){
+                throw new Error("Credit track not found")
+            }
+            credit_track.available_credit -= 10000
+            const updatedCreditTrack = await creditTrackService.updateCreditTrack(user_id,credit_track as Partial<CreditTrack>)
+            return updatedCreditTrack
+        } catch (error: any) {
+            throw error
+        }
+    }
+
+    createCreditTrack= async(req: any,res: Response,next: NextFunction)=>{
+        const responseHandler = new ResponseHandler(res, next);
+        const creditTrackService = new CreditTrackModel()
+        try {
+            const body = req.body
+            body["user_id"] = "user_2yje3NugrwcgIJ85KkQmcZNr2yL"
+            body["available_credit"] = 10000
+
+            const credit_track = await creditTrackService.createCreditTrack(body)
+
+            responseHandler.success(credit_track);
+        } catch (error: any) {
+            responseHandler.error(error);
+        }
+    }
+
+}
+
+const binding = new BindMethods(new CreditTrackController());
+export default binding.bindMethods();

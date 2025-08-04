@@ -1,0 +1,15 @@
+extends ../layout/main
+
+block content
+  section.hero
+    h1 Welcome to Unpuzzle
+    p Challenge your mind with our collection of courses
+    
+  section.features.container
+    h2 Featured Courses
+    .puzzle-grid
+      each course in courses
+        .puzzle-card
+          h3= course.title
+          //- p(class="mb-4")= puzzle.description
+          a(href=`/courses/${course.id}`, class="btn-secondary") Start Puzzle 

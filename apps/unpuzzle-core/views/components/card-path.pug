@@ -1,0 +1,30 @@
+include ./media.pug
+
+p(class="text-sm text-gray-900 font-semibold hidden path-paused-notification mb-4")
+    | Paused at 
+    span(class="paused-at-time")
+        |
+    span(class="text-gray-900")
+        | PuzzlePath activated
+
+div(class="w-full border border-[#00AFF0] p-[12px] rounded-md card-path hidden")
+    div(class="flex flex-row w-full gap-4 mb-4")
+        - var title = "Puzzle Path"
+        - var description = "Having trouble? Maybe a path could help!"
+        - var type = "split-card"
+        include ../components/ai-agent-card.pug
+
+    div(class="flex flex-row w-full gap-2 mb-4 items-center")
+        +media('image', `${ASSET_ORIGIN}/img/icon-idea.svg`, 'Brainstorming', 'w-[24px] h-[24px]')
+        p(class="text-sm text-gray-500 card-path-title")
+            | Need a path to keep going?
+        
+
+    div(class="w-full p-[8px] bg-gray-100 rounded-md card-path-body hidden")
+        
+    
+    div(class="flex flex-col w-full gap-2 mt-4 card-path-buttons")
+        button(class="btn-dark text-sm w-full primary-action-button", action="generate-path")
+            | Get Custom Path
+        button(class="btn-outline text-sm w-full p-[8px] secondary-action-button", action="do-not-generate-path")
+            | No Thanks

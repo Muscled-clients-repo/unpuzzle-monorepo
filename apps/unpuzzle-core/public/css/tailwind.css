@@ -1,0 +1,11 @@
+@layer base {
+    :root {
+        --color-clifford: #da373d;
+    }
+}
+
+@layer components {
+    .btn-clifford {
+        @apply bg-clifford text-white px-4 py-2 rounded-md;
+    }
+}

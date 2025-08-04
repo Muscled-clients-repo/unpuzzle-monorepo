@@ -1,0 +1,113 @@
+import supabase from "./client";
+import { PuzzlePath } from "../../types/puzzlePath.type";
+import PuzzlePathSchema from "../validator/puzzlePath.validator";
+
+class PuzzlePathModel extends PuzzlePathSchema{
+  constructor(){
+    super();
+  }
+  getAllPuzzlePaths=async(page = 1,limit = 10)=> {
+    try{
+      const from = (page - 1) * limit;
+      const to = from + limit - 1;
+
+      const { data, error } = await supabase
+      .from("puzzlepaths")
+      .select("*", { count: "exact" })
+      .order("created_at", { ascending: false })
+      .range(from, to);
+
+      if (error) throw new Error(error.message);
+      return data;
+    }catch(error){
+      throw error
+    }
+  }
+
+  getPuzzlePathById=async(id: string)=> {
+    try{
+      const { data, error } = await supabase
+      .from("puzzlepaths")
+      .select("*")
+      .eq("id", id)
+      .maybeSingle();
+
+      if (error) throw new Error(error.message);
+      return data;
+    }catch(error){
+      throw error
+    }
+  }
+
+  getPuzzlePathsByVideo=async(video_id: string)=> {
+    try{
+      const { data, error } = await supabase
+      .from("puzzlepaths")
+      .select(`
+        id,
+        video_id,
+        video_details:content_video_id(
+          id,
+          title,
+          duration,
+          start_time,
+          end_time,
+          yt_video_id)
+      `)
+      .eq("video_id", video_id)
+      .order("created_at", { ascending: false });
+
+      if (error) throw new Error(error.message);
+      return data;
+    }catch(error){
+      throw error
+    }
+  }
+
+  createPuzzlePath=async(body: PuzzlePath)=> {
+    try{
+      this.validate(body);
+
+      const { data, error } = await supabase
+        .from("puzzlepaths")
+        .insert([body])
+        .select()
+        .single();
+
+      if (error) throw new Error(error.message);
+      return data;
+    }catch(error){
+      throw error
+    }
+  }
+
+  updatePuzzlePath=async(id: string, body: Partial<PuzzlePath>)=> {
+    try{
+      this.validate(body, 1);
+
+      const { data, error } = await supabase
+        .from("puzzlepaths")
+        .update(body)
+        .eq("id", id)
+        .select()
+        .single();
+
+      if (error) throw new Error(error.message);
+      return data;
+    }catch(error){
+      throw error
+    }
+  }
+
+  deletePuzzlePath=async(id: string)=> {
+    try{
+      const { error } = await supabase.from("puzzlepaths").delete().eq("id", id);
+      if (error) throw new Error(error.message);
+      return { success: true, message: "Resource Deleted Successfully!" };
+    }catch(error){
+      throw error
+    }
+  }
+}
+
+export default new PuzzlePathModel();

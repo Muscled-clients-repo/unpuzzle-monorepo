@@ -1,0 +1,119 @@
+import { NextFunction, Request, Response } from "express";
+import activityLogsModel from "../../../models/supabase/activityLogs.model"; // Adjust path as needed
+import { randomUUID } from "crypto";
+import { BindMethods } from "../../utility/BindMethods";
+// import { ActivityLogs } from "../../../types/activityLogs.type";
+import ResponseHandler from "../../utility/ResponseHandler";
+
+class ActivityLogsController {
+  constructor(){
+
+  }
+  // Fetch all activity logs with pagination
+  getAllActivityLogs= async(req: any, res: Response, next:NextFunction)=>{
+    const responseHandler = new ResponseHandler(res, next);
+    const videoId = req.query.videoId;
+    try {
+      const result = await activityLogsModel.getLatestActivityLogs(req.user.id, videoId);
+      if (!result) {
+        const error= new Error("Unable to fetch activity logs. Please try again later.")
+        return responseHandler.error(error)
+      }
+      return responseHandler.success(result)
+    } catch (error: any) {
+      return responseHandler.error(error)
+    }
+  }
+
+  // Get activity log by ID
+  getActivityLogById= async(req: Request, res: Response, next:NextFunction)=>{
+    const responseHandler = new ResponseHandler(res, next);
+    try {
+      const result = await activityLogsModel.getActivityLogById(req.params.id);
+      if (!result) {
+        const error= new Error("Unable to fetch activity logs. Please try again later.")
+        return responseHandler.error(error)
+      }
+      return responseHandler.success(result)
+    } catch (error: any) {
+      return responseHandler.error(error)
+    }
+  }
+
+  // Get latest log
+  getLatestActivityLog= async(req: Request, res: Response, next: NextFunction)=>{
+    const responseHandler = new ResponseHandler(res, next);
+    try {
+      const { userId, videoId } = req.params;
+      if (!userId || !videoId) next();
+      const result = await activityLogsModel.getLatestActivityLogs(
+        userId,
+        videoId
+      );
+      if (!result) {
+        const error= new Error("Unable to fetch activity logs. Please try again later.")
+        return responseHandler.error(error)
+      }
+
+      return responseHandler.success(result)
+    } catch (error: any) {
+      console.log("error is: ", error);
+      return responseHandler.error(error)
+    }
+  }
+
+  // Create a new activity log
+  createActivityLog= async(req: Request, res: Response, next:NextFunction)=>{
+    const responseHandler = new ResponseHandler(res, next);
+    try {
+      let activityLogData = req.body;
+      activityLogData = { id: randomUUID(), ...activityLogData }; // Add UUID to activity log data
+
+      const result = await activityLogsModel.createActivityLog(activityLogData);
+      if (!result) {
+        const error= new Error("Unable to create activity logs. Please try again later.")
+        return responseHandler.error(error)
+      }
+      return responseHandler.success(result)
+    } catch (error: any) {
+      return responseHandler.error(error)
+    }
+  }
+
+  // Update activity log by ID
+  updateActivityLog= async(req: Request, res: Response, next:NextFunction)=>{
+    const responseHandler = new ResponseHandler(res, next);
+    try {
+      const updates = req.body;
+      const result = await activityLogsModel.updateActivityLog(
+        req.params.id,
+        updates
+      );
+      if (!result) {
+        const error= new Error("Unable to update activity logs. Please try again later.")
+        return responseHandler.error(error)
+      }
+      return responseHandler.success(result)
+    } catch (error: any) {
+      return responseHandler.error(error)
+    }
+  }
+
+  // Delete activity log by ID
+  deleteActivityLog= async(req: Request, res: Response, next:NextFunction)=>{
+    const responseHandler = new ResponseHandler(res, next);
+    try {
+      const result = await activityLogsModel.deleteActivityLog(req.params.id);
+      if (!result) {
+        const error= new Error("Unable to delete activity logs. Please try again later.")
+        return responseHandler.error(error)
+      }
+      return responseHandler.success(result)
+    } catch (error: any) {
+      return responseHandler.error(error)
+    }
+  }
+}
+
+const binding = new BindMethods(new ActivityLogsController());
+export default binding.bindMethods();

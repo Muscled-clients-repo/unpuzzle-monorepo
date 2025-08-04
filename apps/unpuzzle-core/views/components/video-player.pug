@@ -1,0 +1,57 @@
+div(class="relative video-player-container")
+    div(class="w-full controll-wrapper hidden")
+        div(class="absolute bottom-[40px] left-0 z-10 right-0 h-2 bg-gray-800/50 cursor-pointer video-controll" id="progressContainer")
+            div(class="relative h-full w-full")
+                div(class="absolute left-0 top-0 h-full yt-progress-bar" id="progressBar" style="width: 0%")
+                div(class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-3 h-3 bg-white rounded-full hover:scale-125 bg-red-600" id="progressHandle" style="left: 0%")
+            
+        div(class="w-full absolute bottom-0 h-[40px] z-8 left-0 right-0 flex items-center bg-gray-400/50 justify-between px-6")
+            div(class="w-fit h-6 flex items-center gap-1 justify-center")
+                div(class="w-fit h-fit flex items-center gap-1 mr-2")
+                    button(class="w-fit h-fit bg-transparent border-none text-white font-semibold" id="playButton")
+                        img(src=`${ASSET_ORIGIN}/img/icon-play.svg`, alt="mute", class="w-[18px] h-[20px]")
+
+                span(class="video-playback-time text-white font-semibold")
+                    | 00:00
+                span(class="w-[2px] h-[70%] bg-white rotate-12")
+                    | 
+                span(class="total-duration text-white font-semibold")
+                    | 00:00
+
+                div(class="w-fit h-fit flex items-center gap-1 ml-2")
+                    button(class="w-fit h-fit bg-transparent border-none text-white font-semibold" id="muteButton")
+                        img(src=`${ASSET_ORIGIN}/img/icon-mute.svg`, alt="mute", class="w-[20px] h-[20px]")
+                    div(class="w-fit h-fit flex items-center gap-2")
+                        input(type="range" min="0" max="100" step="1" value="80" class="w-24 h-2" id="soundSlider")
+                        span(class="text-white text-sm" id="soundValue") 80%
+                    //- Toggle Switch
+                    //- div(class="flex items-center ml-2 ")
+                    //-     input(id="puzzle-pieces-switch" type="checkbox" class="hidden" checked)    
+                    //-     label(for="puzzle-pieces-switch" class="cursor-pointer flex items-center gap-2 active")
+                    //-         span(class="text-white text-sm") Puzzle Pieces
+                    //-         div(class="switch-wrapper")
+                    //-             div(class="w-4 h-4 bg-[#00AFF0] rounded-full")
+
+            div(class="w-fit h-fit relative flex items-center gap-1 ml-2 gap-2")
+
+                button(class="w-fit h-fit bg-transparent border-none text-white font-semibold mr-2" id="ccButton")
+                    img(src=`${ASSET_ORIGIN}/img/icon-cc.svg`, alt="cc", class="w-[30px] h-auto")
+
+                button(class="w-fit h-fit bg-transparent border-none text-white font-semibold mr-2" id="playSpeedButton")
+                    span(class="text-white text-sm") 1x
+
+                button(class="w-fit h-fit bg-transparent border-none text-white font-semibold" id="fullScreenButton")
+                    img(src=`${ASSET_ORIGIN}/img/icon-full-screen.png`, alt="fullscreen", class="w-[20px] h-[20px]")
+
+                
+
+
+
+    div(class="w-full h-[543px] max-w-full aspect-video loading video-player" id="courseVideoPlayer" data-video=firstVideo)
+        //- video(controls, poster="/img/course-video.png", id="courseVideo", class="w-full rounded-lg")
+        //-     source(src="https://www.w3schools.com/html/mov_bbb.mp4", type="video/mp4")
+        //-     | Your browser does not support the video tag.
+        //- Instructor overlay
+        //- div(class=" absolute top-4 left-4 flex items-center bg-black bg-opacity-60 p-2 rounded-md gap-2")
+        //-     img.w-12.h-12.rounded-full.mr-2(src="/img/course-instructor.png", alt="Instructor")
+        //-     span.text-white.font-semibold Mahtab Alam

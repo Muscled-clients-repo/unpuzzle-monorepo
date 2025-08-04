@@ -1,0 +1,40 @@
+include ./media.pug
+
+p(class="text-sm text-gray-900 font-semibold hidden check-paused-notification mb-4")
+    | Paused at 
+    span(class="paused-at-time")
+        |
+    span(class="text-gray-900")
+        | PuzzleCheck activated
+
+
+div(class="w-full border border-[#00AFF0] p-[12px] rounded-md card-check hidden")
+    div(class="flex flex-row w-full gap-4")
+        - var title = "Puzzle check"
+        - var description = "Having trouble? Maybe a check could help!"
+        - var type = "split-card"
+        include ../components/ai-agent-card.pug
+    div(class="w-full card-check-progress h-auto mb-4")
+        div(class="w-[0%] h-[5px] bg-[#00AFF0] card-check-progress-bar")
+
+
+    div(class="w-full gap-2 mb-4")
+        div(class="flex flex-row w-full gap-2 items-center justify-between")
+            p(class="text-sm text-gray-500 card-check-question-number")
+                | Question 0 of 0
+            //- div(class="flex flex-row gap-2 items-center card-check-buttons")
+            //-     button(class="rotate-180 opacity-20 previous-button hidden")
+            //-         +media('image', '/img/icon-arrow.svg', 'Brainstorming', 'w-[10px] h-[14px] ')
+            //-     button(class="next-button hidden")
+            //-         +media('image', '/img/icon-arrow.svg', 'Brainstorming', 'w-[10px] h-[14px]')
+
+
+    div(class="w-full card-check-body hidden")
+        h3(class="text-[14px] text-[#1D1D1D] font-semibold card-check-title mb-2")
+
+
+    div(class="flex flex-col w-full gap-2 mt-4 card-check-buttons hidden")
+        button(class="btn-outline text-sm w-full p-[8px] secondary-action-button", action="do-not-generate-check")
+            | No Thanks
+        button(class="btn-dark text-sm w-full primary-action-button", action="generate-check")
+            | Take Quiz

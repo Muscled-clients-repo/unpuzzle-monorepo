@@ -1,0 +1,125 @@
+import supabase from "./client";
+import { PuzzleHint } from "../../types/puzzleHint.type";
+import PuzzleHintSchema from "../validator/puzzleHint.validator";
+
+class PuzzleHintModel extends PuzzleHintSchema{
+  constructor(){
+    super()
+  }
+  getAllPuzzleHints=async(page = 1, limit = 10)=> {
+    const from = (page - 1) * limit;
+    const to = from + limit - 1;
+
+    try{
+      const { data, error, count } = await supabase
+      .from("puzzlehints")
+      .select("*", { count: "exact" })
+      .order("order_index", { ascending: true })
+      .range(from, to);
+
+      if (error) {
+        throw new Error(error.message)
+      }
+      return data;
+    }catch(error){
+      throw error
+    }
+  }
+
+  getPuzzleHintById=async(id: string)=> {
+    try{
+      const { data, error } = await supabase
+        .from("puzzlehints")
+        .select("*")
+        .eq("id", id)
+        .maybeSingle();
+
+      if (error) {
+        throw new Error(error.message)
+      }
+      return data;
+    }catch(error){
+      throw error
+    }
+  }
+
+  getPuzzleHintsByPath=async(puzzle_path_id: string)=> {
+    try{
+      const { data, error } = await supabase
+      .from("puzzlehints")
+      .select("*")
+      .eq("puzzle_path_id", puzzle_path_id)
+      .order("order_index", { ascending: true });
+
+      if (error) {
+        throw new Error(error.message)
+      }
+      return data;
+    }catch(error){
+      throw error
+    }
+  }
+
+  createPuzzleHint=async(body: PuzzleHint)=> {
+    try{
+      this.validate(body);
+      const { data, error } = await supabase
+        .from("puzzlehints")
+        .insert([body])
+        .select()
+        .single();
+
+      if (error) {
+        throw new Error(error.message)
+      }
+      return data;
+    }catch(error){
+      throw error
+    }
+  }
+
+  updatePuzzleHint=async(id: string, body: Partial<PuzzleHint>)=> {
+    try{
+      this.validate(body, 1);
+      const { data, error } = await supabase
+        .from("puzzlehints")
+        .update(body)
+        .eq("id", id)
+        .select()
+        .single();
+
+      if (error) {
+        throw new Error(error.message)
+      }
+      return data;
+    }catch(error){
+      throw error
+    }
+  }
+
+  getPuzzleHintByDuration=async(video_id: string, startTime: number, endTime: number)=> {
+    try{
+      const { data, error } = await supabase.from("puzzlehints").select("*").eq("video_id", video_id).gte("duration", startTime).lte("duration", endTime+5).limit(1);
+      if (error){
+        throw new Error(error.message)
+      }
+      return data[0] as PuzzleHint;
+    }catch(error){
+      throw error
+    }
+  }
+
+  deletePuzzleHint=async(id: string)=> {
+    try{
+      const { error } = await supabase.from("puzzlehints").delete().eq("id", id);
+      if (error){
+        throw new Error(error.message)
+      }
+      return { success: true, message: "Resource Deleted Successfully!" };
+    }catch(error){
+      throw error
+    }
+  }
+}
+
+export default new PuzzleHintModel();

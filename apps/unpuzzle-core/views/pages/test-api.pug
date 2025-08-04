@@ -1,0 +1,8 @@
+extends ../layout/main
+
+block content
+    div(class="video-upload-stream")
+        button(class="api-test", endpoint="/api/video/upload", service="http://localhost:4000") Upload video 
+
+block scripts 
+    script(src=`${ASSET_ORIGIN}/js/test-api.js`, type="module")

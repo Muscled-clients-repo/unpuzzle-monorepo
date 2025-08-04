@@ -1,0 +1,17 @@
+include ./media.pug
+
+if user
+    //- profile image
+    div(class="flex flex-col w-full gap-2")
+        div(class="flex flex-row w-full gap-[16px] items-center")
+            div(class="w-[56px] h-[56px] relative shrink-0")
+                +media('image', user.image_url, 'Profile Image', 'w-[56px] h-[56px] rounded-full')
+                +media('image', `${ASSET_ORIGIN}/img/verified.svg`, 'Verified', 'w-[16px] h-[16px] absolute bottom-0 right-0')
+            div(class="flex flex-col w-full")
+                h3(class="text-md font-semibold text-[#1D1D1D]")= user.first_name + " " + user.last_name
+                p(class="text-sm text-gray-500")= user.title 
+
+    //- About
+    div(class="flex flex-col w-full gap-2 mt-[30px]")
+        h3(class="text-[20px] font-semibold text-[#1D1D1D]") About Instructor
+        p(class="text-[16px] text-gray-500")= user.bio
