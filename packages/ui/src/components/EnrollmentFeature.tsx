@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Check, User, Mail, BookOpen, ArrowRight } from 'lucide-react';
 import {
   Dialog,
@@ -40,13 +40,18 @@ const EnrollmentFeature: React.FC<EnrollmentFeatureProps> = ({
   confirmationMessage = 'Congratulations! You are now enrolled in this course.',
   selfContained = true
 }) => {
-  const [isEnrolled, setIsEnrolled] = useState(course?.enrolled || false);
+  const [isEnrolled, setIsEnrolled] = useState(!!course?.enrolled);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     fullName: '',
     email: ''
   });
+
+  // Sync enrollment state when course prop changes
+  useEffect(() => {
+    setIsEnrolled(!!course?.enrolled);
+  }, [course?.enrolled]);
 
   const handleOpenModal = () => {
     setIsModalOpen(true);

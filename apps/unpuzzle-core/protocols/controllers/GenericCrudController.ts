@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { BaseController } from './BaseController';
 import { NotFoundError, ValidationError, ERROR_MESSAGES } from '../../constants/errors';
+import EnrollmentModel from '../../models/supabase/enrollment.model';
 
 /**
  * Generic CRUD Controller that works with our migrated BaseModel pattern
@@ -55,6 +56,17 @@ export abstract class GenericCrudController<T> extends BaseController {
     
     if (!result) {
       throw new NotFoundError(`${this.resourceName} with ID ${id} not found`);
+    }
+    
+    // If this is a course and user is authenticated, check enrollment status
+    if (this.resourceName === 'Course' && (req as any).user?.id) {
+      try {
+        const enrollment = await EnrollmentModel.getEnrollmentByUserAndCourse((req as any).user.id, id);
+        result.enrolled = !!enrollment;
+      } catch (error) {
+        // If enrollment check fails, default to not enrolled
+        result.enrolled = false;
+      }
     }
     
     return this.sendSuccess(res, result);

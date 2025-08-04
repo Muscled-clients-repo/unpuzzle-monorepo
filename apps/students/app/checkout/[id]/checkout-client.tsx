@@ -10,7 +10,7 @@ import { useNavigationLoading } from "@/app/context/NavigationLoadingContext";
 import { useCourseDetails } from "@/app/hooks/useCourses";
 import { useCreateEnrollMutation } from "@/app/redux/services/enroll.services";
 import { CustomCheckout, useStripeCheckout } from "@unpuzzle/stripe-integration";
-import axios from "axios";
+import { useBaseApi } from "@/app/hooks/useBaseApi";
 import { API_ENDPOINTS } from "@/app/config/api.config";
 import { 
   CheckCircleIcon, 
@@ -34,8 +34,12 @@ interface CheckoutClientProps {
 
 export default function CheckoutClient({ courseId, initialCourseData }: CheckoutClientProps) {
   const router = useRouter();
+  const api = useBaseApi();
   const { startNavigation } = useNavigationLoading();
-  const { course, loading, error } = useCourseDetails(courseId, initialCourseData);
+  const { course: reduxCourse, loading, error } = useCourseDetails(courseId, initialCourseData);
+  
+  // Prioritize initialCourseData over Redux course to prevent "not found" flash
+  const course = initialCourseData || reduxCourse;
   const [createEnroll, { isLoading: isEnrolling }] = useCreateEnrollMutation();
   
   const [processingPayment, setProcessingPayment] = useState(false);
@@ -70,26 +74,27 @@ export default function CheckoutClient({ courseId, initialCourseData }: Checkout
     try {
       console.log('Creating payment intent for course:', course.id);
       
-      const response = await axios.post(
-        `${API_ENDPOINTS.BASE}/stripe/create-course-payment-intent`,
-        {
-          userId: 'current-user-id', // Replace with actual user ID from auth
-          courseId: course.id
+      const response = await api.post('/stripe/create-course-payment-intent', {
+        courseId: course.id
+      });
+
+      console.log('Payment intent response:', response);
+
+      if (response.success && response.data) {
+        const data = response.data.body || response.data;
+        if (data.clientSecret) {
+          setClientSecret(data.clientSecret);
+        } else {
+          console.error('No client secret received:', data);
+          setErrors({ payment: 'Failed to initialize payment. Please try again.' });
         }
-      );
-
-      const data = response.data.body || response.data;
-      console.log('Payment intent response:', data);
-
-      if (data.clientSecret) {
-        setClientSecret(data.clientSecret);
       } else {
-        console.error('No client secret received:', data);
-        setErrors({ payment: 'Failed to initialize payment. Please try again.' });
+        console.error('Payment intent creation failed:', response.error);
+        setErrors({ payment: response.error || 'Failed to initialize payment.' });
       }
     } catch (error: any) {
       console.error('Failed to create payment intent:', error);
-      setErrors({ payment: error.response?.data?.message || 'Failed to initialize payment.' });
+      setErrors({ payment: 'Failed to initialize payment. Please try again.' });
     }
   };
 
@@ -162,19 +167,14 @@ export default function CheckoutClient({ courseId, initialCourseData }: Checkout
   const handlePaymentSuccess = async () => {
     if (!course) return;
     
-    try {
-      // Enroll the user after successful payment
-      await createEnroll({ 
-        userId: 'current-user-id', // This should come from auth context
-        courseId: course.id 
-      }).unwrap();
-      
+    // Payment succeeded - webhook will handle enrollment automatically
+    console.log('Payment successful! Webhook will handle enrollment.');
+    
+    // Brief delay to allow webhook processing, then redirect to course details
+    setTimeout(() => {
       startNavigation();
-      router.push(`/courses/${courseId}/learn`);
-    } catch (error) {
-      console.error('Enrollment failed:', error);
-      setErrors({ payment: 'Payment succeeded but enrollment failed. Please contact support.' });
-    }
+      router.push(`/courses/${courseId}`);
+    }, 1500);
   };
 
   const handlePaymentError = (error: string) => {
@@ -186,13 +186,17 @@ export default function CheckoutClient({ courseId, initialCourseData }: Checkout
     
     setProcessingPayment(true);
     try {
-      await createEnroll({ 
-        userId: 'current-user-id', // This should come from auth context
+      const response = await api.post('/enroll', {
         courseId: course.id 
-      }).unwrap();
+      });
       
-      startNavigation();
-      router.push(`/courses/${courseId}/learn`);
+      if (response.success) {
+        startNavigation();
+        router.push(`/courses/${courseId}`);
+      } else {
+        console.error('Free enrollment failed:', response.error);
+        setErrors({ payment: response.error || 'Enrollment failed. Please try again.' });
+      }
     } catch (error) {
       console.error('Free enrollment failed:', error);
       setErrors({ payment: 'Enrollment failed. Please try again.' });

@@ -7,7 +7,7 @@ class EnrollmentSchema extends BaseValidator {
     super();
     this.schema = Joi.object({
       id: Joi.string().uuid().optional(),
-      user_id: Joi.string().uuid().required(),
+      user_id: Joi.string().required(),
       course_id: Joi.string().uuid().required(),
       created_at: Joi.date().optional(),
       updated_at: Joi.date().allow(null).optional(),

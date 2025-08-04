@@ -541,11 +541,15 @@ class StripeWebhookController extends StripeService{
         const responseHandler = new ResponseHandler(res, next);
         
         try {
-            const { userId, courseId } = req.body;
+            const { courseId } = req.body;
+            const userId = (req as any).user?.id;
             
             // Validate required fields
-            if (!userId || !courseId) {
-                throw new Error('Missing required fields: userId, courseId');
+            if (!userId) {
+                throw new Error('User not authenticated');
+            }
+            if (!courseId) {
+                throw new Error('Missing required field: courseId');
             }
             
             // Get course details
