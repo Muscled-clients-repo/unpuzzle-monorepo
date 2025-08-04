@@ -21,6 +21,7 @@ export const API_ENDPOINTS = {
   ENROLLMENTS: `${API_BASE_URL}/api/enrollments`,
   QUIZZES: `${API_BASE_URL}/api/quizzes`,
   SCRIPTS: `${API_BASE_URL}/api/scripts`,
+  STRIPE: `${API_BASE_URL}/api/stripe`,
   
   // M1 Server endpoints
   M1: {

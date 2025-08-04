@@ -86,4 +86,44 @@ export class StripeService {
       throw new Error(`Checkout Session Creation Failed: ${err.message}`);
     }
   }
+
+  // Create Checkout Session for Course Purchase
+  createCourseCheckoutSession = async (params: {
+    userId: string;
+    courseId: string;
+    courseTitle: string;
+    priceInCents: number;
+    successUrl: string;
+    cancelUrl: string;
+  }): Promise<Stripe.Checkout.Session> => {
+    try {
+      const session = await this.stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        line_items: [
+          {
+            price_data: {
+              currency: 'usd',
+              product_data: {
+                name: params.courseTitle,
+                description: `Access to course: ${params.courseTitle}`,
+              },
+              unit_amount: params.priceInCents,
+            },
+            quantity: 1,
+          },
+        ],
+        mode: 'payment',
+        success_url: params.successUrl,
+        cancel_url: params.cancelUrl,
+        metadata: {
+          userId: params.userId,
+          courseId: params.courseId,
+          type: 'course_purchase',
+        },
+      });
+      return session;
+    } catch (err: any) {
+      throw new Error(`Course Checkout Session Creation Failed: ${err.message}`);
+    }
+  }
 }

@@ -6,6 +6,8 @@ import OrdersModel from "../../../models/supabase/orders.model"
 import ProductModel from "../../../models/supabase/product.model";
 import CreditTrackModel from "../../../models/supabase/creditTrack.model";
 import CreditTransactionModel from "../../../models/supabase/creditTransaction.model";
+import EnrollmentModel from "../../../models/supabase/enrollment.model";
+import CourseModel from "../../../models/supabase/course.model";
 import { logger } from "../../../utils/logger";
 
 
@@ -232,6 +234,218 @@ class StripeWebhookController extends StripeService{
             }
             
             logger.error('Webhook processing error', {
+                error: err.message,
+                stack: err.stack
+            });
+            return res.status(400).send(`Webhook Error: ${err.message}`);
+        }
+    }
+
+    handleCreateCourseCheckoutSession = async(req: Request, res: Response, next: NextFunction) => {
+        const responseHandler = new ResponseHandler(res, next);
+        
+        try {
+            const { userId, courseId, successUrl, cancelUrl } = req.body;
+            
+            // Validate required fields
+            if (!userId || !courseId || !successUrl || !cancelUrl) {
+                throw new Error('Missing required fields: userId, courseId, successUrl, cancelUrl');
+            }
+            
+            // Get course details
+            const course = await CourseModel.getCourseById(courseId);
+            if (!course) {
+                throw new Error('Course not found');
+            }
+            
+            // Check if user is already enrolled
+            const existingEnrollment = await EnrollmentModel.getEnrollmentByUserAndCourse(userId, courseId);
+            if (existingEnrollment) {
+                throw new Error('User is already enrolled in this course');
+            }
+            
+            // Convert price to cents
+            const priceInCents = Math.round(course.price * 100);
+            
+            // Create checkout session using the parent StripeService method
+            const session = await this.createCourseCheckoutSession({
+                userId,
+                courseId,
+                courseTitle: course.title,
+                priceInCents,
+                successUrl,
+                cancelUrl
+            });
+            
+            logger.info('Course checkout session created successfully', {
+                sessionId: session.id,
+                userId,
+                courseId,
+                courseTitle: course.title,
+                priceInCents
+            });
+            
+            responseHandler.success({
+                sessionId: session.id,
+                checkoutUrl: session.url,
+                sessionUrl: session.url
+            });
+            
+        } catch (error: any) {
+            logger.error('Failed to create course checkout session', {
+                error: error.message,
+                body: req.body
+            });
+            responseHandler.error(error);
+        }
+    }
+
+    courseWebhook = async(req: any, res: Response, next: NextFunction) => {
+        const responseHandler = new ResponseHandler(res, next);
+        let event;
+
+        try {
+            // Verify webhook signature
+            const sig = req.headers['stripe-signature'];
+            
+            if (!sig) {
+                logger.error('Missing stripe-signature header');
+                return res.status(400).send('Missing stripe-signature header');
+            }
+
+            event = this.stripe.webhooks.constructEvent(
+                req.body, 
+                sig, 
+                this.stripeWebhookSecret
+            );
+
+            logger.info(`Stripe course webhook received: ${event.type}`, { eventId: event.id });
+
+            // Handle the event
+            switch (event.type) {
+                case 'checkout.session.completed':
+                    const session = event.data.object as any; // Checkout Session object
+                    
+                    // Extract metadata
+                    const { userId, courseId, type } = session.metadata || {};
+                    
+                    // Only process course purchases
+                    if (type !== 'course_purchase') {
+                        logger.info('Non-course purchase session, skipping', {
+                            sessionId: session.id,
+                            type
+                        });
+                        return res.status(200).json({ received: true, message: 'Not a course purchase' });
+                    }
+                    
+                    if (!userId || !courseId) {
+                        logger.error('Missing required metadata in course checkout session', {
+                            sessionId: session.id,
+                            metadata: session.metadata
+                        });
+                        return res.status(200).json({ received: true, error: 'Missing metadata' });
+                    }
+
+                    try {
+                        // Check if user is already enrolled (idempotency)
+                        const existingEnrollment = await EnrollmentModel.getEnrollmentByUserAndCourse(userId, courseId);
+                        
+                        if (existingEnrollment) {
+                            logger.info(`User ${userId} already enrolled in course ${courseId}`, {
+                                sessionId: session.id,
+                                enrollmentId: existingEnrollment.id
+                            });
+                            return res.status(200).json({ 
+                                received: true,
+                                message: 'User already enrolled',
+                                enrollmentId: existingEnrollment.id
+                            });
+                        }
+
+                        // Get course details
+                        const course = await CourseModel.getCourseById(courseId);
+                        if (!course) {
+                            logger.error('Course not found for enrollment', {
+                                courseId,
+                                sessionId: session.id
+                            });
+                            return res.status(200).json({ 
+                                received: true, 
+                                error: 'Course not found' 
+                            });
+                        }
+
+                        // Calculate amount paid in dollars
+                        const amountPaid = session.amount_total ? session.amount_total / 100 : 0;
+
+                        // Create enrollment
+                        const enrollment = await EnrollmentModel.createEnrollment({
+                            user_id: userId,
+                            course_id: courseId
+                        } as any);
+                        
+                        // Create order record for payment tracking
+                        const order = await OrdersModel.createOrder({
+                            user_id: userId,
+                            product_id: courseId,
+                            product_type: 'course',
+                            amount: amountPaid,
+                            currency: session.currency || 'usd',
+                            status: 'completed',
+                            stripe_session_id: session.id,
+                            metadata: {
+                                courseTitle: course.title,
+                                customerEmail: session.customer_email,
+                                paymentStatus: session.payment_status
+                            }
+                        } as any);
+                        
+                        logger.info('Course enrollment created successfully', {
+                            userId,
+                            courseId,
+                            courseTitle: course.title,
+                            amountPaid,
+                            sessionId: session.id,
+                            enrollmentId: enrollment.id,
+                            orderId: order?.id
+                        });
+
+                        return res.status(200).json({ 
+                            received: true,
+                            message: 'Course enrollment created successfully',
+                            enrollmentId: enrollment.id
+                        });
+                    } catch (dbError: any) {
+                        logger.error('Failed to create course enrollment', {
+                            error: dbError.message,
+                            stack: dbError.stack,
+                            userId,
+                            courseId,
+                            sessionId: session.id
+                        });
+                        // Always return 200 to Stripe to prevent retries
+                        return res.status(200).json({ 
+                            received: true, 
+                            error: 'Database error - logged for manual review' 
+                        });
+                    }
+                    break;
+
+                default:
+                    logger.info(`Unhandled course webhook event type: ${event.type}`);
+                    return res.status(200).json({ received: true, message: 'Event type not handled' });
+            }
+
+        } catch (err: any) {
+            if (err.name === 'StripeSignatureVerificationError') {
+                logger.error('Stripe signature verification failed', {
+                    error: err.message,
+                    header: req.headers['stripe-signature']
+                });
+                return res.status(400).send('Webhook signature verification failed');
+            }
+            
+            logger.error('Course webhook processing error', {
                 error: err.message,
                 stack: err.stack
             });
