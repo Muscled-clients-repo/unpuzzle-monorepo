@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import { ContentCard, CardHeader, CardTitle } from "../shared/ui/content-card";
 import { useRouter, usePathname } from "next/navigation";
 import { RootState } from "../../redux/store";
+import { useNavigationLoading } from "@/app/context/NavigationLoadingContext";
 import {
   CourseCardProps,
 } from "../../types/course.types";
@@ -18,13 +19,15 @@ export const CourseCard: React.FC<CourseCardProps> = React.memo(({
 }) => {
   const router = useRouter();
   const pathname = usePathname();
+  const { startNavigation } = useNavigationLoading();
   const [createEnroll] = useCreateEnrollMutation();
 
   const user = useSelector((state: RootState) => state.user.user);
 
   const handleClick = useCallback(() => {
+    startNavigation();
     router.push("/student-annotations");
-  }, [router]);
+  }, [router, startNavigation]);
 
   const handleEnroll = useCallback(async () => {
     if (!user?.id || !course?.id) {

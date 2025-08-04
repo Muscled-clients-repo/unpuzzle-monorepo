@@ -2,9 +2,11 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { notFound } from "next/navigation";
+import { LoadingLink } from "@/app/components/navigation/LoadingLink";
+import { LoadingButton } from "@/app/components/navigation/LoadingButton";
+import { useNavigationLoading } from "@/app/context/NavigationLoadingContext";
 import { useCourseDetails, useCourses } from "@/app/hooks/useCourses";
 import { 
   CheckCircleIcon, 
@@ -29,7 +31,7 @@ import {
   DevicePhoneMobileIcon
 } from "@heroicons/react/24/outline";
 import { StarIcon as StarSolidIcon, CheckBadgeIcon } from "@heroicons/react/24/solid";
-import { CourseDetailSkeleton, CourseEnrollButton } from "@unpuzzle/ui";
+import { CourseDetailSkeleton, EnrollmentFeature } from "@unpuzzle/ui";
 
 interface CourseDetailClientProps {
   courseId: string;
@@ -39,6 +41,7 @@ interface CourseDetailClientProps {
 
 export default function CourseDetailClient({ courseId, initialCourseData, breadcrumbItems }: CourseDetailClientProps) {
   const router = useRouter();
+  const { startNavigation } = useNavigationLoading();
   
   // Safe check for courseId
   if (!courseId || typeof courseId !== 'string') {
@@ -56,9 +59,15 @@ export default function CourseDetailClient({ courseId, initialCourseData, breadc
   const handleEnrollment = async (courseId: string) => {
     const result = await enrollInCourse(courseId);
     if (result.success) {
+      startNavigation();
       router.push(`/courses/${courseId}/learn`);
     }
     return result;
+  };
+
+  const handleCheckout = () => {
+    startNavigation();
+    router.push(`/checkout/${courseId}`);
   };
 
   if (loading) {
@@ -99,13 +108,13 @@ export default function CourseDetailClient({ courseId, initialCourseData, breadc
                         {index === breadcrumbItems.length - 1 ? (
                           <span className="text-white">{item.name}</span>
                         ) : (
-                          <Link href={item.url} className="hover:text-white transition-colors">{item.name}</Link>
+                          <LoadingLink href={item.url} className="hover:text-white transition-colors">{item.name}</LoadingLink>
                         )}
                       </li>
                     ))
                   ) : (
                     <>
-                      <li><Link href="/courses" className="hover:text-white transition-colors">Courses</Link></li>
+                      <li><LoadingLink href="/courses" className="hover:text-white transition-colors">Courses</LoadingLink></li>
                       <li className="flex items-center">
                         <ArrowRightIcon className="w-4 h-4 mx-2" />
                         <span className="text-white">{effectiveCourse.category || "General"}</span>
@@ -162,11 +171,24 @@ export default function CourseDetailClient({ courseId, initialCourseData, breadc
 
               {/* Enhanced CTA Buttons */}
               <div className="flex flex-wrap items-center gap-4 pt-4">
-                <CourseEnrollButton 
-                  course={effectiveCourse}
-                  onEnroll={handleEnrollment}
-                  variant="primary"
-                />
+                {effectiveCourse.price > 0 && !effectiveCourse.enrolled ? (
+                  <LoadingButton 
+                    onClick={handleCheckout}
+                    className="px-8 py-4 bg-white text-gray-900 font-bold rounded-xl hover:bg-gray-100 transition-all transform hover:scale-105 shadow-lg"
+                    loadingText="Loading checkout..."
+                    showSpinner={true}
+                  >
+                    Buy Now - ${effectiveCourse.price}
+                  </LoadingButton>
+                ) : (
+                  <EnrollmentFeature 
+                    course={effectiveCourse}
+                    onEnroll={handleEnrollment}
+                    variant="primary"
+                    fullWidth={false}
+                    size="lg"
+                  />
+                )}
                 <button className="p-4 bg-white/10 backdrop-blur-sm border-2 border-white/30 rounded-xl hover:bg-white/20 hover:border-white/50 transition-all group">
                   <PlayCircleIcon className="w-6 h-6 group-hover:scale-110 transition-transform" />
                 </button>
@@ -516,12 +538,24 @@ export default function CourseDetailClient({ courseId, initialCourseData, breadc
 
                 <div className="p-6 space-y-6">
                   {/* CTA Button */}
-                  <CourseEnrollButton 
-                    course={effectiveCourse}
-                    onEnroll={handleEnrollment}
-                    variant="secondary"
-                    fullWidth={true}
-                  />
+                  {effectiveCourse.price > 0 && !effectiveCourse.enrolled ? (
+                    <LoadingButton 
+                      onClick={handleCheckout}
+                      className="w-full py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all transform hover:scale-105 shadow-lg"
+                      loadingText="Loading checkout..."
+                      showSpinner={true}
+                    >
+                      Proceed to Checkout - ${effectiveCourse.price}
+                    </LoadingButton>
+                  ) : (
+                    <EnrollmentFeature 
+                      course={effectiveCourse}
+                      onEnroll={handleEnrollment}
+                      variant="secondary"
+                      fullWidth={true}
+                      size="md"
+                    />
+                  )}
 
                   {/* Guarantees */}
                   <div className="space-y-3">

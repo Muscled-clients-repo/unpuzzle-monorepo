@@ -1,0 +1,64 @@
+name: Manual Deploy to Heroku
+
+on:
+  workflow_dispatch:
+    inputs:
+      app:
+        description: 'Which app to deploy'
+        required: true
+        type: choice
+        options:
+          - unpuzzle-core
+          - unpuzzle-m1
+          - both
+      environment:
+        description: 'Environment'
+        required: true
+        type: choice
+        default: 'production'
+        options:
+          - production
+          - staging
+
+jobs:
+  deploy-core:
+    if: ${{ github.event.inputs.app == 'unpuzzle-core' || github.event.inputs.app == 'both' }}
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment }}
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      
+      - name: Deploy unpuzzle-core to Heroku
+        uses: akhileshns/heroku-deploy@v3.12.14
+        with:
+          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+          heroku_app_name: ${{secrets.HEROKU_CORE_APP_NAME}}
+          heroku_email: ${{secrets.HEROKU_EMAIL}}
+          appdir: "apps/unpuzzle-core"
+          buildpack: "heroku/nodejs"
+
+  deploy-m1:
+    if: ${{ github.event.inputs.app == 'unpuzzle-m1' || github.event.inputs.app == 'both' }}
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment }}
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      
+      - name: Deploy unpuzzle-m1 to Heroku
+        uses: akhileshns/heroku-deploy@v3.12.14
+        with:
+          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+          heroku_app_name: ${{secrets.HEROKU_M1_APP_NAME}}
+          heroku_email: ${{secrets.HEROKU_EMAIL}}
+          appdir: "apps/unpuzzle-m1"
+          buildpack: "heroku/nodejs"

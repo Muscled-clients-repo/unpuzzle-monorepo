@@ -40,6 +40,8 @@
     "@tailwindcss/cli": "^4.1.11",
     "@tailwindcss/postcss": "^4.1.11",
     "@types/socket.io-client": "^1.4.36",
+    "@unpuzzle/auth": "*",
+    "@unpuzzle/ui": "*",
     "@wavesurfer/react": "^1.0.11",
     "axios": "^1.10.0",
     "chart.js": "^4.4.9",
@@ -60,9 +62,7 @@
     "tailwindcss": "^4.1.11",
     "uuid": "^11.1.0",
     "video-editing-timeline-react": "^1.0.0",
-    "wavesurfer.js": "^7.9.9",
-    "@unpuzzle/ui": "*",
-    "@unpuzzle/auth": "*"
+    "wavesurfer.js": "^7.9.9"
   },
   "devDependencies": {
     "@next/bundle-analyzer": "^15.4.4",

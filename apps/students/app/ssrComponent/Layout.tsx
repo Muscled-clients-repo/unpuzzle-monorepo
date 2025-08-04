@@ -3,9 +3,9 @@ import { Geist, Geist_Mono } from "next/font/google";
 import type { Metadata } from "next";
 import { Provider } from "react-redux";
 import store from "../redux/store";
-import { LayoutSkeleton } from "@unpuzzle/ui";
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { VideoTimeProvider } from "../context/VideoTimeContext";
+import { NavigationLoadingProvider } from "../context/NavigationLoadingContext";
 import { ToastContainer } from 'react-toastify';
 import { ComponentErrorBoundary } from "@unpuzzle/ui";
 import {AuthProvider} from "@unpuzzle/auth"
@@ -29,18 +29,8 @@ export const metadata: Metadata = {
 
 function LayoutContent({ children }: { children: React.ReactNode }) {
   // const user = useSelector((state: RootState) => state.user); // Not currently used
-  const [loading, setLoading] = useState<boolean>(true);
 
   // Environment variables are properly configured
-
-  useEffect(() => {
-    // Add a small delay to ensure all providers are initialized
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 100);
-    return () => clearTimeout(timer);
-  }, []);
-
 
   return (
     <>
@@ -52,13 +42,9 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
 
         {/* Main Content */}
         <div className="min-h-screen bg-gray-50">
-          {loading ? (
-            <LayoutSkeleton />
-          ) : (
-            <ComponentErrorBoundary>
-              {children}
-            </ComponentErrorBoundary>
-          )}
+          <ComponentErrorBoundary>
+            {children}
+          </ComponentErrorBoundary>
         </div>
       </main>
 
@@ -86,9 +72,11 @@ export default function RootLayout({
 
           <Provider store={store}>
             <AuthProvider>
+              <NavigationLoadingProvider>
                 <VideoTimeProvider>
                   <LayoutContent>{children}</LayoutContent>
                 </VideoTimeProvider>
+              </NavigationLoadingProvider>
             </AuthProvider>
           </Provider>
       </body>
