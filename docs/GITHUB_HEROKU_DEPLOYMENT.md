@@ -5,10 +5,10 @@ Deploy your monorepo apps (unpuzzle-core and unpuzzle-m1) directly from GitHub t
 
 ## Setup Steps
 
-### 1. Create Heroku Apps
-Create two Heroku apps using the Heroku Dashboard:
-- One for unpuzzle-core
-- One for unpuzzle-m1
+### 1. Existing Heroku Apps
+Your existing Heroku apps will be used:
+- **unpuzzle-core** → deploys to `unpuzzle-ai-backend`
+- **unpuzzle-m1** → deploys to `unpuzzle-m1`
 
 ### 2. GitHub Actions Setup
 
@@ -18,8 +18,6 @@ Go to your GitHub repository → Settings → Secrets and variables → Actions
 Add these secrets:
 - `HEROKU_API_KEY`: Your Heroku API key (get from Heroku Account Settings)
 - `HEROKU_EMAIL`: Your Heroku account email
-- `HEROKU_CORE_APP_NAME`: Name of your unpuzzle-core Heroku app
-- `HEROKU_M1_APP_NAME`: Name of your unpuzzle-m1 Heroku app
 
 #### Get Your Heroku API Key:
 1. Go to https://dashboard.heroku.com/account
@@ -65,17 +63,25 @@ The workflow will automatically detect which apps have changes and deploy only t
 
 ### 5. Environment Variables
 
-Set environment variables in Heroku Dashboard:
+Set environment variables in Heroku Dashboard for both apps:
 
-1. Go to your Heroku app
+#### For unpuzzle-ai-backend (unpuzzle-core):
+1. Go to https://dashboard.heroku.com/apps/unpuzzle-ai-backend
 2. Navigate to "Settings" tab
 3. Click "Reveal Config Vars"
-4. Add all required environment variables from your `.env` file
-5. **Important variables**:
-   - `NODE_ENV=production`
-   - Database connection strings
-   - API keys
-   - Any other app-specific variables
+4. Add all required environment variables from `apps/unpuzzle-core/.env`
+
+#### For unpuzzle-m1:
+1. Go to https://dashboard.heroku.com/apps/unpuzzle-m1
+2. Navigate to "Settings" tab
+3. Click "Reveal Config Vars"
+4. Add all required environment variables from `apps/unpuzzle-m1/.env`
+
+**Important variables for both**:
+- `NODE_ENV=production`
+- Database connection strings
+- API keys
+- Any other app-specific variables
 
 ### 6. Important Files
 
@@ -104,12 +110,22 @@ apps/unpuzzle-m1/
 
 #### Heroku Logs:
 View application logs from Heroku Dashboard:
-1. Go to your Heroku app
+
+**For unpuzzle-core:**
+1. Go to https://dashboard.heroku.com/apps/unpuzzle-ai-backend
+2. Click "More" → "View logs"
+
+**For unpuzzle-m1:**
+1. Go to https://dashboard.heroku.com/apps/unpuzzle-m1
 2. Click "More" → "View logs"
 
 Or use Heroku CLI (if installed locally):
 ```bash
-heroku logs --tail --app your-app-name
+# For unpuzzle-core
+heroku logs --tail --app unpuzzle-ai-backend
+
+# For unpuzzle-m1
+heroku logs --tail --app unpuzzle-m1
 ```
 
 ### 8. Troubleshooting
