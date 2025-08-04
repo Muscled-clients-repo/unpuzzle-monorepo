@@ -8,25 +8,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  changes:
-    runs-on: ubuntu-latest
-    outputs:
-      core: ${{ steps.filter.outputs.core }}
-      m1: ${{ steps.filter.outputs.m1 }}
-    steps:
-      - uses: actions/checkout@v3
-      - uses: dorny/paths-filter@v2
-        id: filter
-        with:
-          filters: |
-            core:
-              - 'apps/unpuzzle-core/**'
-            m1:
-              - 'apps/unpuzzle-m1/**'
-
   deploy-core:
-    needs: changes
-    if: ${{ needs.changes.outputs.core == 'true' || github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -44,8 +26,6 @@ jobs:
           dontautocreate: true
 
   deploy-m1:
-    needs: changes
-    if: ${{ needs.changes.outputs.m1 == 'true' || github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
