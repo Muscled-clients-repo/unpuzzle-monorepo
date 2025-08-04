@@ -277,28 +277,40 @@ class StripeWebhookController extends StripeService{
                 });
             }
 
-            const amountPaid = session.amount_total ? session.amount_total / 100 : 0;
+            // Calculate the amount from course price (server-side validation)
+            const coursePrice = course.price || 0;
+            const amountPaid = session.amount_total ? session.amount_total / 100 : coursePrice;
+            
+            // Validate that the amount paid matches the course price
+            if (Math.abs(amountPaid - coursePrice) > 0.01) {
+                logger.warn('Payment amount mismatch', {
+                    coursePrice,
+                    amountPaid,
+                    sessionId: session.id,
+                    courseId
+                });
+            }
 
-            // Create enrollment
+            // Create enrollment (no amount needed here)
             const enrollment = await EnrollmentModel.createEnrollment({
                 user_id: userId,
                 course_id: courseId
             } as any);
             
-            // Create order record
+            // Create order record with required fields matching the validator
             const order = await OrdersModel.createOrder({
                 user_id: userId,
-                product_id: courseId,
-                product_type: 'course',
-                amount: amountPaid,
-                currency: session.currency || 'usd',
-                status: 'completed',
-                stripe_session_id: session.id,
-                metadata: {
-                    courseTitle: course.title,
-                    customerEmail: session.customer_email,
-                    paymentStatus: session.payment_status
-                }
+                total_amount: amountPaid,
+                items: [{
+                    product_id: courseId,
+                    quantity: 1
+                }],
+                payment_status: 'paid',
+                payment_method: 'stripe',
+                payment_amount: amountPaid,
+                payment_currency: 'USD',
+                payment_date: new Date(),
+                payment_id: session.payment_intent as string || session.id
             } as any);
             
             logger.info('Course enrollment created successfully', {
