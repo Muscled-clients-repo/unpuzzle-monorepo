@@ -27,6 +27,7 @@ export async function getCourseById(courseId: string, customHeaders?: HeadersIni
     const response = await fetch(`${API_ENDPOINTS.COURSES}/${courseId}`, {
       next: { revalidate: 60 }, // Cache for 60 seconds
       headers: headersObj,
+      signal: AbortSignal.timeout(10000), // 10 second timeout
     });
 
     if (!response.ok) {
