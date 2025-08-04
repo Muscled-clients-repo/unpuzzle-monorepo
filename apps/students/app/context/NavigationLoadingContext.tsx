@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
+import { LoadingOverlay } from '../components/LoadingOverlay';
 
 interface NavigationLoadingContextType {
   isNavigating: boolean;
@@ -21,27 +22,33 @@ export function NavigationLoadingProvider({ children }: { children: React.ReactN
   }, [pathname]);
 
   const startNavigation = useCallback(() => {
+    console.log('Starting navigation...');
     setIsNavigating(true);
   }, []);
 
   const stopNavigation = useCallback(() => {
+    console.log('Stopping navigation...');
     setIsNavigating(false);
   }, []);
+
+  // Expose globally for Header component
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      (window as any).__startNavigation = startNavigation;
+      (window as any).__stopNavigation = stopNavigation;
+    }
+    return () => {
+      if (typeof window !== 'undefined') {
+        delete (window as any).__startNavigation;
+        delete (window as any).__stopNavigation;
+      }
+    };
+  }, [startNavigation, stopNavigation]);
 
   return (
     <NavigationLoadingContext.Provider value={{ isNavigating, startNavigation, stopNavigation }}>
       {children}
-      {isNavigating && (
-        <div className="fixed inset-0 z-[9999] bg-black/20 backdrop-blur-sm flex items-center justify-center">
-          <div className="bg-white rounded-2xl p-8 shadow-2xl flex flex-col items-center gap-4">
-            <div className="relative">
-              <div className="w-16 h-16 border-4 border-blue-200 rounded-full"></div>
-              <div className="absolute top-0 left-0 w-16 h-16 border-4 border-blue-600 rounded-full animate-spin border-t-transparent"></div>
-            </div>
-            <p className="text-gray-700 font-medium">Loading...</p>
-          </div>
-        </div>
-      )}
+      <LoadingOverlay isVisible={isNavigating} />
     </NavigationLoadingContext.Provider>
   );
 }

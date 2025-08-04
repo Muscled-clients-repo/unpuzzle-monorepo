@@ -8,7 +8,12 @@
     "build": "npm run build:students",
     "dev": "npm run dev:students",
     "build:students": "cd apps/students && npm run build",
-    "dev:students": "cd apps/students && npm run dev"
+    "students": "cd apps/students && npm run dev",
+    "build:core": "cd apps/unpuzzle-core && npm run build",
+    "core": "cd apps/unpuzzle-core && npm run dev",
+    "build:m1": "cd apps/unpuzzle-m1 && npm run build",
+    "m1": "cd apps/unpuzzle-m1 && npm run dev",
+    "dev:all": "npm run dev:students & npm run dev:core & npm run dev:m1"
   },
   "devDependencies": {
     "@types/estree": "^1.0.8",

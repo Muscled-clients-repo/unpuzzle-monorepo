@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { 
   Bars3Icon, 
   XMarkIcon, 
@@ -38,6 +38,14 @@ export function Header({ variant = "student" }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const pathname = usePathname();
+  const router = useRouter();
+
+  // Helper function to trigger loading state
+  const triggerLoadingState = () => {
+    if (typeof window !== 'undefined' && (window as any).__startNavigation) {
+      (window as any).__startNavigation();
+    }
+  };
 
   // Close mobile menu when route changes
   useEffect(() => {
@@ -58,7 +66,17 @@ export function Header({ variant = "student" }: HeaderProps) {
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <div className="flex items-center">
-            <Link href="/" className="flex items-center space-x-2">
+            <Link 
+              href="/" 
+              onClick={(e) => {
+                if (pathname !== '/') {
+                  e.preventDefault();
+                  triggerLoadingState();
+                  setTimeout(() => router.push('/'), 50);
+                }
+              }}
+              className="flex items-center space-x-2"
+            >
               <Image
                 src="/assets/logo.svg"
                 alt="Unpuzzle"
@@ -80,6 +98,13 @@ export function Header({ variant = "student" }: HeaderProps) {
                 <Link
                   key={item.name}
                   href={item.href}
+                  onClick={(e) => {
+                    if (!isActive) {
+                      e.preventDefault();
+                      triggerLoadingState();
+                      setTimeout(() => router.push(item.href), 50);
+                    }
+                  }}
                   className={`flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                     isActive
                       ? 'text-blue-600 bg-blue-50'
@@ -161,6 +186,14 @@ export function Header({ variant = "student" }: HeaderProps) {
                 <Link
                   key={item.name}
                   href={item.href}
+                  onClick={(e) => {
+                    if (!isActive) {
+                      e.preventDefault();
+                      triggerLoadingState();
+                      setMobileMenuOpen(false);
+                      setTimeout(() => router.push(item.href), 50);
+                    }
+                  }}
                   className={`flex items-center space-x-3 px-3 py-2 rounded-md text-base font-medium ${
                     isActive
                       ? 'text-blue-600 bg-blue-50'
@@ -178,6 +211,14 @@ export function Header({ variant = "student" }: HeaderProps) {
               <div className="flex items-center px-3 space-x-3">
                 <Link
                   href="/settings"
+                  onClick={(e) => {
+                    if (pathname !== '/settings') {
+                      e.preventDefault();
+                      triggerLoadingState();
+                      setMobileMenuOpen(false);
+                      setTimeout(() => router.push('/settings'), 50);
+                    }
+                  }}
                   className="flex-1 text-center bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-md text-sm font-medium"
                 >
                   Settings

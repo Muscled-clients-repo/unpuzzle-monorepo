@@ -411,8 +411,8 @@ export default function CheckoutClient({ courseId }: CheckoutClientProps) {
                       className="mt-1"
                     />
                     <label htmlFor="terms" className="text-sm text-gray-700">
-                      I agree to the <Link href="/terms" className="text-blue-600 hover:underline">Terms of Service</Link> and{' '}
-                      <Link href="/privacy" className="text-blue-600 hover:underline">Privacy Policy</Link>. 
+                      I agree to the <LoadingLink href="/terms" className="text-blue-600 hover:underline">Terms of Service</LoadingLink> and{' '}
+                      <LoadingLink href="/privacy" className="text-blue-600 hover:underline">Privacy Policy</LoadingLink>. 
                       I understand that this purchase is non-refundable after 30 days.
                     </label>
                   </div>
