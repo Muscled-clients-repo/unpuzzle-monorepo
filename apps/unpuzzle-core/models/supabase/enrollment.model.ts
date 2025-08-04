@@ -76,6 +76,24 @@ class EnrollmentModel extends EnrollmentSchema{
     }
   }
 
+  getEnrollmentByUserAndCourse=async(user_id: string, course_id: string)=> {
+    try{
+      const { data, error } = await supabase
+        .from("enrollments")
+        .select("*")
+        .eq("user_id", user_id)
+        .eq("course_id", course_id)
+        .maybeSingle();
+
+      if (error) {
+        throw new Error(error.message)
+      }
+      return data;
+    }catch(error){
+      throw error
+    }
+  }
+
   createEnrollment=async(body: Enrollment)=> {
     try{
       this.validate(body,1);

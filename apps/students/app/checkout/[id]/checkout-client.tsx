@@ -9,21 +9,21 @@ import { LoadingButton } from "@/app/components/navigation/LoadingButton";
 import { useNavigationLoading } from "@/app/context/NavigationLoadingContext";
 import { useCourseDetails } from "@/app/hooks/useCourses";
 import { useCreateEnrollMutation } from "@/app/redux/services/enroll.services";
+import { StripeProvider, StripeCheckoutForm, useStripeCheckout } from "@unpuzzle/stripe-integration";
+import { API_ENDPOINTS } from "@/app/config/api.config";
 import { 
   CheckCircleIcon, 
   ClockIcon, 
   VideoCameraIcon,
-  DocumentTextIcon,
-  ShieldCheckIcon,
   LockClosedIcon,
-  CreditCardIcon,
   ChevronLeftIcon,
   ExclamationTriangleIcon,
   CheckBadgeIcon,
   GlobeAltIcon,
   DevicePhoneMobileIcon,
   AcademicCapIcon,
-  ArrowPathIcon
+  ArrowPathIcon,
+  ShieldCheckIcon
 } from "@heroicons/react/24/outline";
 
 interface CheckoutClientProps {
@@ -36,27 +36,51 @@ export default function CheckoutClient({ courseId }: CheckoutClientProps) {
   const { course, loading, error } = useCourseDetails(courseId);
   const [createEnroll, { isLoading: isEnrolling }] = useCreateEnrollMutation();
   
-  const [paymentMethod, setPaymentMethod] = useState<'card' | 'paypal'>('card');
-  const [cardDetails, setCardDetails] = useState({
-    number: '',
-    name: '',
-    expiry: '',
-    cvv: ''
-  });
-  const [billingDetails, setBillingDetails] = useState({
-    email: '',
-    country: 'US',
-    zip: ''
-  });
-  const [agreeToTerms, setAgreeToTerms] = useState(false);
   const [processingPayment, setProcessingPayment] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
+  
+  const { 
+    createCourseCheckoutSession, 
+    redirectToCheckout,
+    isLoading: isCreatingSession 
+  } = useStripeCheckout(API_ENDPOINTS.BASE.replace('/api', ''));
 
   useEffect(() => {
     if (!courseId || typeof courseId !== 'string') {
       notFound();
     }
   }, [courseId]);
+
+  // Create Stripe checkout session when course loads
+  useEffect(() => {
+    if (course && course.price > 0 && !clientSecret && !isCreatingSession) {
+      handleCreateStripeSession();
+    }
+  }, [course, clientSecret, isCreatingSession]);
+
+  const handleCreateStripeSession = async () => {
+    if (!course) return;
+    
+    const session = await createCourseCheckoutSession({
+      userId: 'current-user-id', // Replace with actual user ID from auth
+      courseId: course.id,
+      successUrl: `${window.location.origin}/checkout/success?course_id=${courseId}`,
+      cancelUrl: `${window.location.origin}/checkout/cancel?course_id=${courseId}`,
+    });
+
+    if (session) {
+      if (session.sessionUrl || session.checkoutUrl) {
+        // For Stripe Checkout (redirect)
+        redirectToCheckout(session.sessionUrl || session.checkoutUrl || '');
+      } else if (session.clientSecret) {
+        // For Stripe Elements (embedded)
+        setClientSecret(session.clientSecret);
+      }
+    } else {
+      setErrors({ payment: 'Failed to initialize payment. Please try again.' });
+    }
+  };
 
   if (loading) {
     return (
@@ -83,107 +107,48 @@ export default function CheckoutClient({ courseId }: CheckoutClientProps) {
   const discount = originalPrice - course.price;
   const discountPercentage = Math.round((discount / originalPrice) * 100);
 
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
-
-    if (!billingDetails.email) {
-      newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(billingDetails.email)) {
-      newErrors.email = 'Invalid email address';
+  const handlePaymentSuccess = async () => {
+    if (!course) return;
+    
+    try {
+      // Enroll the user after successful payment
+      await createEnroll({ 
+        userId: 'current-user-id', // This should come from auth context
+        courseId: course.id 
+      }).unwrap();
+      
+      startNavigation();
+      router.push(`/courses/${courseId}/learn`);
+    } catch (error) {
+      console.error('Enrollment failed:', error);
+      setErrors({ payment: 'Payment succeeded but enrollment failed. Please contact support.' });
     }
-
-    if (paymentMethod === 'card') {
-      if (!cardDetails.number) {
-        newErrors.cardNumber = 'Card number is required';
-      } else if (cardDetails.number.replace(/\s/g, '').length !== 16) {
-        newErrors.cardNumber = 'Card number must be 16 digits';
-      }
-
-      if (!cardDetails.name) {
-        newErrors.cardName = 'Cardholder name is required';
-      }
-
-      if (!cardDetails.expiry) {
-        newErrors.expiry = 'Expiry date is required';
-      } else if (!/^\d{2}\/\d{2}$/.test(cardDetails.expiry)) {
-        newErrors.expiry = 'Invalid expiry format (MM/YY)';
-      }
-
-      if (!cardDetails.cvv) {
-        newErrors.cvv = 'CVV is required';
-      } else if (!/^\d{3,4}$/.test(cardDetails.cvv)) {
-        newErrors.cvv = 'Invalid CVV';
-      }
-    }
-
-    if (!billingDetails.zip) {
-      newErrors.zip = 'ZIP code is required';
-    }
-
-    if (!agreeToTerms) {
-      newErrors.terms = 'You must agree to the terms and conditions';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
   };
 
-  const handlePayment = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handlePaymentError = (error: string) => {
+    setErrors({ payment: error });
+  };
+
+  const handleFreeEnrollment = async () => {
+    if (!course) return;
     
-    if (!validateForm()) {
-      return;
-    }
-
     setProcessingPayment(true);
-
     try {
-      // Simulate payment processing
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await createEnroll({ 
+        userId: 'current-user-id', // This should come from auth context
+        courseId: course.id 
+      }).unwrap();
       
-      // For free courses, directly enroll
-      if (course.price === 0) {
-        const result = await createEnroll({ 
-          userId: 'current-user-id', // This should come from auth context
-          courseId: course.id 
-        }).unwrap();
-        
-        startNavigation();
-        router.push(`/courses/${courseId}/learn`);
-      } else {
-        // For paid courses, process payment first
-        // This is where you'd integrate with Stripe or other payment provider
-        
-        // After successful payment, enroll the user
-        const result = await createEnroll({ 
-          userId: 'current-user-id', // This should come from auth context
-          courseId: course.id 
-        }).unwrap();
-        
-        startNavigation();
-        router.push(`/courses/${courseId}/learn`);
-      }
+      startNavigation();
+      router.push(`/courses/${courseId}/learn`);
     } catch (error) {
-      console.error('Payment failed:', error);
-      setErrors({ payment: 'Payment processing failed. Please try again.' });
+      console.error('Free enrollment failed:', error);
+      setErrors({ payment: 'Enrollment failed. Please try again.' });
     } finally {
       setProcessingPayment(false);
     }
   };
 
-  const formatCardNumber = (value: string) => {
-    const cleaned = value.replace(/\s/g, '');
-    const chunks = cleaned.match(/.{1,4}/g) || [];
-    return chunks.join(' ').substr(0, 19);
-  };
-
-  const formatExpiry = (value: string) => {
-    const cleaned = value.replace(/\D/g, '');
-    if (cleaned.length >= 2) {
-      return cleaned.slice(0, 2) + '/' + cleaned.slice(2, 4);
-    }
-    return cleaned;
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
@@ -210,249 +175,55 @@ export default function CheckoutClient({ courseId }: CheckoutClientProps) {
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Payment Form */}
             <div className="lg:col-span-2 space-y-6">
-              {/* Payment Method Selection */}
-              <div className="bg-white rounded-xl shadow-sm p-6">
-                <h2 className="text-xl font-semibold mb-4">Payment Method</h2>
-                <div className="grid md:grid-cols-2 gap-4">
-                  <button
-                    type="button"
-                    onClick={() => setPaymentMethod('card')}
-                    className={`p-4 border-2 rounded-lg transition-all ${
-                      paymentMethod === 'card' 
-                        ? 'border-blue-600 bg-blue-50' 
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
-                  >
-                    <CreditCardIcon className="w-8 h-8 mx-auto mb-2 text-gray-700" />
-                    <p className="font-medium">Credit/Debit Card</p>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setPaymentMethod('paypal')}
-                    className={`p-4 border-2 rounded-lg transition-all ${
-                      paymentMethod === 'paypal' 
-                        ? 'border-blue-600 bg-blue-50' 
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
-                  >
-                    <div className="w-8 h-8 mx-auto mb-2">
-                      <span className="text-2xl font-bold text-blue-800">P</span>
-                    </div>
-                    <p className="font-medium">PayPal</p>
-                  </button>
-                </div>
-              </div>
-
-              {/* Payment Details Form */}
-              <form onSubmit={handlePayment} className="space-y-6">
-                {/* Billing Information */}
+              {course.price === 0 ? (
+                // Free Course Enrollment
                 <div className="bg-white rounded-xl shadow-sm p-6">
-                  <h2 className="text-xl font-semibold mb-4">Billing Information</h2>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Email Address
-                      </label>
-                      <input
-                        type="email"
-                        value={billingDetails.email}
-                        onChange={(e) => setBillingDetails({ ...billingDetails, email: e.target.value })}
-                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                          errors.email ? 'border-red-500' : 'border-gray-300'
-                        }`}
-                        placeholder="john@example.com"
-                      />
-                      {errors.email && (
-                        <p className="text-red-500 text-sm mt-1">{errors.email}</p>
-                      )}
+                  <h2 className="text-xl font-semibold mb-4">Free Course</h2>
+                  <p className="text-gray-600 mb-6">This course is available for free. Click below to enroll.</p>
+                  
+                  {errors.payment && (
+                    <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3 mb-4">
+                      <ExclamationTriangleIcon className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                      <p className="text-red-700">{errors.payment}</p>
                     </div>
-
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Country
-                        </label>
-                        <select
-                          value={billingDetails.country}
-                          onChange={(e) => setBillingDetails({ ...billingDetails, country: e.target.value })}
-                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        >
-                          <option value="US">United States</option>
-                          <option value="CA">Canada</option>
-                          <option value="GB">United Kingdom</option>
-                          <option value="AU">Australia</option>
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          ZIP Code
-                        </label>
-                        <input
-                          type="text"
-                          value={billingDetails.zip}
-                          onChange={(e) => setBillingDetails({ ...billingDetails, zip: e.target.value })}
-                          className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                            errors.zip ? 'border-red-500' : 'border-gray-300'
-                          }`}
-                          placeholder="12345"
-                        />
-                        {errors.zip && (
-                          <p className="text-red-500 text-sm mt-1">{errors.zip}</p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Card Details (shown only if card payment is selected) */}
-                {paymentMethod === 'card' && (
-                  <div className="bg-white rounded-xl shadow-sm p-6">
-                    <h2 className="text-xl font-semibold mb-4">Card Details</h2>
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Card Number
-                        </label>
-                        <input
-                          type="text"
-                          value={cardDetails.number}
-                          onChange={(e) => setCardDetails({ ...cardDetails, number: formatCardNumber(e.target.value) })}
-                          className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                            errors.cardNumber ? 'border-red-500' : 'border-gray-300'
-                          }`}
-                          placeholder="1234 5678 9012 3456"
-                          maxLength={19}
-                        />
-                        {errors.cardNumber && (
-                          <p className="text-red-500 text-sm mt-1">{errors.cardNumber}</p>
-                        )}
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Cardholder Name
-                        </label>
-                        <input
-                          type="text"
-                          value={cardDetails.name}
-                          onChange={(e) => setCardDetails({ ...cardDetails, name: e.target.value })}
-                          className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                            errors.cardName ? 'border-red-500' : 'border-gray-300'
-                          }`}
-                          placeholder="John Doe"
-                        />
-                        {errors.cardName && (
-                          <p className="text-red-500 text-sm mt-1">{errors.cardName}</p>
-                        )}
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Expiry Date
-                          </label>
-                          <input
-                            type="text"
-                            value={cardDetails.expiry}
-                            onChange={(e) => setCardDetails({ ...cardDetails, expiry: formatExpiry(e.target.value) })}
-                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                              errors.expiry ? 'border-red-500' : 'border-gray-300'
-                            }`}
-                            placeholder="MM/YY"
-                            maxLength={5}
-                          />
-                          {errors.expiry && (
-                            <p className="text-red-500 text-sm mt-1">{errors.expiry}</p>
-                          )}
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            CVV
-                          </label>
-                          <input
-                            type="text"
-                            value={cardDetails.cvv}
-                            onChange={(e) => setCardDetails({ ...cardDetails, cvv: e.target.value.replace(/\D/g, '') })}
-                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                              errors.cvv ? 'border-red-500' : 'border-gray-300'
-                            }`}
-                            placeholder="123"
-                            maxLength={4}
-                          />
-                          {errors.cvv && (
-                            <p className="text-red-500 text-sm mt-1">{errors.cvv}</p>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* PayPal Option */}
-                {paymentMethod === 'paypal' && (
-                  <div className="bg-white rounded-xl shadow-sm p-6">
-                    <div className="text-center py-8">
-                      <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <span className="text-3xl font-bold text-blue-800">P</span>
-                      </div>
-                      <p className="text-gray-600">You will be redirected to PayPal to complete your purchase</p>
-                    </div>
-                  </div>
-                )}
-
-                {/* Terms and Conditions */}
-                <div className="bg-white rounded-xl shadow-sm p-6">
-                  <div className="flex items-start gap-3">
-                    <input
-                      type="checkbox"
-                      id="terms"
-                      checked={agreeToTerms}
-                      onChange={(e) => setAgreeToTerms(e.target.checked)}
-                      className="mt-1"
-                    />
-                    <label htmlFor="terms" className="text-sm text-gray-700">
-                      I agree to the <LoadingLink href="/terms" className="text-blue-600 hover:underline">Terms of Service</LoadingLink> and{' '}
-                      <LoadingLink href="/privacy" className="text-blue-600 hover:underline">Privacy Policy</LoadingLink>. 
-                      I understand that this purchase is non-refundable after 30 days.
-                    </label>
-                  </div>
-                  {errors.terms && (
-                    <p className="text-red-500 text-sm mt-2">{errors.terms}</p>
                   )}
+
+                  <LoadingButton
+                    onClick={handleFreeEnrollment}
+                    disabled={processingPayment || isEnrolling}
+                    className="w-full py-4 bg-gradient-to-r from-green-600 to-blue-600 text-white font-semibold rounded-xl hover:from-green-700 hover:to-blue-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    loadingText="Enrolling..."
+                    showSpinner={true}
+                  >
+                    <CheckCircleIcon className="w-5 h-5" />
+                    Enroll for Free
+                  </LoadingButton>
                 </div>
+              ) : (
+                // Paid Course - Stripe Payment
+                <div className="space-y-6">
+                  {/* Error Message */}
+                  {errors.payment && (
+                    <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
+                      <ExclamationTriangleIcon className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                      <p className="text-red-700">{errors.payment}</p>
+                    </div>
+                  )}
 
-                {/* Error Message */}
-                {errors.payment && (
-                  <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
-                    <ExclamationTriangleIcon className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-                    <p className="text-red-700">{errors.payment}</p>
-                  </div>
-                )}
-
-                {/* Submit Button */}
-                <LoadingButton
-                  type="submit"
-                  disabled={processingPayment || isEnrolling}
-                  className="w-full py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                  loadingText="Processing payment..."
-                  showSpinner={true}
-                >
-                  <LockClosedIcon className="w-5 h-5" />
-                  Complete Purchase - ${course.price}
-                </LoadingButton>
-
-                {/* Security Badges */}
-                <div className="flex items-center justify-center gap-6 text-sm text-gray-600">
-                  <div className="flex items-center gap-2">
-                    <ShieldCheckIcon className="w-5 h-5 text-green-600" />
-                    <span>SSL Secure</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <LockClosedIcon className="w-5 h-5 text-green-600" />
-                    <span>256-bit Encryption</span>
-                  </div>
+                  {/* Stripe Payment Form */}
+                  <StripeProvider 
+                    publishableKey={process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!}
+                    clientSecret={clientSecret || undefined}
+                  >
+                    <StripeCheckoutForm
+                      onSuccess={handlePaymentSuccess}
+                      onError={handlePaymentError}
+                      amount={course.price}
+                      title={course.title}
+                    />
+                  </StripeProvider>
                 </div>
-              </form>
+              )}
             </div>
 
             {/* Order Summary */}
