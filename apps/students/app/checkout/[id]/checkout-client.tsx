@@ -29,12 +29,13 @@ import {
 
 interface CheckoutClientProps {
   courseId: string;
+  initialCourseData?: any;
 }
 
-export default function CheckoutClient({ courseId }: CheckoutClientProps) {
+export default function CheckoutClient({ courseId, initialCourseData }: CheckoutClientProps) {
   const router = useRouter();
   const { startNavigation } = useNavigationLoading();
-  const { course, loading, error } = useCourseDetails(courseId);
+  const { course, loading, error } = useCourseDetails(courseId, initialCourseData);
   const [createEnroll, { isLoading: isEnrolling }] = useCreateEnrollMutation();
   
   const [processingPayment, setProcessingPayment] = useState(false);
@@ -50,13 +51,15 @@ export default function CheckoutClient({ courseId }: CheckoutClientProps) {
 
   useEffect(() => {
     if (!courseId || typeof courseId !== 'string') {
-      notFound();
+      console.error('Invalid courseId:', courseId);
+      // Don't call notFound() here as it can cause routing issues
+      // The parent page already validates the ID
     }
   }, [courseId]);
 
   // Create Stripe payment intent when course loads
   useEffect(() => {
-    if (course && course.price > 0 && !clientSecret) {
+    if (course && Number(course.price) > 0 && !clientSecret) {
       handleCreatePaymentIntent();
     }
   }, [course, clientSecret]);
@@ -101,8 +104,48 @@ export default function CheckoutClient({ courseId }: CheckoutClientProps) {
     );
   }
 
-  if (error || !course) {
-    notFound();
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600 mb-4">Error loading course: {error}</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!course && !loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-gray-600 mb-4">Course not found</p>
+          <a 
+            href="/" 
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            Go Home
+          </a>
+        </div>
+      </div>
+    );
+  }
+
+  // Additional safety check - ensure course and price are available
+  if (!course || course.price === undefined || course.price === null) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <ArrowPathIcon className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
+          <p className="text-gray-600">Loading course details...</p>
+        </div>
+      </div>
+    );
   }
 
   if (course.enrolled) {
@@ -111,9 +154,10 @@ export default function CheckoutClient({ courseId }: CheckoutClientProps) {
   }
 
   const totalVideos = course.chapters?.reduce((acc, chapter) => acc + (chapter.videos?.length || 0), 0) || 0;
-  const originalPrice = course.price * 1.5;
-  const discount = originalPrice - course.price;
-  const discountPercentage = Math.round((discount / originalPrice) * 100);
+  const coursePrice = Number(course.price) || 0;
+  const originalPrice = coursePrice * 1.5;
+  const discount = originalPrice - coursePrice;
+  const discountPercentage = originalPrice > 0 ? Math.round((discount / originalPrice) * 100) : 0;
 
   const handlePaymentSuccess = async () => {
     if (!course) return;
@@ -183,7 +227,7 @@ export default function CheckoutClient({ courseId }: CheckoutClientProps) {
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Payment Form */}
             <div className="lg:col-span-2 space-y-6">
-              {course.price === 0 ? (
+              {coursePrice === 0 ? (
                 // Free Course Enrollment
                 <div className="bg-white rounded-xl shadow-sm p-6">
                   <h2 className="text-xl font-semibold mb-4">Free Course</h2>
@@ -223,7 +267,7 @@ export default function CheckoutClient({ courseId }: CheckoutClientProps) {
                     <CustomCheckout
                       publishableKey={process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!}
                       clientSecret={clientSecret}
-                      amount={course.price * 100} // Convert to cents
+                      amount={coursePrice * 100} // Convert to cents
                       courseTitle={course.title}
                       onSuccess={async (paymentIntent) => {
                         console.log('Payment successful:', paymentIntent);
@@ -307,7 +351,7 @@ export default function CheckoutClient({ courseId }: CheckoutClientProps) {
                       </div>
                       <div className="flex justify-between text-lg font-semibold pt-2 border-t">
                         <span>Total</span>
-                        <span className="text-blue-600">${course.price.toFixed(2)}</span>
+                        <span className="text-blue-600">${coursePrice.toFixed(2)}</span>
                       </div>
                     </div>
 

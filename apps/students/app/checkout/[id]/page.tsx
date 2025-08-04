@@ -1,29 +1,53 @@
+import { headers } from "next/headers";
+import { getCourseById } from "../../services/course.service";
 import CheckoutClient from './checkout-client';
 import { notFound } from 'next/navigation';
 
-// Generate static params for known routes (optional)
+interface PageProps {
+  params: Promise<{ id: string }>;
+}
+
+// Generate static params for build time - returns empty array for dynamic generation
 export async function generateStaticParams() {
-  // Return empty array to enable dynamic generation
+  // Return empty array to allow all dynamic routes
   return [];
 }
 
-// Enable dynamic rendering
-export const dynamic = 'force-dynamic';
-
-export default async function CheckoutPage({ 
-  params 
-}: { 
-  params: Promise<{ id: string }> 
-}) {
+export default async function CheckoutPage({ params }: PageProps) {
   try {
-    const { id } = await params;
+    const resolvedParams = await params;
     
-    // Basic validation
-    if (!id || typeof id !== 'string') {
+    // Safe check for id
+    if (!resolvedParams?.id) {
       notFound();
     }
 
-    return <CheckoutClient courseId={id} />;
+    const headersList = await headers();
+    
+    // Extract cookies, authorization, and origin headers for API calls
+    const cookieHeader = headersList.get('cookie');
+    const authHeader = headersList.get('authorization');
+    const hostHeader = headersList.get('host');
+    
+    const forwardHeaders: HeadersInit = {};
+    if (cookieHeader) {
+      forwardHeaders['cookie'] = cookieHeader;
+    }
+    if (authHeader) {
+      forwardHeaders['authorization'] = authHeader;
+    }
+    if (hostHeader) {
+      forwardHeaders['origin'] = `https://${hostHeader}`;
+    }
+    
+    // Fetch course data server-side
+    const course = await getCourseById(resolvedParams.id, forwardHeaders);
+    
+    if (!course) {
+      notFound();
+    }
+    
+    return <CheckoutClient courseId={resolvedParams.id} initialCourseData={course} />;
   } catch (error) {
     console.error('Error in checkout page:', error);
     notFound();

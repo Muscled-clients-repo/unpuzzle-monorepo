@@ -208,15 +208,32 @@ export const CustomCheckoutForm: React.FC<CustomCheckoutFormProps> = ({
       <button
         type="submit"
         disabled={!stripe || isProcessing}
+        style={{
+          background: isProcessing 
+            ? 'linear-gradient(to right, #64748b, #475569)'
+            : 'linear-gradient(to right, #9333ea, #8b5cf6, #6366f1)',
+          color: 'white',
+          border: 'none'
+        }}
         className={`
-          w-full py-4 px-6 rounded-xl font-semibold text-white text-lg
+          w-full py-4 px-6 rounded-xl font-semibold text-lg
           transition-all duration-300 transform shadow-lg
           ${isProcessing 
-            ? 'bg-gradient-to-r from-gray-400 to-gray-500 cursor-not-allowed scale-95' 
-            : 'bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-600 hover:from-indigo-700 hover:via-purple-700 hover:to-blue-700 hover:shadow-2xl hover:scale-105 active:scale-95'
+            ? 'cursor-not-allowed scale-95' 
+            : 'hover:shadow-2xl hover:scale-105 active:scale-95'
           }
           relative overflow-hidden
         `}
+        onMouseEnter={(e) => {
+          if (!isProcessing) {
+            e.currentTarget.style.background = 'linear-gradient(to right, #7c3aed, #7c3aed, #4f46e5)';
+          }
+        }}
+        onMouseLeave={(e) => {
+          if (!isProcessing) {
+            e.currentTarget.style.background = 'linear-gradient(to right, #9333ea, #8b5cf6, #6366f1)';
+          }
+        }}
       >
         {isProcessing ? (
           <span className="flex items-center justify-center">
