@@ -48,7 +48,10 @@ class OrdersController {
         const stripeService = new StripeService()
         
         try {
-            const data = await stripeService.createPaymentIntent(amount)
+            const data = await stripeService.createPaymentIntent({
+                amount: amount,
+                description: 'Order payment'
+            })
             return data
         } catch (error: any) {
             throw error

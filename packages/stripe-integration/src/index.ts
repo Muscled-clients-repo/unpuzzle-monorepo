@@ -5,6 +5,10 @@ export type { StripeProviderProps } from './components/StripeProvider';
 export { StripeCheckoutForm } from './components/StripeCheckoutForm';
 export type { StripeCheckoutFormProps } from './components/StripeCheckoutForm';
 
+export { EmbeddedCheckout } from './components/EmbeddedCheckout';
+export { CustomCheckout } from './components/CustomCheckout';
+export { CustomCheckoutForm } from './components/CustomCheckoutForm';
+
 // Hooks
 export { useStripeCheckout } from './hooks/useStripeCheckout';
 export type { 

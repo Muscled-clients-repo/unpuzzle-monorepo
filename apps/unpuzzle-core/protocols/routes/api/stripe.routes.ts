@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import express from 'express';
 import StripeWebhookController from '../../controllers/api/stripeWebhook.controller';
 
 const router = Router();
@@ -10,20 +9,11 @@ router.post('/create-checkout-session', StripeWebhookController.handleCreateChec
 // Create checkout session for course purchase
 router.post('/create-course-checkout-session', StripeWebhookController.handleCreateCourseCheckoutSession);
 
-// Stripe webhook endpoint for credit purchases
-// IMPORTANT: This route must use express.raw() middleware to preserve the raw body
-// for Stripe signature verification
-router.post(
-  '/credit-webhook',
-  express.raw({ type: 'application/json' }),
-  StripeWebhookController.creditWebhook
-);
+// Create payment intent for course purchase (for custom checkout)
+router.post('/create-course-payment-intent', StripeWebhookController.handleCreateCoursePaymentIntent);
 
-// Stripe webhook endpoint for course purchases
-router.post(
-  '/course-webhook',
-  express.raw({ type: 'application/json' }),
-  StripeWebhookController.courseWebhook
-);
+// Single Stripe webhook endpoint for all events
+// IMPORTANT: Raw body parsing is handled in index.ts before this route
+router.post('/webhook', StripeWebhookController.webhookHandler);
 
 export default router;

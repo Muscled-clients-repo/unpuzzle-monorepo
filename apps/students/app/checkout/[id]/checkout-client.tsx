@@ -9,7 +9,8 @@ import { LoadingButton } from "@/app/components/navigation/LoadingButton";
 import { useNavigationLoading } from "@/app/context/NavigationLoadingContext";
 import { useCourseDetails } from "@/app/hooks/useCourses";
 import { useCreateEnrollMutation } from "@/app/redux/services/enroll.services";
-import { StripeProvider, StripeCheckoutForm, useStripeCheckout } from "@unpuzzle/stripe-integration";
+import { CustomCheckout, useStripeCheckout } from "@unpuzzle/stripe-integration";
+import { useBaseApi } from "@/app/hooks/useBaseApi";
 import { API_ENDPOINTS } from "@/app/config/api.config";
 import { 
   CheckCircleIcon, 
@@ -28,17 +29,23 @@ import {
 
 interface CheckoutClientProps {
   courseId: string;
+  initialCourseData?: any;
 }
 
-export default function CheckoutClient({ courseId }: CheckoutClientProps) {
+export default function CheckoutClient({ courseId, initialCourseData }: CheckoutClientProps) {
   const router = useRouter();
+  const api = useBaseApi();
   const { startNavigation } = useNavigationLoading();
-  const { course, loading, error } = useCourseDetails(courseId);
+  const { course: reduxCourse, loading, error } = useCourseDetails(courseId, initialCourseData);
+  
+  // Prioritize initialCourseData over Redux course to prevent "not found" flash
+  const course = initialCourseData || reduxCourse;
   const [createEnroll, { isLoading: isEnrolling }] = useCreateEnrollMutation();
   
   const [processingPayment, setProcessingPayment] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [isRedirecting, setIsRedirecting] = useState(false);
   
   const { 
     createCourseCheckoutSession, 
@@ -48,53 +55,102 @@ export default function CheckoutClient({ courseId }: CheckoutClientProps) {
 
   useEffect(() => {
     if (!courseId || typeof courseId !== 'string') {
-      notFound();
+      console.error('Invalid courseId:', courseId);
+      // Don't call notFound() here as it can cause routing issues
+      // The parent page already validates the ID
     }
   }, [courseId]);
 
-  // Create Stripe checkout session when course loads
+  // Create Stripe payment intent when course loads
   useEffect(() => {
-    if (course && course.price > 0 && !clientSecret && !isCreatingSession) {
-      handleCreateStripeSession();
+    if (course && Number(course.price) > 0 && !clientSecret) {
+      handleCreatePaymentIntent();
     }
-  }, [course, clientSecret, isCreatingSession]);
+  }, [course, clientSecret]);
 
-  const handleCreateStripeSession = async () => {
-    if (!course) return;
+  const handleCreatePaymentIntent = async () => {
+    if (!course || isRedirecting) return;
     
-    const session = await createCourseCheckoutSession({
-      userId: 'current-user-id', // Replace with actual user ID from auth
-      courseId: course.id,
-      successUrl: `${window.location.origin}/checkout/success?course_id=${courseId}`,
-      cancelUrl: `${window.location.origin}/checkout/cancel?course_id=${courseId}`,
-    });
+    try {
+      console.log('Creating payment intent for course:', course.id);
+      
+      const response = await api.post('/stripe/create-course-payment-intent', {
+        courseId: course.id
+      });
 
-    if (session) {
-      if (session.sessionUrl || session.checkoutUrl) {
-        // For Stripe Checkout (redirect)
-        redirectToCheckout(session.sessionUrl || session.checkoutUrl || '');
-      } else if (session.clientSecret) {
-        // For Stripe Elements (embedded)
-        setClientSecret(session.clientSecret);
+      console.log('Payment intent response:', response);
+
+      if (response.success && response.data) {
+        const data = response.data.body || response.data;
+        if (data.clientSecret) {
+          setClientSecret(data.clientSecret);
+        } else {
+          console.error('No client secret received:', data);
+          setErrors({ payment: 'Failed to initialize payment. Please try again.' });
+        }
+      } else {
+        console.error('Payment intent creation failed:', response.error);
+        setErrors({ payment: response.error || 'Failed to initialize payment.' });
       }
-    } else {
+    } catch (error: any) {
+      console.error('Failed to create payment intent:', error);
       setErrors({ payment: 'Failed to initialize payment. Please try again.' });
     }
   };
 
-  if (loading) {
+  if (loading || isRedirecting) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <ArrowPathIcon className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
-          <p className="text-gray-600">Loading checkout...</p>
+          <p className="text-gray-600">{isRedirecting ? 'Redirecting to payment...' : 'Loading checkout...'}</p>
         </div>
       </div>
     );
   }
 
-  if (error || !course) {
-    notFound();
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600 mb-4">Error loading course: {error}</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!course && !loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-gray-600 mb-4">Course not found</p>
+          <a 
+            href="/" 
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            Go Home
+          </a>
+        </div>
+      </div>
+    );
+  }
+
+  // Additional safety check - ensure course and price are available
+  if (!course || course.price === undefined || course.price === null) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <ArrowPathIcon className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
+          <p className="text-gray-600">Loading course details...</p>
+        </div>
+      </div>
+    );
   }
 
   if (course.enrolled) {
@@ -103,26 +159,22 @@ export default function CheckoutClient({ courseId }: CheckoutClientProps) {
   }
 
   const totalVideos = course.chapters?.reduce((acc, chapter) => acc + (chapter.videos?.length || 0), 0) || 0;
-  const originalPrice = course.price * 1.5;
-  const discount = originalPrice - course.price;
-  const discountPercentage = Math.round((discount / originalPrice) * 100);
+  const coursePrice = Number(course.price) || 0;
+  const originalPrice = coursePrice * 1.5;
+  const discount = originalPrice - coursePrice;
+  const discountPercentage = originalPrice > 0 ? Math.round((discount / originalPrice) * 100) : 0;
 
   const handlePaymentSuccess = async () => {
     if (!course) return;
     
-    try {
-      // Enroll the user after successful payment
-      await createEnroll({ 
-        userId: 'current-user-id', // This should come from auth context
-        courseId: course.id 
-      }).unwrap();
-      
+    // Payment succeeded - webhook will handle enrollment automatically
+    console.log('Payment successful! Webhook will handle enrollment.');
+    
+    // Brief delay to allow webhook processing, then redirect to course details
+    setTimeout(() => {
       startNavigation();
-      router.push(`/courses/${courseId}/learn`);
-    } catch (error) {
-      console.error('Enrollment failed:', error);
-      setErrors({ payment: 'Payment succeeded but enrollment failed. Please contact support.' });
-    }
+      router.push(`/courses/${courseId}`);
+    }, 1500);
   };
 
   const handlePaymentError = (error: string) => {
@@ -134,13 +186,17 @@ export default function CheckoutClient({ courseId }: CheckoutClientProps) {
     
     setProcessingPayment(true);
     try {
-      await createEnroll({ 
-        userId: 'current-user-id', // This should come from auth context
+      const response = await api.post('/enroll', {
         courseId: course.id 
-      }).unwrap();
+      });
       
-      startNavigation();
-      router.push(`/courses/${courseId}/learn`);
+      if (response.success) {
+        startNavigation();
+        router.push(`/courses/${courseId}`);
+      } else {
+        console.error('Free enrollment failed:', response.error);
+        setErrors({ payment: response.error || 'Enrollment failed. Please try again.' });
+      }
     } catch (error) {
       console.error('Free enrollment failed:', error);
       setErrors({ payment: 'Enrollment failed. Please try again.' });
@@ -175,7 +231,7 @@ export default function CheckoutClient({ courseId }: CheckoutClientProps) {
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Payment Form */}
             <div className="lg:col-span-2 space-y-6">
-              {course.price === 0 ? (
+              {coursePrice === 0 ? (
                 // Free Course Enrollment
                 <div className="bg-white rounded-xl shadow-sm p-6">
                   <h2 className="text-xl font-semibold mb-4">Free Course</h2>
@@ -210,18 +266,28 @@ export default function CheckoutClient({ courseId }: CheckoutClientProps) {
                     </div>
                   )}
 
-                  {/* Stripe Payment Form */}
-                  <StripeProvider 
-                    publishableKey={process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!}
-                    clientSecret={clientSecret || undefined}
-                  >
-                    <StripeCheckoutForm
-                      onSuccess={handlePaymentSuccess}
-                      onError={handlePaymentError}
-                      amount={course.price}
-                      title={course.title}
+                  {/* Custom Stripe Checkout - Only render if we have a clientSecret */}
+                  {clientSecret ? (
+                    <CustomCheckout
+                      publishableKey={process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!}
+                      clientSecret={clientSecret}
+                      amount={coursePrice * 100} // Convert to cents
+                      courseTitle={course.title}
+                      onSuccess={async (paymentIntent) => {
+                        console.log('Payment successful:', paymentIntent);
+                        await handlePaymentSuccess();
+                      }}
+                      onError={(error) => {
+                        console.error('Payment error:', error);
+                        handlePaymentError(error);
+                      }}
                     />
-                  </StripeProvider>
+                  ) : (
+                    <div className="text-center py-8">
+                      <ArrowPathIcon className="w-8 h-8 text-blue-600 animate-spin mx-auto mb-3" />
+                      <p className="text-gray-600">Preparing secure checkout...</p>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -289,7 +355,7 @@ export default function CheckoutClient({ courseId }: CheckoutClientProps) {
                       </div>
                       <div className="flex justify-between text-lg font-semibold pt-2 border-t">
                         <span>Total</span>
-                        <span className="text-blue-600">${course.price.toFixed(2)}</span>
+                        <span className="text-blue-600">${coursePrice.toFixed(2)}</span>
                       </div>
                     </div>
 

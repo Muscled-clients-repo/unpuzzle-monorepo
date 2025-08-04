@@ -94,10 +94,11 @@ app.use(
 
 app.options("*", cors());
 
-// Apply JSON body parser to all routes except Stripe webhooks
+// Apply raw body parser for Stripe webhook, JSON for everything else
 app.use((req, res, next) => {
-  if (req.originalUrl === "/api/stripe/credit-webhook") {
-    next();
+  // Use raw body parser for Stripe webhook endpoint
+  if (req.originalUrl === "/api/stripe/webhook") {
+    express.raw({ type: 'application/json' })(req, res, next);
   } else {
     express.json()(req, res, next);
   }

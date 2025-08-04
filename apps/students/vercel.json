@@ -1,6 +1,13 @@
 {
-  "installCommand": "pnpm install --frozen-lockfile",
-  "buildCommand": "pnpm run build",
-  "outputDirectory": ".next",
-  "framework": "nextjs"
+  "rewrites": [
+    {
+      "source": "/checkout/(.*)",
+      "destination": "/checkout/[id]"
+    }
+  ],
+  "functions": {
+    "app/checkout/[id]/page.tsx": {
+      "maxDuration": 10
+    }
+  }
 }

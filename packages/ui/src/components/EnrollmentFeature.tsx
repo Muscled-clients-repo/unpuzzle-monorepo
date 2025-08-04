@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Check, User, Mail, BookOpen, ArrowRight } from 'lucide-react';
 import {
   Dialog,
@@ -40,13 +40,18 @@ const EnrollmentFeature: React.FC<EnrollmentFeatureProps> = ({
   confirmationMessage = 'Congratulations! You are now enrolled in this course.',
   selfContained = true
 }) => {
-  const [isEnrolled, setIsEnrolled] = useState(course?.enrolled || false);
+  const [isEnrolled, setIsEnrolled] = useState(!!course?.enrolled);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     fullName: '',
     email: ''
   });
+
+  // Sync enrollment state when course prop changes
+  useEffect(() => {
+    setIsEnrolled(!!course?.enrolled);
+  }, [course?.enrolled]);
 
   const handleOpenModal = () => {
     setIsModalOpen(true);
@@ -126,7 +131,7 @@ const EnrollmentFeature: React.FC<EnrollmentFeatureProps> = ({
 
   // Variant styles
   const getButtonStyles = () => {
-    const baseClasses = `font-semibold rounded-lg transition-all duration-200 flex items-center justify-center gap-2 ${
+    const baseClasses = `font-semibold rounded-lg transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer ${
       fullWidth ? 'w-full' : ''
     } ${sizeClasses[size]}`;
 
@@ -157,7 +162,11 @@ const EnrollmentFeature: React.FC<EnrollmentFeatureProps> = ({
         course?.id ? (
           <button
             onClick={() => window.location.href = `/courses/${course.id}/learn`}
-            className={`${sizeClasses[size]} ${fullWidth ? 'w-full' : ''} inline-flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5`}
+            className={`${sizeClasses[size]} ${fullWidth ? 'w-full' : ''} inline-flex items-center justify-center gap-3 text-white rounded-xl font-bold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 cursor-pointer`}
+            style={{
+              background: 'linear-gradient(90deg, #10b981 0%, #22c55e 50%, #14b8a6 100%)',
+              border: 'none'
+            }}
           >
             <Check className={iconSizes[size]} />
             <span>Continue Learning</span>

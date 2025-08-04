@@ -78,7 +78,7 @@ class CourseModel extends CourseSchema {
       if (data && data.chapters) {
         data.chapters.sort((a: any, b: any) => a.order_index - b.order_index); // Sorting chapters by order_index
       }
-      data["enrolled"]=false
+      // data["enrolled"]=false
       return data;
     } catch (error) {
       throw error;
