@@ -7,11 +7,9 @@ interface PageProps {
   params: Promise<{ id: string }>;
 }
 
-// Generate static params for build time - returns empty array for dynamic generation
-export async function generateStaticParams() {
-  // Return empty array to allow all dynamic routes at build time
-  return [];
-}
+// Force dynamic rendering for checkout pages
+export const dynamic = 'force-dynamic';
+export const dynamicParams = true;
 
 export default async function CheckoutPage({ params }: PageProps) {
   try {
@@ -20,6 +18,12 @@ export default async function CheckoutPage({ params }: PageProps) {
     // Safe check for id
     if (!resolvedParams?.id) {
       console.error('CheckoutPage: Missing course ID');
+      notFound();
+    }
+
+    // Check for build-time placeholder
+    if (resolvedParams.id === '[id]') {
+      console.error('CheckoutPage: Received placeholder [id] - this should not happen in production');
       notFound();
     }
 
