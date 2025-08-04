@@ -38,8 +38,10 @@ jobs:
           heroku_app_name: "unpuzzle-ai-backend"
           heroku_email: ${{secrets.HEROKU_EMAIL}}
           appdir: "apps/unpuzzle-core"
-          buildpack: "heroku/nodejs"
-          procfile: "web: npm start"
+          usedocker: true
+          docker_heroku_process_type: web
+          stack: "container"
+          dontautocreate: true
 
   deploy-m1:
     needs: changes
@@ -55,5 +57,7 @@ jobs:
           heroku_app_name: "unpuzzle-m1"
           heroku_email: ${{secrets.HEROKU_EMAIL}}
           appdir: "apps/unpuzzle-m1"
-          buildpack: "heroku/nodejs"
-          procfile: "web: npm start"
+          usedocker: true
+          docker_heroku_process_type: web
+          stack: "container"
+          dontautocreate: true
