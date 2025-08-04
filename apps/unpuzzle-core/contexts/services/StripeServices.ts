@@ -79,6 +79,7 @@ export class StripeService {
         metadata: {
           userId: params.userId,
           creditAmount: params.creditAmount.toString(),
+          type: 'credit_purchase',
         },
       });
       return session;

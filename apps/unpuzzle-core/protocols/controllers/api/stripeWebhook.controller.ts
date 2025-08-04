@@ -18,30 +18,293 @@ class StripeWebhookController extends StripeService{
         this.stripeWebhookSecret=process.env.STRIPE_WEBHOOK_SECRET as string
     }
 
-    stripeWebhookEvent= async(req: any,res: Response,next: NextFunction)=>{
-        const responseHandler = new ResponseHandler(res, next);
-        const sig = req.headers['stripe-signature'];
-        const event = this.stripe.webhooks.constructEvent(req.body, sig, this.stripeWebhookSecret);
-        console.log(event)
+    // Single webhook handler for all Stripe events
+    webhookHandler = async(req: any, res: Response, next: NextFunction) => {
+        let event;
+
         try {
-            // Handle the event
-            switch (event.type) {
-                case 'payment_intent.succeeded':
-                const paymentIntent = event.data.object; // PaymentIntent object
-                console.log('PaymentIntent was successful!', paymentIntent);
-                break;
-                case 'payment_intent.payment_failed':
-                const failedPaymentIntent = event.data.object;
-                console.log('PaymentIntent failed!', failedPaymentIntent);
-                break;
-                // Add other event cases as needed
-                default:
-                console.log('Unhandled event type:', event.type);
+            // Verify webhook signature
+            const sig = req.headers['stripe-signature'];
+            
+            if (!sig) {
+                logger.error('Missing stripe-signature header');
+                return res.status(400).send('Missing stripe-signature header');
             }
 
-            responseHandler.success(event);
-        } catch (error: any) {
-            responseHandler.error(error);
+            // Debug logging
+            logger.info('Stripe webhook received', {
+                hasBody: !!req.body,
+                bodyType: typeof req.body,
+                isBuffer: Buffer.isBuffer(req.body),
+                bodyLength: req.body?.length || JSON.stringify(req.body).length,
+                signature: sig?.substring(0, 20) + '...',
+                webhookSecret: this.stripeWebhookSecret?.substring(0, 10) + '...'
+            });
+
+            event = this.stripe.webhooks.constructEvent(
+                req.body, 
+                sig, 
+                this.stripeWebhookSecret
+            );
+
+            logger.info(`Stripe webhook event: ${event.type}`, { eventId: event.id });
+
+            // Handle different event types
+            switch (event.type) {
+                case 'checkout.session.completed':
+                    const session = event.data.object as any;
+                    const { type, userId, creditAmount, courseId } = session.metadata || {};
+                    
+                    // Log full session details for debugging
+                    logger.info('Processing checkout session', {
+                        sessionId: session.id,
+                        metadata: session.metadata,
+                        lineItems: session.line_items?.data?.[0]?.description,
+                        customerEmail: session.customer_email,
+                        amountTotal: session.amount_total
+                    });
+                    
+                    // Route to appropriate handler based on purchase type
+                    if (type === 'credit_purchase') {
+                        return await this.handleCreditPurchase(session, res);
+                    } else if (type === 'course_purchase') {
+                        return await this.handleCoursePurchase(session, res);
+                    } else {
+                        // Fallback: Try to determine type from metadata or line items
+                        if (creditAmount && userId) {
+                            logger.info('Detected credit purchase from metadata (legacy format)', {
+                                sessionId: session.id,
+                                userId,
+                                creditAmount
+                            });
+                            return await this.handleCreditPurchase(session, res);
+                        } else if (courseId && userId) {
+                            logger.info('Detected course purchase from metadata (legacy format)', {
+                                sessionId: session.id,
+                                userId,
+                                courseId
+                            });
+                            return await this.handleCoursePurchase(session, res);
+                        } else {
+                            logger.warn('Cannot determine purchase type - missing metadata', {
+                                sessionId: session.id,
+                                metadata: session.metadata,
+                                customerEmail: session.customer_email
+                            });
+                            return res.status(200).json({ 
+                                received: true, 
+                                message: 'Cannot determine purchase type - please check checkout session creation',
+                                sessionId: session.id
+                            });
+                        }
+                    }
+                    
+                default:
+                    logger.info(`Unhandled webhook event type: ${event.type}`);
+                    return res.status(200).json({ 
+                        received: true, 
+                        message: 'Event type not handled' 
+                    });
+            }
+
+        } catch (err: any) {
+            if (err.name === 'StripeSignatureVerificationError') {
+                logger.error('Stripe signature verification failed', {
+                    error: err.message,
+                    header: req.headers['stripe-signature']
+                });
+                return res.status(400).send('Webhook signature verification failed');
+            }
+            
+            logger.error('Webhook processing error', {
+                error: err.message,
+                stack: err.stack
+            });
+            return res.status(400).send(`Webhook Error: ${err.message}`);
+        }
+    }
+
+    // Helper method to handle credit purchases
+    private async handleCreditPurchase(session: any, res: Response) {
+        const { userId, creditAmount } = session.metadata || {};
+        
+        if (!userId || !creditAmount) {
+            logger.error('Missing required metadata in credit purchase session', {
+                sessionId: session.id,
+                metadata: session.metadata
+            });
+            return res.status(200).json({ received: true, error: 'Missing metadata' });
+        }
+
+        const credits = parseInt(creditAmount, 10);
+        
+        if (isNaN(credits) || credits <= 0) {
+            logger.error('Invalid credit amount', {
+                sessionId: session.id,
+                creditAmount,
+                credits
+            });
+            return res.status(200).json({ received: true, error: 'Invalid credit amount' });
+        }
+
+        try {
+            // Check for idempotency
+            const existingTransaction = await CreditTransactionModel.getCreditTransactionBySessionId(session.id);
+            
+            if (existingTransaction) {
+                logger.info(`Session ${session.id} already processed`, {
+                    userId,
+                    existingTransactionId: existingTransaction.id
+                });
+                return res.status(200).json({ 
+                    received: true,
+                    message: 'Session already processed',
+                    transactionId: existingTransaction.id
+                });
+            }
+
+            const amountPaid = session.amount_total ? session.amount_total / 100 : 0;
+
+            // Update credits
+            const updatedCredits = await CreditTrackModel.incrementCredits(userId, credits);
+            
+            // Record transaction
+            const creditTransaction = await CreditTransactionModel.createCreditTransaction({
+                user_id: userId,
+                amount: credits,
+                type: 'purchase',
+                stripe_session_id: session.id,
+                description: `Purchased ${credits} credits for $${amountPaid}`,
+                metadata: {
+                    amountPaid,
+                    currency: session.currency || 'usd',
+                    paymentMethod: 'stripe',
+                    customerEmail: session.customer_email,
+                    paymentStatus: session.payment_status
+                }
+            });
+            
+            logger.info('Credits successfully updated', {
+                userId,
+                creditAmount: credits,
+                newAvailableCredits: updatedCredits.available_credit,
+                sessionId: session.id,
+                transactionId: creditTransaction.id
+            });
+
+            return res.status(200).json({ 
+                received: true,
+                message: 'Credits updated successfully',
+                availableCredits: updatedCredits.available_credit,
+                transactionId: creditTransaction.id
+            });
+        } catch (dbError: any) {
+            logger.error('Failed to update credits in database', {
+                error: dbError.message,
+                stack: dbError.stack,
+                userId,
+                creditAmount: credits,
+                sessionId: session.id
+            });
+            return res.status(200).json({ 
+                received: true, 
+                error: 'Database error - logged for manual review' 
+            });
+        }
+    }
+
+    // Helper method to handle course purchases
+    private async handleCoursePurchase(session: any, res: Response) {
+        const { userId, courseId } = session.metadata || {};
+        
+        if (!userId || !courseId) {
+            logger.error('Missing required metadata in course purchase session', {
+                sessionId: session.id,
+                metadata: session.metadata
+            });
+            return res.status(200).json({ received: true, error: 'Missing metadata' });
+        }
+
+        try {
+            // Check if already enrolled
+            const existingEnrollment = await EnrollmentModel.getEnrollmentByUserAndCourse(userId, courseId);
+            
+            if (existingEnrollment) {
+                logger.info(`User ${userId} already enrolled in course ${courseId}`, {
+                    sessionId: session.id,
+                    enrollmentId: existingEnrollment.id
+                });
+                return res.status(200).json({ 
+                    received: true,
+                    message: 'User already enrolled',
+                    enrollmentId: existingEnrollment.id
+                });
+            }
+
+            // Get course details
+            const course = await CourseModel.getCourseById(courseId);
+            if (!course) {
+                logger.error('Course not found for enrollment', {
+                    courseId,
+                    sessionId: session.id
+                });
+                return res.status(200).json({ 
+                    received: true, 
+                    error: 'Course not found' 
+                });
+            }
+
+            const amountPaid = session.amount_total ? session.amount_total / 100 : 0;
+
+            // Create enrollment
+            const enrollment = await EnrollmentModel.createEnrollment({
+                user_id: userId,
+                course_id: courseId
+            } as any);
+            
+            // Create order record
+            const order = await OrdersModel.createOrder({
+                user_id: userId,
+                product_id: courseId,
+                product_type: 'course',
+                amount: amountPaid,
+                currency: session.currency || 'usd',
+                status: 'completed',
+                stripe_session_id: session.id,
+                metadata: {
+                    courseTitle: course.title,
+                    customerEmail: session.customer_email,
+                    paymentStatus: session.payment_status
+                }
+            } as any);
+            
+            logger.info('Course enrollment created successfully', {
+                userId,
+                courseId,
+                courseTitle: course.title,
+                amountPaid,
+                sessionId: session.id,
+                enrollmentId: enrollment.id,
+                orderId: order?.id
+            });
+
+            return res.status(200).json({ 
+                received: true,
+                message: 'Course enrollment created successfully',
+                enrollmentId: enrollment.id
+            });
+        } catch (dbError: any) {
+            logger.error('Failed to create course enrollment', {
+                error: dbError.message,
+                stack: dbError.stack,
+                userId,
+                courseId,
+                sessionId: session.id
+            });
+            return res.status(200).json({ 
+                received: true, 
+                error: 'Database error - logged for manual review' 
+            });
         }
     }
 
@@ -111,6 +374,16 @@ class StripeWebhookController extends StripeService{
                 logger.error('Missing stripe-signature header');
                 return res.status(400).send('Missing stripe-signature header');
             }
+
+            // Debug logging
+            logger.info('Credit webhook received', {
+                hasBody: !!req.body,
+                bodyType: typeof req.body,
+                isBuffer: Buffer.isBuffer(req.body),
+                bodyLength: req.body?.length || JSON.stringify(req.body).length,
+                signature: sig?.substring(0, 20) + '...',
+                webhookSecret: this.stripeWebhookSecret?.substring(0, 10) + '...'
+            });
 
             event = this.stripe.webhooks.constructEvent(
                 req.body, 
@@ -312,6 +585,16 @@ class StripeWebhookController extends StripeService{
                 logger.error('Missing stripe-signature header');
                 return res.status(400).send('Missing stripe-signature header');
             }
+
+            // Debug logging
+            logger.info('Webhook received', {
+                hasBody: !!req.body,
+                bodyType: typeof req.body,
+                isBuffer: Buffer.isBuffer(req.body),
+                bodyLength: req.body?.length || JSON.stringify(req.body).length,
+                signature: sig?.substring(0, 20) + '...',
+                webhookSecret: this.stripeWebhookSecret?.substring(0, 10) + '...'
+            });
 
             event = this.stripe.webhooks.constructEvent(
                 req.body, 
