@@ -518,23 +518,38 @@ export default function CourseDetailClient({ courseId, initialCourseData, breadc
           {/* Enhanced Sidebar */}
           <div className="lg:col-span-1">
             <div className="sticky top-6 space-y-6">
-              {/* Course Purchase Card */}
+              {/* Course Access Card */}
               <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-                {/* Price Header */}
-                <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-6 text-white">
-                  <div className="flex items-baseline justify-between mb-2">
-                    <span className="text-4xl font-bold">${effectiveCourse.price}</span>
-                    {effectiveCourse.price > 0 && (
-                      <span className="text-lg line-through opacity-75">${(effectiveCourse.price * 1.5).toFixed(2)}</span>
-                    )}
+                {/* Price Header - Only show for non-enrolled users */}
+                {!effectiveCourse.enrolled && (
+                  <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-6">
+                    <div className="flex items-baseline justify-between mb-2">
+                      <span className="text-4xl font-bold text-yellow-300">${effectiveCourse.price}</span>
+                      {effectiveCourse.price > 0 && (
+                        <span className="text-lg line-through text-gray-300">${(effectiveCourse.price * 1.5).toFixed(2)}</span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="px-2 py-1 bg-yellow-400 text-blue-900 rounded-full text-xs font-bold">
+                        50% OFF
+                      </span>
+                      <span className="text-sm text-blue-100">Limited time offer</span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className="px-2 py-1 bg-white/20 rounded-full text-xs font-medium">
-                      50% OFF
-                    </span>
-                    <span className="text-sm">Limited time offer</span>
+                )}
+
+                {/* Enrolled Header - Show for enrolled users */}
+                {effectiveCourse.enrolled && (
+                  <div className="bg-gradient-to-r from-green-600 to-emerald-600 p-6">
+                    <div className="flex items-center justify-center gap-3 mb-2">
+                      <CheckCircleIcon className="w-8 h-8 text-green-100" />
+                      <span className="text-2xl font-bold text-green-50">Enrolled</span>
+                    </div>
+                    <div className="text-center">
+                      <span className="text-sm text-emerald-100">You have full access to this course</span>
+                    </div>
                   </div>
-                </div>
+                )}
 
                 <div className="p-6 space-y-6">
                   {/* CTA Button */}
