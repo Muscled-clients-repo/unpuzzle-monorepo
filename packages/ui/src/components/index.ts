@@ -24,3 +24,6 @@ export * from './Switch'
 
 // Course Components
 export { default as EnrollmentFeature } from './EnrollmentFeature'
+
+// Status Components
+export { default as OrderStatusIndicator } from './OrderStatusIndicator'
