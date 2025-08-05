@@ -1,2 +1,5 @@
 // Utility Functions
-export * from './seo.utils'
+// Currently no utility functions implemented
+
+// Export a placeholder to make this a valid module
+export const placeholder = true;

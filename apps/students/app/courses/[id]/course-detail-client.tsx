@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { notFound } from "next/navigation";
@@ -31,7 +31,7 @@ import {
   DevicePhoneMobileIcon
 } from "@heroicons/react/24/outline";
 import { StarIcon as StarSolidIcon, CheckBadgeIcon } from "@heroicons/react/24/solid";
-import { CourseDetailSkeleton, EnrollmentFeature } from "@unpuzzle/ui";
+import { CourseDetailSkeleton, PollableEnrollmentButton, Button } from "@unpuzzle/ui";
 
 interface CourseDetailClientProps {
   courseId: string;
@@ -48,10 +48,22 @@ export default function CourseDetailClient({ courseId, initialCourseData, breadc
     notFound();
   }
   
-  const { course, loading, error } = useCourseDetails(courseId, initialCourseData);
+  const { course, loading, error, refetch } = useCourseDetails(courseId, initialCourseData);
   const { enrollInCourse } = useCourses();
   const [expandedChapter, setExpandedChapter] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"overview" | "curriculum">("overview");
+  
+  // Check for refresh parameter in URL
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    if (searchParams.get('refresh')) {
+      // Force refetch the course data
+      refetch();
+      // Remove the refresh parameter from URL
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, '', newUrl);
+    }
+  }, [refetch]);
 
   console.log('Client component state:', { course, loading, error, initialCourseData });
   console.log('initialCourseData details:', initialCourseData);
@@ -171,24 +183,14 @@ export default function CourseDetailClient({ courseId, initialCourseData, breadc
 
               {/* Enhanced CTA Buttons */}
               <div className="flex flex-wrap items-center gap-4 pt-4">
-                {effectiveCourse.price > 0 && !effectiveCourse.enrolled ? (
-                  <LoadingButton 
-                    onClick={handleCheckout}
-                    className="px-8 py-4 bg-white text-gray-900 font-bold rounded-xl hover:bg-gray-100 transition-all transform hover:scale-105 shadow-lg"
-                    loadingText="Loading checkout..."
-                    showSpinner={true}
-                  >
-                    Buy Now - ${effectiveCourse.price}
-                  </LoadingButton>
-                ) : (
-                  <EnrollmentFeature 
-                    course={effectiveCourse}
-                    onEnroll={handleEnrollment}
-                    variant="primary"
-                    fullWidth={false}
-                    size="lg"
-                  />
-                )}
+                <PollableEnrollmentButton 
+                  course={effectiveCourse}
+                  onEnroll={handleEnrollment}
+                  onCheckout={handleCheckout}
+                  refetch={refetch}
+                  size="xl"
+                  fullWidth={false}
+                />
                 <button className="p-4 bg-white/10 backdrop-blur-sm border-2 border-white/30 rounded-xl hover:bg-white/20 hover:border-white/50 transition-all group">
                   <PlayCircleIcon className="w-6 h-6 group-hover:scale-110 transition-transform" />
                 </button>
@@ -553,24 +555,14 @@ export default function CourseDetailClient({ courseId, initialCourseData, breadc
 
                 <div className="p-6 space-y-6">
                   {/* CTA Button */}
-                  {effectiveCourse.price > 0 && !effectiveCourse.enrolled ? (
-                    <LoadingButton 
-                      onClick={handleCheckout}
-                      className="w-full py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all transform hover:scale-105 shadow-lg"
-                      loadingText="Loading checkout..."
-                      showSpinner={true}
-                    >
-                      Proceed to Checkout - ${effectiveCourse.price}
-                    </LoadingButton>
-                  ) : (
-                    <EnrollmentFeature 
-                      course={effectiveCourse}
-                      onEnroll={handleEnrollment}
-                      variant="secondary"
-                      fullWidth={true}
-                      size="md"
-                    />
-                  )}
+                  <PollableEnrollmentButton 
+                    course={effectiveCourse}
+                    onEnroll={handleEnrollment}
+                    onCheckout={handleCheckout}
+                    refetch={refetch}
+                    size="lg"
+                    fullWidth={true}
+                  />
 
                   {/* Guarantees */}
                   <div className="space-y-3">

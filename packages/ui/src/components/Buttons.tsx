@@ -2,35 +2,113 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { ArrowRightIcon, SparklesIcon } from "@heroicons/react/24/outline";
+import { ArrowRightIcon, SparklesIcon, CheckCircleIcon } from "@heroicons/react/24/outline";
 import { useAuth } from '@unpuzzle/auth';
 
-// ============= Button Component =============
+// ============= Professional Button Component =============
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "solid" | "outline";
+  variant?: "primary" | "secondary" | "success" | "danger" | "warning" | "info" | "light" | "dark" | "outline" | "ghost";
+  size?: "xs" | "sm" | "md" | "lg" | "xl";
+  fullWidth?: boolean;
+  loading?: boolean;
+  icon?: React.ReactNode;
+  iconPosition?: "left" | "right";
   children: React.ReactNode;
 }
 
 export const Button: React.FC<ButtonProps> = ({
-  variant = "outline",
+  variant = "primary",
+  size = "md",
+  fullWidth = false,
+  loading = false,
+  icon,
+  iconPosition = "left",
   children,
   className = "",
+  disabled,
   ...props
 }) => {
-  const baseClasses =
-    "text-sm w-full p-2 py-1 px-4 rounded border transition-colors duration-200";
+  const sizeClasses = {
+    xs: "px-2.5 py-1.5 text-xs font-medium",
+    sm: "px-3 py-2 text-sm font-medium",
+    md: "px-4 py-2.5 text-sm font-semibold",
+    lg: "px-6 py-3 text-base font-semibold",
+    xl: "px-8 py-4 text-lg font-bold"
+  };
 
-  const variantClasses =
-    variant === "solid"
-      ? "bg-[#1D1D1D] text-white hover:bg-white hover:text-[#1D1D1D] border-[#1D1D1D] hover:border-[#1D1D1D]"
-      : "bg-transparent text-[#1D1D1D] hover:bg-[#1D1D1D] hover:text-white border-[#1D1D1D] hover:border-transparent";
+  const iconSizes = {
+    xs: "w-3 h-3",
+    sm: "w-4 h-4", 
+    md: "w-4 h-4",
+    lg: "w-5 h-5",
+    xl: "w-6 h-6"
+  };
+
+  const variantClasses = {
+    primary: "!bg-blue-600 !text-white hover:!bg-blue-700 focus:ring-blue-500 shadow-lg hover:shadow-xl border-0",
+    secondary: "!bg-gray-600 !text-white hover:!bg-gray-700 focus:ring-gray-500 shadow-lg hover:shadow-xl border-0",
+    success: "!bg-green-600 !text-white hover:!bg-green-700 focus:ring-green-500 shadow-lg hover:shadow-xl border-0",
+    danger: "!bg-red-600 !text-white hover:!bg-red-700 focus:ring-red-500 shadow-lg hover:shadow-xl border-0",
+    warning: "!bg-yellow-500 !text-white hover:!bg-yellow-600 focus:ring-yellow-500 shadow-lg hover:shadow-xl border-0",
+    info: "!bg-cyan-600 !text-white hover:!bg-cyan-700 focus:ring-cyan-500 shadow-lg hover:shadow-xl border-0",
+    light: "!bg-gray-100 !text-gray-900 hover:!bg-gray-200 focus:ring-gray-300 shadow-md hover:shadow-lg border border-gray-300",
+    dark: "!bg-gray-900 !text-white hover:!bg-gray-800 focus:ring-gray-500 shadow-lg hover:shadow-xl border-0",
+    outline: "!bg-transparent !text-blue-600 hover:!bg-blue-600 hover:!text-white focus:ring-blue-500 border-2 border-blue-600 shadow-sm hover:shadow-md",
+    ghost: "!bg-transparent !text-gray-600 hover:!bg-gray-100 hover:!text-gray-900 focus:ring-gray-300 border-0 shadow-none hover:shadow-sm"
+  };
+
+  const baseClasses = `
+    inline-flex items-center justify-center
+    rounded-lg transition-all duration-200 ease-in-out
+    focus:outline-none focus:ring-2 focus:ring-offset-2
+    disabled:opacity-50 disabled:cursor-not-allowed
+    transform hover:scale-105 active:scale-95
+  `;
+
+  const widthClass = fullWidth ? "w-full" : "";
 
   return (
     <button
-      className={`${baseClasses} ${variantClasses} ${className}`}
+      className={`
+        ${baseClasses}
+        ${sizeClasses[size]}
+        ${variantClasses[variant]}
+        ${widthClass}
+        ${className}
+      `}
+      disabled={disabled || loading}
       {...props}
     >
-      {children}
+      {loading ? (
+        <>
+          <svg className={`animate-spin ${iconSizes[size]} mr-2`} viewBox="0 0 24 24">
+            <circle 
+              className="opacity-25" 
+              cx="12" 
+              cy="12" 
+              r="10" 
+              stroke="currentColor" 
+              strokeWidth="4" 
+            />
+            <path 
+              className="opacity-75" 
+              fill="currentColor" 
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" 
+            />
+          </svg>
+          Loading...
+        </>
+      ) : (
+        <>
+          {icon && iconPosition === "left" && (
+            <span className={`${iconSizes[size]} mr-2 flex-shrink-0`}>{icon}</span>
+          )}
+          {children}
+          {icon && iconPosition === "right" && (
+            <span className={`${iconSizes[size]} ml-2 flex-shrink-0`}>{icon}</span>
+          )}
+        </>
+      )}
     </button>
   );
 };
@@ -39,7 +117,7 @@ export const Button: React.FC<ButtonProps> = ({
 export const BaseButton = Button;
 export const SharedButton = Button;
 
-// ============= Enrollment Button Component =============
+// ============= Professional Enrollment Button Component =============
 interface Course {
   id: string;
   title: string;
@@ -50,17 +128,19 @@ interface Course {
 
 interface EnrollmentButtonProps {
   course: Course;
-  onEnroll?: (courseId: string) => Promise<{ success: boolean }>;
+  onEnroll?: (courseId: string) => Promise<{ success: boolean; message?: string }>;
+  onCheckout?: () => void;
   className?: string;
-  variant?: "primary" | "secondary";
+  size?: "xs" | "sm" | "md" | "lg" | "xl";
   fullWidth?: boolean;
 }
 
 export const EnrollmentButton: React.FC<EnrollmentButtonProps> = ({
   course,
   onEnroll,
+  onCheckout,
   className = "",
-  variant = "primary",
+  size = "lg",
   fullWidth = false,
 }) => {
   const [isEnrolling, setIsEnrolling] = useState(false);
@@ -72,77 +152,163 @@ export const EnrollmentButton: React.FC<EnrollmentButtonProps> = ({
     try {
       const result = await onEnroll(course.id);
       if (!result.success) {
-        // Use a more gentle warning instead of error
         console.warn("Enrollment was not successful:", result);
       }
     } catch (error) {
-      // Use a more gentle warning instead of error
       console.warn("Enrollment failed:", error);
     } finally {
       setIsEnrolling(false);
     }
   };
 
-  const baseClasses = `
-    group px-8 py-4 font-bold rounded-xl transition-all 
-    disabled:opacity-50 disabled:cursor-not-allowed 
-    shadow-xl hover:shadow-2xl transform hover:scale-105
-  `;
-
-  const variantClasses = {
-    primary: "bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700",
-    secondary: "bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700"
+  const handleCheckout = () => {
+    if (onCheckout) {
+      onCheckout();
+    }
   };
 
-  const widthClass = fullWidth ? "w-full" : "";
-
+  // If enrolled, show success button with enrolled status
   if (course.enrolled) {
     return (
-      <Link 
-        href={`/course-video/${course.id}`}
-        className={`
-          ${baseClasses} 
-          ${variantClasses[variant]} 
-          ${widthClass} 
-          ${className}
-          cursor-pointer inline-flex items-center justify-center gap-2
-        `}
+      <Button
+        variant="success"
+        size={size}
+        fullWidth={fullWidth}
+        className={className}
+        disabled={true}
+        icon={<CheckCircleIcon />}
+        iconPosition="left"
       >
-        Continue Learning 
-        <ArrowRightIcon className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-      </Link>
+        Enrolled - Full Access
+      </Button>
     );
   }
 
+  // If free course, show enrollment button
+  if (course.price === 0) {
+    return (
+      <Button
+        variant="success"
+        size={size}
+        fullWidth={fullWidth}
+        className={className}
+        onClick={handleEnroll}
+        loading={isEnrolling}
+        icon={<SparklesIcon />}
+        iconPosition="right"
+      >
+        Enroll for Free
+      </Button>
+    );
+  }
+
+  // If paid course, show checkout button
   return (
-    <button
-      onClick={handleEnroll}
-      disabled={isEnrolling}
-      className={`
-        ${baseClasses} 
-        ${variantClasses[variant]} 
-        ${widthClass} 
-        ${className}
-        cursor-pointer
-      `}
+    <Button
+      variant="primary"
+      size={size}
+      fullWidth={fullWidth}
+      className={className}
+      onClick={handleCheckout}
+      icon={<ArrowRightIcon />}
+      iconPosition="right"
     >
-      <span className="flex items-center justify-center gap-2">
-        {isEnrolling ? (
-          <>
-            <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-            </svg>
-            Processing...
-          </>
-        ) : (
-          <>
-            Enroll for ${course.price} 
-            <SparklesIcon className="w-5 h-5" />
-          </>
-        )}
-      </span>
-    </button>
+      Buy Now - ${course.price}
+    </Button>
+  );
+};
+
+// ============= Pollable Enrollment Button Component =============
+interface PollableEnrollmentButtonProps {
+  course: Course;
+  onEnroll?: (courseId: string) => Promise<{ success: boolean; message?: string }>;
+  onCheckout?: () => void;
+  refetch?: () => Promise<any>;
+  className?: string;
+  size?: "xs" | "sm" | "md" | "lg" | "xl";
+  fullWidth?: boolean;
+}
+
+export const PollableEnrollmentButton: React.FC<PollableEnrollmentButtonProps> = ({
+  course,
+  onEnroll,
+  onCheckout,
+  refetch,
+  className = "",
+  size = "lg",
+  fullWidth = false,
+}) => {
+  const [localCourse, setLocalCourse] = useState(course);
+  const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const pollCountRef = useRef(0);
+
+  // Check if we recently returned from checkout
+  useEffect(() => {
+    const checkForRecentPurchase = () => {
+      const recentPurchase = sessionStorage.getItem(`recent_purchase_${course.id}`);
+      if (recentPurchase && refetch) {
+        sessionStorage.removeItem(`recent_purchase_${course.id}`);
+        
+        pollCountRef.current = 0;
+        pollIntervalRef.current = setInterval(async () => {
+          pollCountRef.current++;
+          
+          const result = await refetch();
+          if (result && result.data && result.data.enrolled) {
+            setLocalCourse(result.data);
+            if (pollIntervalRef.current) {
+              clearInterval(pollIntervalRef.current);
+              pollIntervalRef.current = null;
+            }
+          }
+          
+          if (pollCountRef.current >= 10) {
+            if (pollIntervalRef.current) {
+              clearInterval(pollIntervalRef.current);
+              pollIntervalRef.current = null;
+            }
+          }
+        }, 3000);
+      }
+    };
+
+    checkForRecentPurchase();
+
+    return () => {
+      if (pollIntervalRef.current) {
+        clearInterval(pollIntervalRef.current);
+      }
+    };
+  }, [course.id, refetch]);
+
+  useEffect(() => {
+    setLocalCourse(course);
+  }, [course]);
+
+  const handleEnrollment = async (courseId: string) => {
+    sessionStorage.setItem(`recent_purchase_${courseId}`, 'true');
+    if (onEnroll) {
+      return onEnroll(courseId);
+    }
+    return { success: false };
+  };
+
+  const handleCheckout = () => {
+    sessionStorage.setItem(`recent_purchase_${course.id}`, 'true');
+    if (onCheckout) {
+      onCheckout();
+    }
+  };
+
+  return (
+    <EnrollmentButton
+      course={localCourse}
+      onEnroll={handleEnrollment}
+      onCheckout={handleCheckout}
+      className={className}
+      size={size}
+      fullWidth={fullWidth}
+    />
   );
 };
 
@@ -486,6 +652,7 @@ export const ProfileButton = () => {
 // Aliases for backward compatibility
 export const CourseEnrollButton = EnrollmentButton;
 export const UserButton = ProfileButton;
+
 
 // Export default for backward compatibility
 export default Button;

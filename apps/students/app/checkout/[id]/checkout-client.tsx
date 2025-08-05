@@ -9,6 +9,7 @@ import { LoadingButton } from "@/app/components/navigation/LoadingButton";
 import { useNavigationLoading } from "@/app/context/NavigationLoadingContext";
 import { useCourseDetails } from "@/app/hooks/useCourses";
 import { useCreateEnrollMutation } from "@/app/redux/services/enroll.services";
+// import { useOrders } from "@/app/hooks/useOrder"; // Temporarily disabled until API issue is resolved
 import { CustomCheckout, useStripeCheckout } from "@unpuzzle/stripe-integration";
 import { useBaseApi } from "@/app/hooks/useBaseApi";
 import { API_ENDPOINTS } from "@/app/config/api.config";
@@ -37,14 +38,44 @@ export default function CheckoutClient({ courseId, initialCourseData }: Checkout
   const api = useBaseApi();
   const { startNavigation } = useNavigationLoading();
   const { course: reduxCourse, loading, error } = useCourseDetails(courseId, initialCourseData);
+  // const { createOrder } = useOrders(); // Temporarily disabled until API issue is resolved
   
+  // Debug logging
+  console.log('CheckoutClient props:', { courseId, initialCourseData });
+  console.log('Redux course:', reduxCourse);
+  
+  // Extract actual course data from API response
+  const extractCourseData = (courseResponse: any) => {
+    if (!courseResponse) return null;
+    
+    // If it's already a course object (has id, title, etc.), return as is
+    if (courseResponse.id && courseResponse.title) {
+      return courseResponse;
+    }
+    
+    // If it's an API response wrapper, extract from body
+    if (courseResponse.success && courseResponse.body) {
+      return courseResponse.body;
+    }
+    
+    // If it has body property but no success, still try body
+    if (courseResponse.body) {
+      return courseResponse.body;
+    }
+    
+    return courseResponse;
+  };
+
   // Prioritize initialCourseData over Redux course to prevent "not found" flash
-  const course = initialCourseData || reduxCourse;
+  const course = extractCourseData(initialCourseData || reduxCourse);
+  console.log('Extracted course:', course);
+  
   const [createEnroll, { isLoading: isEnrolling }] = useCreateEnrollMutation();
   
   const [processingPayment, setProcessingPayment] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [currentOrderId, setCurrentOrderId] = useState<string | null>(null);
   const [isRedirecting, setIsRedirecting] = useState(false);
   
   const { 
@@ -63,19 +94,67 @@ export default function CheckoutClient({ courseId, initialCourseData }: Checkout
 
   // Create Stripe payment intent when course loads
   useEffect(() => {
-    if (course && Number(course.price) > 0 && !clientSecret) {
+    // Ensure course is fully loaded with valid ID
+    if (course && 
+        course.id && 
+        course.id !== 'undefined' && 
+        course.id === courseId && // Ensure the loaded course matches requested courseId
+        Number(course.price) > 0 && 
+        !clientSecret && 
+        !loading) { // Don't create intent while still loading
       handleCreatePaymentIntent();
     }
-  }, [course, clientSecret]);
+  }, [course, clientSecret, courseId, loading]);
 
   const handleCreatePaymentIntent = async () => {
     if (!course || isRedirecting) return;
     
+    // Validate course data
+    if (!course.id || course.id === 'undefined') {
+      console.error('Invalid course ID:', course);
+      setErrors({ payment: 'Invalid course information. Please refresh and try again.' });
+      return;
+    }
+    
     try {
-      console.log('Creating payment intent for course:', course.id);
+      console.log('Creating payment intent for course:', {
+        courseId: course.id,
+        courseIdType: typeof course.id,
+        courseTitle: course.title,
+        coursePrice: course.price,
+        fullCourse: course
+      });
+      
+      // Ensure we have a valid course ID
+      const validCourseId = course.id || courseId;
+      if (!validCourseId || validCourseId === 'undefined' || validCourseId === '[id]') {
+        throw new Error(`Invalid course ID: ${validCourseId}`);
+      }
+      
+      // TODO: Temporarily disable order creation until API issue is resolved
+      // First create the order with pending status
+      // const orderData = await createOrder({
+      //   courseId: validCourseId,
+      //   amount: course.price * 100, // Convert to cents
+      //   currency: 'usd',
+      //   items: [{
+      //     courseId: validCourseId,
+      //     courseName: course.title || 'Course',
+      //     price: course.price * 100,
+      //     quantity: 1
+      //   }]
+      // });
+
+      // if (!orderData || !orderData.data) {
+      //   throw new Error('Failed to create order');
+      // }
+
+      // setCurrentOrderId(orderData.data.id);
       
       const response = await api.post('/stripe/create-course-payment-intent', {
-        courseId: course.id
+        courseId: validCourseId
+        // TODO: Add orderId when order creation is working
+        // orderId: orderData.data.id // Pass order ID to link with payment intent
       });
 
       console.log('Payment intent response:', response);
@@ -141,8 +220,13 @@ export default function CheckoutClient({ courseId, initialCourseData }: Checkout
     );
   }
 
-  // Additional safety check - ensure course and price are available
-  if (!course || course.price === undefined || course.price === null) {
+  // Additional safety check - ensure course is properly loaded with valid data
+  if (!course || 
+      !course.id || 
+      course.id === 'undefined' ||
+      course.id !== courseId ||
+      course.price === undefined || 
+      course.price === null) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -154,11 +238,11 @@ export default function CheckoutClient({ courseId, initialCourseData }: Checkout
   }
 
   if (course.enrolled) {
-    router.push(`/courses/${courseId}/learn`);
+    router.push(`/courses/${courseId}`);
     return null;
   }
 
-  const totalVideos = course.chapters?.reduce((acc, chapter) => acc + (chapter.videos?.length || 0), 0) || 0;
+  const totalVideos = course.chapters?.reduce((acc: number, chapter: any) => acc + (chapter.videos?.length || 0), 0) || 0;
   const coursePrice = Number(course.price) || 0;
   const originalPrice = coursePrice * 1.5;
   const discount = originalPrice - coursePrice;
@@ -167,14 +251,13 @@ export default function CheckoutClient({ courseId, initialCourseData }: Checkout
   const handlePaymentSuccess = async () => {
     if (!course) return;
     
-    // Payment succeeded - webhook will handle enrollment automatically
-    console.log('Payment successful! Webhook will handle enrollment.');
+    // Payment succeeded - redirect back to course page (original flow)
+    console.log('Payment successful! Redirecting to course...');
     
-    // Brief delay to allow webhook processing, then redirect to course details
-    setTimeout(() => {
-      startNavigation();
-      router.push(`/courses/${courseId}`);
-    }, 1500);
+    // TODO: When order tracking is working, redirect to track/${currentOrderId}
+    // For now, redirect back to course with refresh parameter
+    startNavigation();
+    router.push(`/courses/${courseId}?refresh=${Date.now()}`);
   };
 
   const handlePaymentError = (error: string) => {
@@ -184,15 +267,49 @@ export default function CheckoutClient({ courseId, initialCourseData }: Checkout
   const handleFreeEnrollment = async () => {
     if (!course) return;
     
+    // Validate course data
+    if (!course.id || course.id === 'undefined') {
+      console.error('Invalid course ID:', course);
+      setErrors({ payment: 'Invalid course information. Please refresh and try again.' });
+      return;
+    }
+    
     setProcessingPayment(true);
     try {
+      // Ensure we have a valid course ID
+      const validCourseId = course.id || courseId;
+      if (!validCourseId || validCourseId === 'undefined' || validCourseId === '[id]') {
+        throw new Error(`Invalid course ID: ${validCourseId}`);
+      }
+      
+      // TODO: Temporarily disable order creation until API issue is resolved
+      // Create order for free course
+      // const orderData = await createOrder({
+      //   courseId: validCourseId,
+      //   amount: 0, // Free course
+      //   currency: 'usd',
+      //   items: [{
+      //     courseId: validCourseId,
+      //     courseName: course.title || 'Course',
+      //     price: 0,
+      //     quantity: 1
+      //   }]
+      // });
+
+      // if (!orderData || !orderData.data) {
+      //   throw new Error('Failed to create order');
+      // }
+
+      // For free courses, directly enroll the user
       const response = await api.post('/enroll', {
-        courseId: course.id 
+        courseId: validCourseId
+        // TODO: Add orderId when order creation is working
+        // orderId: orderData.data.id 
       });
       
       if (response.success) {
         startNavigation();
-        router.push(`/courses/${courseId}`);
+        router.push(`/courses/${courseId}?refresh=${Date.now()}`);
       } else {
         console.error('Free enrollment failed:', response.error);
         setErrors({ payment: response.error || 'Enrollment failed. Please try again.' });

@@ -113,7 +113,16 @@ export const useCourses = () => {
     const response = await api.get<Course>(`/courses/${courseId}`);
     
     if (response.success && response.data) {
-      dispatch(setCourse(response.data));
+      // Extract actual course data from nested response
+      let courseData = response.data;
+      
+      // If response.data is wrapped in another response object, extract from body
+      if (courseData && typeof courseData === 'object' && 'body' in courseData) {
+        courseData = (courseData as any).body;
+      }
+      
+      console.log('fetchCourseById - Setting course data:', courseData);
+      dispatch(setCourse(courseData));
       dispatch(fetchCoursesFailure(''));
     } else {
       dispatch(fetchCoursesFailure(response.error || 'Failed to fetch course'));
