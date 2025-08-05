@@ -344,7 +344,7 @@ export function LoadingOverlay({
 
   return createPortal(
     <div 
-      className="loading-overlay-root fixed inset-0 bg-gradient-to-br from-blue-950/60 via-purple-950/60 to-indigo-950/60 backdrop-blur-md flex items-center justify-center"
+      className="loading-overlay-root fixed inset-0 flex items-center justify-center"
       style={{ 
         zIndex: 2147483647,
         position: 'fixed',
@@ -352,14 +352,18 @@ export function LoadingOverlay({
         left: 0,
         right: 0,
         bottom: 0,
-        pointerEvents: 'auto'
+        pointerEvents: 'auto',
+        background: 'rgba(255, 255, 255, 0.3)',
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)'
       }}
     >
       <div 
-        className="bg-white/95 backdrop-blur-lg rounded-3xl p-12 shadow-[0_20px_70px_-15px_rgba(0,0,0,0.3)] flex flex-col items-center gap-8 border border-white/20"
+        className="backdrop-blur-lg rounded-3xl p-12 shadow-[0_20px_70px_-15px_rgba(0,0,0,0.4)] flex flex-col items-center gap-8 border border-gray-200"
         style={{ 
           animation: 'slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
-          background: 'linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(249,250,251,0.98) 100%)',
+          background: 'rgba(255, 255, 255, 0.95)',
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.05)',
           zIndex: 2147483647,
           minWidth: '320px'
         }}
