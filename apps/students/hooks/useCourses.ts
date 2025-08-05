@@ -405,6 +405,94 @@ export const useEnrolledCourses = () => {
   };
 };
 
+// Hook for My Learning page - uses dedicated endpoint
+export const useMyLearning = (options?: {
+  page?: number;
+  limit?: number;
+  search?: string;
+  category?: string;
+  status?: string;
+  sort?: string;
+}) => {
+  const api = useBaseApi();
+  const [myLearning, setMyLearning] = useState<Course[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCourses, setTotalCourses] = useState(0);
+  const [hasInitialized, setHasInitialized] = useState(false);
+  
+  const fetchMyLearning = useCallback(async (fetchOptions?: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    category?: string;
+    status?: string;
+    sort?: string;
+  }) => {
+    setLoading(true);
+    setError(null);
+    
+    const params: Record<string, any> = {
+      page: fetchOptions?.page || options?.page || 1,
+      limit: fetchOptions?.limit || options?.limit || 15,
+      ...(fetchOptions?.search && { search: fetchOptions.search }),
+      ...(fetchOptions?.category && fetchOptions.category !== "all" && { category: fetchOptions.category }),
+      ...(fetchOptions?.status && fetchOptions.status !== "all" && { status: fetchOptions.status }),
+      ...(fetchOptions?.sort && { sort: fetchOptions.sort }),
+    };
+    
+    try {
+      const response = await api.get<{ 
+        body: { 
+          data: Course[]; 
+          total_page: number; 
+          count: number; 
+        }; 
+        message: string; 
+        success: boolean; 
+      }>(
+        '/my-learning',
+        { params }
+      );
+      
+      if (response.success && response.data) {
+        const apiBody = response.data.body || response.data;
+        const coursesData = apiBody.data || [];
+        
+        setMyLearning(coursesData);
+        setTotalPages(apiBody.total_page || 1);
+        setTotalCourses(apiBody.count || coursesData.length);
+      } else {
+        setError(response.error || 'Failed to fetch enrolled courses');
+      }
+    } catch (error) {
+      console.error('Failed to fetch enrolled courses:', error);
+      setError('Failed to fetch enrolled courses');
+    } finally {
+      setLoading(false);
+    }
+  }, [api, options]);
+
+  // Auto-fetch on mount only once
+  useEffect(() => {
+    if (!hasInitialized) {
+      setHasInitialized(true);
+      fetchMyLearning();
+    }
+  }, [hasInitialized, fetchMyLearning]);
+  
+  return {
+    myLearning,
+    loading,
+    error,
+    totalPages,
+    totalCourses,
+    fetchMyLearning,
+    refetch: () => fetchMyLearning(),
+  };
+};
+
 // Hook for popular courses
 export const usePopularCourses = (limit = 8) => {
   const { popularCourses, fetchPopularCourses, loading, error } = useCourses();

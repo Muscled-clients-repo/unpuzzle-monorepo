@@ -81,6 +81,14 @@ export interface Course {
   category?: string;
   rating?: number;
   reviewCount?: number;
+  // My Learning specific properties
+  progress?: number;
+  instructor?: string;
+  lastAccessed?: string;
+  enrolledAt?: string;
+  enrollmentId?: string;
+  chapters_count?: number;
+  videos_count?: number;
 }
 
 export interface CoursesData {

@@ -17,6 +17,7 @@ import ordersRoutes from "./orders.routes";
 import { errorHandler } from "../../utility/errorHandler";
 import productRoutes from "./product.routes";
 import courseRoutes from "./course.routes";
+import myLearningRoutes from "./myLearning.routes";
 import userAuthRoutes from "./userAuth.routes";
 import stripeRoutes from "./stripe.routes";
 import userRoutes from "./user.routes";
@@ -31,6 +32,7 @@ router.use("/products", productRoutes);
 
 router.use("/activity-logs", activityLogs);
 router.use("/courses", courseRoutes);
+router.use("/my-learning", myLearningRoutes);
 router.use("/chapters", chapters);
 
 router.use("/health", healthRoutes);

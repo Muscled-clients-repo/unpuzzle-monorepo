@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useEnrolledCourses } from "@/hooks/useCourses";
+import { useMyLearning } from "@/hooks/useCourses";
 import { LoadingSpinner } from "@unpuzzle/ui";
 import Link from "next/link";
 import Image from "next/image";
@@ -22,8 +22,6 @@ interface FilterState {
 }
 
 export default function MyCoursesClient() {
-  const { enrolledCourses = [], loading, error } = useEnrolledCourses();
-  
   const [filters, setFilters] = useState<FilterState>({
     search: "",
     status: "all",
@@ -32,39 +30,31 @@ export default function MyCoursesClient() {
   });
   
   const [showFilters, setShowFilters] = useState(false);
+  
+  const { 
+    myLearning: enrolledCourses = [], 
+    loading, 
+    error, 
+    totalCourses,
+    fetchMyLearning 
+  } = useMyLearning();
 
-  // Filter courses based on current filters
-  const filteredCourses = enrolledCourses.filter(course => {
-    // Search filter
-    if (filters.search && !course.title.toLowerCase().includes(filters.search.toLowerCase())) {
-      return false;
-    }
+  // Debounced search to avoid too many API calls
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      fetchMyLearning({
+        search: filters.search || undefined,
+        category: filters.category !== "all" ? filters.category : undefined,
+        status: filters.status !== "all" ? filters.status : undefined,
+        sort: filters.sortBy
+      });
+    }, 300);
     
-    // Status filter
-    if (filters.status === "in-progress" && course.progress >= 100) return false;
-    if (filters.status === "completed" && course.progress < 100) return false;
-    
-    // Category filter - implement based on your category structure
-    if (filters.category !== "all" && course.category !== filters.category) {
-      return false;
-    }
-    
-    return true;
-  });
+    return () => clearTimeout(timeoutId);
+  }, [filters, fetchMyLearning]);
 
-  // Sort courses
-  const sortedCourses = [...filteredCourses].sort((a, b) => {
-    switch (filters.sortBy) {
-      case "recent":
-        return new Date(b.enrolledAt || b.createdAt).getTime() - new Date(a.enrolledAt || a.createdAt).getTime();
-      case "alphabetical":
-        return a.title.localeCompare(b.title);
-      case "progress":
-        return (b.progress || 0) - (a.progress || 0);
-      default:
-        return 0;
-    }
-  });
+  // API handles filtering and sorting, so we use courses directly
+  const sortedCourses = enrolledCourses;
 
   if (loading) {
     return (
@@ -91,7 +81,7 @@ export default function MyCoursesClient() {
           <p className="text-gray-600 mt-1">Track and continue your enrolled courses</p>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-600">{sortedCourses.length} courses</span>
+          <span className="text-sm text-gray-600">{totalCourses || sortedCourses.length} courses</span>
         </div>
       </div>
 
@@ -189,6 +179,17 @@ export default function MyCoursesClient() {
                   Status: {filters.status}
                   <button
                     onClick={() => setFilters({ ...filters, status: "all" })}
+                    className="ml-2 text-gray-400 hover:text-gray-600"
+                  >
+                    ×
+                  </button>
+                </span>
+              )}
+              {filters.category !== "all" && (
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-white border border-gray-300">
+                  Category: {filters.category}
+                  <button
+                    onClick={() => setFilters({ ...filters, category: "all" })}
                     className="ml-2 text-gray-400 hover:text-gray-600"
                   >
                     ×
