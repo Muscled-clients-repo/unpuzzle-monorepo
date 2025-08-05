@@ -89,7 +89,7 @@ const CourseScreen: React.FC = () => {
   const handleButtonClick = async () => {
     if (selectedIndexes.length > 0) {
       try {
-        await Promise.all(selectedIndexes.map((id: string) => deleteCourses(id).unwrap()));
+        await Promise.all(selectedIndexes.map((id: string) => deleteCourses(id)));
         dispatch(clearIndexes());
       } catch (error) {}
     } else {

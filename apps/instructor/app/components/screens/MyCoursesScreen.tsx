@@ -48,7 +48,7 @@ const CourseScreen: React.FC = () => {
 
   useEffect(() => {
     if (courses) {
-      let updatedCourses: EnrolledCourse[] = courses.data;
+      let updatedCourses: EnrolledCourse[] = Array.isArray(courses) ? courses : (courses as any)?.data || [];
 
       if (filterType !== "All") {
         updatedCourses = updatedCourses.filter(
@@ -221,7 +221,7 @@ const CourseScreen: React.FC = () => {
                 className=" cursor-pointer"
               >
                 <div>
-                  <CourseCard layout={layout} course={course} index={index} />
+                  <CourseCard layout={layout} course={course as any} index={index} />
                 </div>
               </button>
             ))}

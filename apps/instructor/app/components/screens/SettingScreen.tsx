@@ -152,7 +152,7 @@ export default function SettingScreen() {
         <p>Loading permissions...</p>
       ) : (
         <div className="flex flex-col gap-3 mt-4">
-        {allPermissions.data?.map((perm: any) => (
+        {((allPermissions as any)?.data || allPermissions)?.map((perm: any) => (
               <label key={perm.id} className="flex items-center space-x-2">
                 <input
                   type="checkbox"

@@ -106,7 +106,7 @@ const StripeGateway: React.FC<StripeGatewayProps> = ({
         billingDetails
       );
 
-      if (result.status === 'succeeded') {
+      if (result?.status === 'succeeded') {
         setPaymentMessage(`Payment successful and payment id is: ${result.id}`);
       }
     } catch (error: any) {
