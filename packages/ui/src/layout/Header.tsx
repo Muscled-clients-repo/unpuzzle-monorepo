@@ -22,7 +22,7 @@ const navigation = {
     student:[
         { name: 'Home', href: '/', icon: HomeIcon },
         { name: 'Courses', href: '/courses', icon: BookOpenIcon },
-        { name: 'My Courses', href: '/my-courses', icon: AcademicCapIcon },
+        { name: 'My Courses', href: '/dashboard/my-learning', icon: AcademicCapIcon },
         { name: 'Puzzle Content', href: '/puzzle-content', icon: PuzzlePieceIcon },
         { name: 'Settings', href: '/settings', icon: Cog6ToothIcon },
     ]
@@ -77,13 +77,9 @@ export function Header({ variant = "student" }: HeaderProps) {
               }}
               className="flex items-center space-x-2"
             >
-              <Image
-                src="/assets/logo.svg"
-                alt="Unpuzzle"
-                width={32}
-                height={32}
-                className="h-8 w-8"
-              />
+              <div className="h-8 w-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                <PuzzlePieceIcon className="h-5 w-5 text-white" />
+              </div>
               <span className="text-2xl font-bold text-gray-900">Unpuzzle</span>
             </Link>
           </div>
