@@ -8,18 +8,34 @@ import VideosIconWhite from '../../public/assets/VideosIconWhite.svg';
 import AssetsIconWhite from '../../public/assets/AssetsIconWhite.svg';
 import CoursesIconWhite from '../../public/assets/CoursesIconWhite.svg';
 import SettingsIconWhite from '../../public/assets/SettingsIconWhite.svg';
+import UserIcon from '../../public/assets/user.svg'
+import allCourse from '../../public/assets/allCoursesBlack.svg'
+import allCourseWhite from '../../public/assets/allCoursesWhite.svg'
+import myCourse from '../../public/assets/myCourses.svg'
+import myCourseWhite from '../../public/assets/myCoursesWhite.svg'
+import puzzleContent from '../../public/assets/puzzleContentBlack.svg'
+import puzzleContentWhite from '../../public/assets/puzzleContentWhite.svg'
 
 
 import { MenuItem } from '../types/lib.types';
 
-// Instructor menu items for the instructor-only application
-export const menuItems : MenuItem[] = [
-  { label: "Editor", path: "/instructor/video-editor", icon: [EditorIcon, EditorIconWhite] },
-  { label: "Assets", path: "/instructor/assets", icon: [AssetsIcon, AssetsIconWhite]},
-  { label: "Videos", path: "/instructor/videos", icon: [VideosIcon, VideosIconWhite]},
-  { label: "Courses", path: "/instructor/courses", icon: [CoursesIcon, CoursesIconWhite]},
-  { label: "Settings", path: "/instructor/settings", icon: [SettingsIcon, SettingsIconWhite]},
+export const menuItemsTeachers : MenuItem[] = [
+  { label: "Editor", path: "/editor", icon: [EditorIcon, EditorIconWhite] },
+  { label: "Assets", path: "/my-assets", icon: [AssetsIcon, AssetsIconWhite]},
+  { label: "Videos", path: "/videos", icon: [VideosIcon, VideosIconWhite]},
+  { label: "Courses", path: "/courses", icon: [CoursesIcon, CoursesIconWhite]},
+  { label: "Settings", path: "/settings", icon: [SettingsIcon, SettingsIconWhite]},
 ];
 
-// Legacy export for backward compatibility (remove after updating all imports)
-export const menuItemsTeachers = menuItems;
+export const menuItemsStudents : MenuItem[] = [
+  { label: "All Courses", path: "/all-courses", icon: [allCourse, allCourseWhite] },
+  { label: "My Courses", path: "/my-courses", icon: [myCourse, myCourseWhite] },
+  { label: "Puzzle Content", path: "/puzzle-content", icon: [puzzleContent, puzzleContentWhite] },
+  { label: "Settings", path: "/settings", icon: [SettingsIcon, SettingsIconWhite] },
+];
+
+export const menuItemsAdmin : MenuItem[] = [ 
+  { label: "Admin", path: "/admin", icon: UserIcon },
+  { label: "Courses", path: "/courses", icon: CoursesIcon },
+  { label: "Settings", path: "/settings", icon: [SettingsIcon, SettingsIconWhite] },
+];

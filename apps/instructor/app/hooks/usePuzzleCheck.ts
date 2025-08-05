@@ -1,6 +1,15 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import io from "socket.io-client";
-import { PuzzleCheck } from "../context/PuzzleCheck";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  setPuzzleChecksLoading,
+  setCurrentCheckData,
+  setCheckStreamData,
+  setCheckScore,
+  setPuzzleChecksError,
+} from "../redux/features/puzzleAgents/puzzleAgentsSlice";
+import { RootState } from "../redux/store";
+import { apiClient } from "../utils/apiClient";
 
 interface PuzzleCheckData {
   completion?: any[];
@@ -9,77 +18,31 @@ interface PuzzleCheckData {
   [key: string]: any;
 }
 
-interface PuzzleCheckInterface {
-  data: PuzzleCheckData | null;
-  totalScore: number;
-  score: number;
-  index: number;
-  setLoading: (loading: boolean) => void;
-  showStream: (data: string) => void;
-  updateCheck: (data?: PuzzleCheckData) => void;
-  onDataChange: (callback: (data: PuzzleCheckData | null) => void) => void;
-  onLoadingChange: (callback: (loading: boolean) => void) => void;
-  onStreamChange: (callback: (streamData: string) => void) => void;
-  onScoreChange: (callback: (score: number, totalScore: number, index: number) => void) => void;
-}
-
 export function usePuzzleCheck(socketId: string | null) {
-  const [data, setData] = useState<PuzzleCheckData | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [streaming, setStreaming] = useState(false);
-  const [streamData, setStreamData] = useState("");
-  const [score, setScore] = useState(0);
-  const [totalScore, setTotalScore] = useState(0);
-  const [index, setIndex] = useState(0);
+  const dispatch = useDispatch();
+  const {
+    currentData: data,
+    loading,
+    streamData,
+    score,
+    totalScore,
+    index,
+  } = useSelector((state: RootState) => state.puzzleAgents.checks);
 
   const socketRef = useRef<any>(null);
-  const checkInterfaceRef = useRef<PuzzleCheckInterface | null>(null);
   const streamingRef = useRef(false);
-  // Initialize PuzzleCheckInterface
-  useEffect(() => {
-    if (!checkInterfaceRef.current) {
-      checkInterfaceRef.current = new PuzzleCheck();
-
-      // Set up event listeners
-      checkInterfaceRef.current.onDataChange(
-        (newData: PuzzleCheckData | null) => {
-          setData(newData);
-        }
-      );
-
-      checkInterfaceRef.current.onLoadingChange((loading: boolean) => {
-        setLoading(loading);
-      });
-
-      checkInterfaceRef.current.onStreamChange((streamData: string) => {
-        setStreamData(streamData);
-      });
-
-      checkInterfaceRef.current.onScoreChange(
-        (score: number, totalScore: number, index: number) => {
-          setScore(score);
-          setTotalScore(totalScore);
-          setIndex(index);
-        }
-      );
-    }
-  }, []);
 
   // Setup socket connection
   useEffect(() => {
-    if (!socketId || !checkInterfaceRef.current) return;
+    if (!socketId) return;
 
     const socket = io(window.location.origin);
     socketRef.current = socket;
 
-    socket.on(`check-stream_${socketId}`, (data: { message: string }) => {
-      if (streamingRef.current && checkInterfaceRef.current) {
-        const currentData = checkInterfaceRef.current.data;
-        const updatedData = {
-          ...currentData,
-          message: (currentData?.message || "") + data.message,
-        };
-        checkInterfaceRef.current.showStream(updatedData.message || "");
+    socket.on(`check-stream_${socketId}`, (socketData: { message: string }) => {
+      if (streamingRef.current) {
+        const currentMessage = (data?.message || "") + socketData.message;
+        dispatch(setCheckStreamData(currentMessage));
       }
     });
 
@@ -91,7 +54,8 @@ export function usePuzzleCheck(socketId: string | null) {
   // Listen for puzzle-check:generate event
   useEffect(() => {
     const handlePuzzleCheckGenerate = () => {
-      getCheck();
+      // getCheck needs parameters, so this event handler should be updated
+      console.log("puzzle-check:generate event received");
     };
 
     document.addEventListener(
@@ -107,67 +71,74 @@ export function usePuzzleCheck(socketId: string | null) {
     };
   }, []);
 
-  const getCheck = useCallback(async (params?: {id:string,duration:number}) => {
-    if (!checkInterfaceRef.current) return;
+  const getCheck = useCallback(
+    async ({ id, duration }: { id: string; duration: number }) => {
+      if (!id) {
+        console.error("Video not available");
+        return;
+      }
 
-    const { id, duration } = params || {};
-    if (!id || !duration) {
-      console.error(!id ? "Video not available" : "Duration not provided");
-      return;
-    }
+      dispatch(setPuzzleChecksLoading(true));
+      streamingRef.current = true;
 
-    checkInterfaceRef.current.setLoading(true);
-    streamingRef.current = true;
-    setStreaming(true);
-
-    try {
-      const response = await fetch(
-        `${
+      try {
+        // const response = await fetch(
+        //   `${
+        //     process.env.NEXT_PUBLIC_APP_SERVER_URL
+        //   }/api/puzzel-checks?videoId=${encodeURIComponent(
+        //     id
+        //   )}&endTime=${encodeURIComponent(duration)}`,
+        //   {
+        //     headers: {
+        //       Authorization: `Bearer ${token}`,
+        //       "Content-Type": "application/json",
+        //     },
+        //   }
+        // );
+        // streamingRef.current = false;
+        // const json = await response.json();
+        // const { data } = json;
+        const url = `${
           process.env.NEXT_PUBLIC_APP_SERVER_URL
         }/api/puzzel-checks?videoId=${encodeURIComponent(
           id
-        )}&endTime=${encodeURIComponent(duration)}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      streamingRef.current = false;
-      setStreaming(false);
-      const json = await response.json();
-      const { data } = json;
-      console.log("Puzzle check data:", data);
+        )}&endTime=${encodeURIComponent(duration)}`;
 
-      if (checkInterfaceRef.current) {
-        checkInterfaceRef.current.data = data;
-        checkInterfaceRef.current.totalScore = data.completion?.length || 0;
-        checkInterfaceRef.current.score = 0;
-        checkInterfaceRef.current.index = 0;
+        const data = await apiClient({
+          url,
+          method: "GET",
+          isJson: true,
+        });
 
-        setTimeout(() => {
-          checkInterfaceRef.current?.updateCheck();
-        }, 100);
+        dispatch(setCurrentCheckData(data));
+        dispatch(
+          setCheckScore({
+            score: 0,
+            totalScore: data.completion?.length || 0,
+            index: 0,
+          })
+        );
+        dispatch(setPuzzleChecksLoading(false));
+        return data;
+      } catch (error: any) {
+        console.error(error);
+        streamingRef.current = false;
+        dispatch(setCurrentCheckData({ error: error.message }));
+        dispatch(setPuzzleChecksError(error.message));
+        dispatch(setPuzzleChecksLoading(false));
       }
-      return data;
-    } catch (error: any) {
-      console.error(error);
-      streamingRef.current = false;
-      setStreaming(false);
-      checkInterfaceRef.current?.updateCheck({ error: error.message });
-      checkInterfaceRef.current?.setLoading(false);
-    }
-  }, []);
+    },
+    [dispatch]
+  );
 
   return {
     data,
     loading,
-    streaming,
+    streaming: streamingRef.current,
     streamData,
     score,
     totalScore,
     index,
     getCheck,
-    checkInterface: checkInterfaceRef.current,
   };
 }

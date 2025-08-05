@@ -1,6 +1,3 @@
-import { Asset } from './assets.types';
-import { AiFile } from './videoeditor.types';
-
 // export interface Video {
 //     title: string;
 //     duration: string;
@@ -17,13 +14,6 @@ export interface Video {
   end_time?: number;
   created_at?: string;
   updated_at?: string;
-  instructor?: {
-    name?: string;
-    avatar?: string;
-    bio?: string;
-  };
-  assets?: Asset[];
-  aiFiles?: AiFile[];
 }
  export interface Module {
     title: string;

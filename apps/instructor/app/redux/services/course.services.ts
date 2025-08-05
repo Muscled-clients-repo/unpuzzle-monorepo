@@ -1,99 +1,148 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import type { BaseQueryFn } from '@reduxjs/toolkit/query';
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { createApiClientBaseQuery } from "./baseQuery";
+import { CoursesApiResponse, EnrolledCourse } from "../../types/course.types";
 
-const BASE_URL = process.env.NEXT_PUBLIC_APP_SERVER_URL || 'https://dev.nazmulcodes.org';
-
-// Create a dynamic base query that accepts token as parameter
-const dynamicBaseQuery: BaseQueryFn = async (args, api, extraOptions) => {
-  // Extract token from the args if it's passed
-  let token: string | undefined;
-  let actualArgs = args;
-  
-  if (typeof args === 'object' && args !== null && 'token' in args) {
-    token = (args as any).token;
-    // Remove token from args before passing to fetchBaseQuery
-    const { token: _, ...restArgs } = args as any;
-    actualArgs = restArgs;
-  }
-  
-  // Remove verbose logging in production
-  if (process.env.NODE_ENV === 'development') {
-    console.log('API Request:', {
-      baseUrl: BASE_URL,
-      endpoint: (actualArgs as any)?.url || actualArgs,
-      hasToken: !!token,
-    });
-  }
-  
-  const rawBaseQuery = fetchBaseQuery({
-    baseUrl: BASE_URL,
-    prepareHeaders: (headers) => {
-      if (token) {
-        headers.set('Authorization', `Bearer ${token}`);
-      }
-      headers.set('Content-Type', 'application/json');
-      return headers;
-    },
-  });
-  
-  try {
-    const result = await rawBaseQuery(actualArgs, api, extraOptions);
-    if (process.env.NODE_ENV === 'development') {
-      console.log('API Response:', {
-        error: result.error,
-        hasData: !!result.data,
-        status: (result.meta as any)?.response?.status
-      });
-    }
-    return result;
-  } catch (error) {
-    console.error('API Request failed:', error);
-    throw error;
-  }
-};
+// Use centralized API client with automatic token handling
+const baseQuery = createApiClientBaseQuery();
 
 export const courseApi = createApi({
-  reducerPath: 'courseApi',
-  baseQuery: dynamicBaseQuery,
-  tagTypes: ['Courses'],
+  reducerPath: "courseApi",
+  baseQuery: baseQuery, // Now uses centralized apiClient with automatic token handling
+  tagTypes: ["Courses"],
   endpoints: (build) => ({
-    getCourses: build.query({
-      query: (token?: string) => ({
-        url: '/api/courses',
-        ...(token && { token }),
+    getCourses: build.query<
+      CoursesApiResponse,
+      { page?: number; limit?: number }
+    >({
+      query: (params = {}) => {
+        const { page = 1, limit = 10 } = params;
+        return {
+          url: `/api/courses/?page=${page}&limit=${limit}`,
+        };
+      },
+      providesTags: ["Courses"],
+      transformResponse: (response: any): CoursesApiResponse => {
+        console.log("-----------------response-----------------:", response);
+        // Handle new API structure with body.data
+        if (response && response.success && response.body) {
+          return {
+            data: response.body.data as EnrolledCourse[],
+            count: response.body.count,
+            totalPages: response.body.total_page,
+          };
+        }
+        return response;
+      },
+    }),
+    getCourseById: build.query({
+      query: ({ id }: { id: string }) => ({
+        url: `/api/courses/${id}`,
       }),
-      providesTags: ['Courses'],
+      providesTags: ["Courses"],
+      transformResponse: (response: any) => {
+        // If the response has a body property, return just the body
+        if (response && response.success && response.body) {
+          return response.body;
+        }
+        // If the response has a data property (old format), return just the data
+        if (response && response.success && response.data) {
+          return response.data;
+        }
+        // Otherwise return the response as is
+        return response;
+      },
     }),
     createCourse: build.mutation({
-      query: ({ coursePayload, token }: { coursePayload: any; token?: string }) => ({
-        url: '/api/courses',
-        method: 'POST',
+      query: ({ coursePayload }: { coursePayload: any }) => ({
+        url: "/api/courses",
+        method: "POST",
         body: coursePayload,
-        ...(token && { token }),
       }),
-      invalidatesTags: ['Courses'],
+      invalidatesTags: ["Courses"],
     }),
     deleteCourse: build.mutation({
-      query: ({ courseId, token }: { courseId: string; token?: string }) => ({
+      query: ({ courseId }: { courseId: string }) => ({
         url: `/api/courses/${courseId}`,
-        method: 'DELETE',
-        ...(token && { token }),
+        method: "DELETE",
       }),
-      invalidatesTags: ['Courses'],
+      invalidatesTags: ["Courses"],
     }),
     updateCourse: build.mutation({
-      query: ({ courseId, updatedData, token }: { courseId: string; updatedData: any; token?: string }) => ({
+      query: ({
+        courseId,
+        updatedData,
+      }: {
+        courseId: string;
+        updatedData: any;
+      }) => ({
         url: `/api/courses/${courseId}`,
-        method: 'PUT',
+        method: "PUT",
         body: updatedData,
-        ...(token && { token }),
       }),
-      invalidatesTags: ['Courses'], // Ensure UI updates after update
+      invalidatesTags: ["Courses"], // Ensure UI updates after update
+    }),
+    getChaptersByCourseId: build.query({
+      query: ({
+        courseId,
+        page = 1,
+        limit = 10,
+      }: {
+        courseId: string;
+        page?: number;
+        limit?: number;
+      }) => ({
+        url: `/api/chapters?course_id=${courseId}&page=${page}&limit=${limit}`,
+      }),
+      providesTags: ["Courses"],
+      transformResponse: (response: any) => {
+        // Handle new API structure with body.data
+        if (response && response.success && response.body) {
+          return {
+            data: response.body.data,
+            count: response.body.count,
+            totalPages: response.body.total_page,
+          };
+        }
+        return response;
+      },
+    }),
+    getVideosByChapterId: build.query({
+      query: ({
+        chapterId,
+        page = 1,
+        limit = 10,
+      }: {
+        chapterId: string;
+        page?: number;
+        limit?: number;
+      }) => ({
+        url: `/api/videos?chapter_id=${chapterId}&page=${page}&limit=${limit}`,
+      }),
+      providesTags: ["Courses"],
+      transformResponse: (response: any) => {
+        // Handle new API structure with body.data
+        if (response && response.success && response.body) {
+          return {
+            data: response.body.data,
+            count: response.body.count,
+            totalPages: response.body.total_page,
+          };
+        }
+        return response;
+      },
     }),
   }),
 });
 
-export const { useGetCoursesQuery, useCreateCourseMutation, useDeleteCourseMutation, useUpdateCourseMutation } = courseApi;
+export const {
+  useGetCoursesQuery,
+  useGetCourseByIdQuery,
+  useCreateCourseMutation,
+  useDeleteCourseMutation,
+  useUpdateCourseMutation,
+  useGetChaptersByCourseIdQuery,
+  useGetVideosByChapterIdQuery,
+} = courseApi;
 
 // Usage:
 // 1. After login, dispatch setToken(token) to Redux.

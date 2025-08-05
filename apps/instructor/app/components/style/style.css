@@ -1,0 +1,16 @@
+.clip-border {
+    border-right: 0.5px solid white;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+.pretty-scrollbar::-webkit-scrollbar{
+    width: 6px;
+}
+
+.pretty-scrollbar::-webkit-scrollbar-thumb{
+    background-color: rgba(217, 217, 217, 1);
+    border-radius: 10px;
+}

@@ -1,15 +1,19 @@
 "use client";
 import React, { createContext, useState, useCallback, ReactNode } from "react";
-import useApi from "../hooks/useApi";
-import { Course } from "@/types/course.types";
+import { Course } from "@/app/types/course.types";
+import { api } from "../utils/apiClient";
 
 interface CourseContextType {
-  course:Course | undefined,
+  course: Course | undefined;
   courses: Course[];
   loading: boolean;
   error: string | null;
   getAllCourses: (page?: number, limit?: number) => Promise<Course[]>;
-  getCourseById: (id: string, chapterId?: string, videoId?: string) => Promise<Course | null>;
+  getCourseById: (
+    id: string,
+    chapterId?: string,
+    videoId?: string
+  ) => Promise<Course | null>;
   createCourse: (courseData: Partial<Course>) => Promise<Course | null>;
   updateCourse: (
     id: string,
@@ -28,7 +32,7 @@ interface CourseContextType {
   setVideo: (video: any) => void;
   videoId: string | null;
   setVideoId: (id: string | null) => void;
-  getYouTubeEmbedUrl:(url:string ) => Promise<string>;
+  getYouTubeEmbedUrl: (url: string) => Promise<string>;
 }
 
 const CourseContext = createContext<CourseContextType | undefined>(undefined);
@@ -43,23 +47,14 @@ const CourseProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const api = useApi();
   const getAllCourses = useCallback(
     async (page = 1, limit = 10): Promise<Course[]> => {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_APP_SERVER_URL}/api/courses?page=${page}&limit=${limit}`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-            credentials: "include",
-          }
-        );
-        console.log("response: ", res);
-        const data = await res.json();
+        const data = await api.get<{data: Course[]}>('/api/courses', {
+          params: { page, limit }
+        });
         console.log("data: ", data);
         setCourses(data?.data || []);
         return data?.data || [];
@@ -70,46 +65,48 @@ const CourseProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         setLoading(false);
       }
     },
-    [api]
+    []
   );
 
   const getCourseById = useCallback(
-    async (id: string, chapterIdParam?: string, videoIdParam?: string): Promise<Course | null> => {
+    async (
+      id: string,
+      chapterIdParam?: string,
+      videoIdParam?: string
+    ): Promise<Course | null> => {
       setLoading(true);
       setError(null);
       try {
-        // const data = await api.get(`${}/api/courses/${id}`);
-        // return data;
-        console.log("id is: ",id)
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_APP_SERVER_URL}/api/courses/${id}`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-            credentials: "include",
-          }
-        );
-        // console.log("response: ", res);
-        const data = await res.json();
+        const data = await api.get<Course>(`/api/courses/${id}`);
         console.log("data: ", data);
-        setCourse(data?.data||null)
+        setCourse(data || null);
         // Set chapter and video globally
-        if (data?.data?.chapters?.length > 0) {
+        const courseData = data;
+        if (courseData?.chapters?.length > 0) {
           let selectedChapter = null;
-          if (chapterIdParam && data.data.chapters.some((ch: any) => ch.id === chapterIdParam)) {
-            selectedChapter = data.data.chapters.find((ch: any) => ch.id === chapterIdParam);
+          if (
+            chapterIdParam &&
+            courseData.chapters.some((ch: any) => ch.id === chapterIdParam)
+          ) {
+            selectedChapter = courseData.chapters.find(
+              (ch: any) => ch.id === chapterIdParam
+            );
             setChapterId(chapterIdParam);
           } else {
-            selectedChapter = data.data.chapters[0];
-            setChapterId(data.data.chapters[0].id);
+            selectedChapter = courseData.chapters[0];
+            setChapterId(courseData.chapters[0].id);
           }
           setChapter(selectedChapter);
 
           if (selectedChapter?.videos?.length > 0) {
             let selectedVideo = null;
-            if (videoIdParam && selectedChapter.videos.some((v: any) => v.id === videoIdParam)) {
-              selectedVideo = selectedChapter.videos.find((v: any) => v.id === videoIdParam);
+            if (
+              videoIdParam &&
+              selectedChapter.videos.some((v: any) => v.id === videoIdParam)
+            ) {
+              selectedVideo = selectedChapter.videos.find(
+                (v: any) => v.id === videoIdParam
+              );
               setVideoId(videoIdParam);
             } else {
               selectedVideo = selectedChapter.videos[0];
@@ -126,7 +123,7 @@ const CourseProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
           setVideo(null);
           setVideoId(null);
         }
-        return data?.data || null;
+        return data || null;
       } catch (err: any) {
         setError(err.message || "Failed to fetch course");
         setChapter(null);
@@ -138,7 +135,7 @@ const CourseProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         setLoading(false);
       }
     },
-    [api]
+    []
   );
 
   const createCourse = useCallback(
@@ -146,39 +143,18 @@ const CourseProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
       setLoading(true);
       setError(null);
       try {
-        // If you need to send as JSON, adjust useApi or use fetch directly
-        
-        const formData = new FormData();
-        Object.entries(courseData).forEach(([key, value]) => {
-          if (value !== undefined && value !== null) {
-            formData.append(key, value as any);
-          }
-        });
-       
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_APP_SERVER_URL}/api/courses`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(courseData),
-            credentials: "include",
-          }
-        );
-        console.log("response ",response )
-        const data = await response.json();
+        const data = await api.post<{data: Course}>('/api/courses', courseData);
         console.log("data: ", data);
-        return (data?.data||null)
+        return data?.data || null;
       } catch (err: any) {
-        console.log("error is: ",err)
+        console.log("error is: ", err);
         setError(err.message || "Failed to create course");
         return null;
       } finally {
         setLoading(false);
       }
     },
-    [api]
+    []
   );
 
   const updateCourse = useCallback(
@@ -186,20 +162,7 @@ const CourseProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
       setLoading(true);
       setError(null);
       try {
-        // If you need to send as JSON, adjust useApi or use fetch directly
-        const formData = new FormData();
-        Object.entries(courseData).forEach(([key, value]) => {
-          if (value !== undefined && value !== null) {
-            formData.append(key, value as any);
-          }
-        });
-        // You may want to implement api.put in useApi for this
-        const response = await fetch(`/api/courses/${id}`, {
-          method: "PUT",
-          body: formData,
-        });
-        if (!response.ok) throw new Error("Failed to update course");
-        const data = await response.json();
+        const data = await api.put<Course>(`/api/courses/${id}`, courseData);
         return data;
       } catch (err: any) {
         setError(err.message || "Failed to update course");
@@ -215,11 +178,7 @@ const CourseProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     setLoading(true);
     setError(null);
     try {
-      // You may want to implement api.delete in useApi for this
-      const response = await fetch(`/api/courses/${id}`, {
-        method: "DELETE",
-      });
-      if (!response.ok) throw new Error("Failed to delete course");
+      await api.delete(`/api/courses/${id}`);
       return true;
     } catch (err: any) {
       setError(err.message || "Failed to delete course");
@@ -228,33 +187,39 @@ const CourseProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
       setLoading(false);
     }
   }, []);
-  const  getYouTubeEmbedUrl=useCallback(async(url: string): Promise<string> => {
-    try {
-      const parsedUrl = new URL(url);
-  
-      // If already in embed format
-      if (parsedUrl.hostname.includes("youtube.com") && parsedUrl.pathname.startsWith("/embed/")) {
+  const getYouTubeEmbedUrl = useCallback(
+    async (url: string): Promise<string> => {
+      try {
+        const parsedUrl = new URL(url);
+
+        // If already in embed format
+        if (
+          parsedUrl.hostname.includes("youtube.com") &&
+          parsedUrl.pathname.startsWith("/embed/")
+        ) {
+          return url;
+        }
+
+        // Handle watch?v=VIDEO_ID format
+        const videoId = parsedUrl.searchParams.get("v");
+        if (videoId) {
+          return `https://www.youtube.com/embed/${videoId}`;
+        }
+
+        // Handle youtu.be short links
+        if (parsedUrl.hostname === "youtu.be") {
+          return `https://www.youtube.com/embed${parsedUrl.pathname}`;
+        }
+
+        return url; // Return original if format is unknown
+      } catch (err) {
+        console.error("Invalid URL", err);
         return url;
       }
-  
-      // Handle watch?v=VIDEO_ID format
-      const videoId = parsedUrl.searchParams.get("v");
-      if (videoId) {
-        return `https://www.youtube.com/embed/${videoId}`;
-      }
-  
-      // Handle youtu.be short links
-      if (parsedUrl.hostname === "youtu.be") {
-        return `https://www.youtube.com/embed${parsedUrl.pathname}`;
-      }
-  
-      return url; // Return original if format is unknown
-    } catch (err) {
-      console.error("Invalid URL", err);
-      return url;
-    }
-  },[])
-  
+    },
+    []
+  );
+
   return (
     <CourseContext.Provider
       value={{
@@ -279,7 +244,7 @@ const CourseProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         setVideo,
         videoId,
         setVideoId,
-        getYouTubeEmbedUrl
+        getYouTubeEmbedUrl,
       }}
     >
       {children}
