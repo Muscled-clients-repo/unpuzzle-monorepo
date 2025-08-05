@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { SEOStructuredData } from "@unpuzzle/ui";
 import { generateOrganizationSchema } from "@unpuzzle/ui";
-import HomeClient from "./home-client";
+import HomeClient from "@/components/home-client";
 
 export const metadata: Metadata = {
   title: "Unpuzzle - Transform Your Learning Experience",

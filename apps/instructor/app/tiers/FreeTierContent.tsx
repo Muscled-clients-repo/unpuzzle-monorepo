@@ -33,13 +33,16 @@ const FreeTierContent: React.FC<{ selected: boolean; onSelect: () => void }> = (
       </div>
       <ul className="mb-2 space-y-2 pt-4 border-t border-[#DDE1E7]">
         <li className="flex items-center gap-2 text-sm text-gray-800">
-          <TickIcon /> 20 PuzzleHints
+          <TickIcon /> 20 PuzzleHints per week
         </li>
         <li className="flex items-center gap-2 text-sm text-gray-800">
-          <TickIcon /> 20 PuzzleChecks
+          <TickIcon /> 20 PuzzleChecks per week
         </li>
         <li className="flex items-center gap-2 text-sm text-gray-800">
-          <TickIcon /> 3 PuzzleReflects
+          <TickIcon /> 3 PuzzleReflects per week
+        </li>
+        <li className="flex items-center gap-2 text-sm text-gray-800">
+          <TickIcon /> Basic support
         </li>
       </ul>
     </div>

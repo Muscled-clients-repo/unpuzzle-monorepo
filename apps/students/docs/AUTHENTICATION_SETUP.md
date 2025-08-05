@@ -1,14 +1,14 @@
 # Student App Authentication Setup
 
 ## Overview
-The student app now has a complete authentication flow using Clerk, with a modern home page and protected routes.
+The student app uses a custom authentication system via the `@unpuzzle/auth` package instead of external services like Clerk.
 
 ## What's Been Implemented
 
-### 1. Authentication Pages
-- **Sign In Page** (`/sign-in`): Clean, modern sign-in interface
-- **Sign Up Page** (`/sign-up`): User-friendly registration page
-- Both pages redirect to `/courses` after successful authentication
+### 1. Custom Authentication System
+- **Auth Package**: Uses `@unpuzzle/auth` for authentication logic
+- **Backend Integration**: Connects to the core backend API for user management
+- **State Management**: Integrated with Redux for user state persistence
 
 ### 2. Home Page (`/`)
 A modern, attractive landing page featuring:
@@ -21,109 +21,123 @@ A modern, attractive landing page featuring:
 - Footer with important links
 
 ### 3. Route Protection
-Updated middleware (`middleware.ts`) with:
-- Public routes: `/`, `/sign-in`, `/sign-up`, `/api/public/*`
-- Protected routes: All other routes require authentication
-- Automatic redirect to sign-in for unauthenticated users
-- Redirect URL preservation for post-login navigation
+Authentication is handled through:
+- Custom AuthProvider wrapping the app
+- Protected routes automatically redirect to login when needed
+- User state persistence across page refreshes
+- Seamless integration with the backend API
 
 ### 4. Layout Integration
-- ClerkProvider already wraps the entire app
+- AuthProvider wraps the entire app in the layout
 - Authentication state is synchronized across components
-- UserButton component for signed-in users
+- User profile information displayed in dashboard
 - Conditional rendering based on auth state
 
 ## Environment Variables Required
 
-Add these to your Vercel deployment:
+The student app only needs backend API configuration:
 
 ```bash
-# Clerk Authentication (Already in your .env.local)
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_aG9wZWZ1bC1za2luay0xNy5jbGVyay5hY2NvdW50cy5kZXYk
-CLERK_SECRET_KEY=sk_test_gAzXahOCkEUgdHPOewgALZ7vCtJ8DkyKNxc1zrveva
+# API Configuration
+NEXT_PUBLIC_CORE_SERVER_URL=your_backend_api_url
+NEXT_PUBLIC_M1_SERVER_URL=your_m1_server_url
+NEXT_PUBLIC_STUDENT_APP_URL=your_student_app_url
+NEXT_PUBLIC_INSTRUCTOR_APP_URL=your_instructor_app_url
 
-# Optional - Customize Clerk URLs
-CLERK_SIGN_IN_URL=/sign-in
-CLERK_SIGN_UP_URL=/sign-up
-CLERK_AFTER_SIGN_IN_URL=/courses
-CLERK_AFTER_SIGN_UP_URL=/courses
+# Stripe Payment (Optional)
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=your_stripe_publishable_key
 ```
 
 ## User Flow
 
 ### New User Journey:
 1. Lands on home page (`/`)
-2. Clicks "Get Started" → Redirected to `/sign-up`
-3. Creates account → Redirected to `/courses`
+2. Clicks "Get Started" → Redirected to registration
+3. Creates account via backend API → Redirected to `/dashboard`
 4. Can access all protected routes
 
 ### Returning User Journey:
 1. Lands on home page (`/`)
-2. Clicks "Sign In" → Redirected to `/sign-in`
-3. Signs in → Redirected to `/courses` or original destination
+2. Clicks "Sign In" → Uses backend authentication
+3. Signs in → Redirected to `/dashboard` or original destination
 4. Can access all protected routes
 
 ### Protected Route Access:
-1. User tries to access protected route (e.g., `/my-courses`)
-2. If not authenticated → Redirected to `/sign-in`
+1. User tries to access protected route (e.g., `/dashboard`)
+2. If not authenticated → Redirected to sign-in
 3. After sign-in → Redirected back to original route
 
-## Navigation Structure
+## Authentication Hook Usage
 
-### Public Navigation (Not Signed In):
-- Logo/Brand
-- Sign In link
-- Get Started button
+```tsx
+import { useAuth } from '@unpuzzle/auth';
 
-### Authenticated Navigation (Signed In):
-- Logo/Brand
-- My Courses link
-- User button (Clerk's UserButton component)
-
-## Customization Options
-
-### 1. Styling Clerk Components
-The sign-in/sign-up pages use Clerk's appearance prop:
-```javascript
-appearance={{
-  elements: {
-    card: "shadow-none",
-    formButtonPrimary: "bg-blue-600 hover:bg-blue-700",
-    footerActionLink: "text-blue-600 hover:text-blue-700"
-  }
-}}
+function Component() {
+  const { user, isLoading, login, logout } = useAuth();
+  
+  if (isLoading) return <div>Loading...</div>;
+  
+  return (
+    <div>
+      {user ? (
+        <div>
+          <p>Welcome, {user.first_name}!</p>
+          <button onClick={logout}>Logout</button>
+        </div>
+      ) : (
+        <button onClick={login}>Login</button>
+      )}
+    </div>
+  );
+}
 ```
 
-### 2. Redirect URLs
-Modify in the sign-in/sign-up components:
-- `afterSignInUrl="/courses"`
-- `afterSignUpUrl="/courses"`
+## Benefits of Custom Authentication
 
-### 3. Protected Routes
-Update the middleware.ts `isPublicRoute` matcher to add/remove public routes.
+### 1. **Simplified Architecture**
+- No external service dependencies
+- Direct integration with existing backend
+- Consistent user data across all apps
+
+### 2. **Cost Effective**
+- No third-party authentication service fees
+- Full control over user management
+- Scalable without per-user costs
+
+### 3. **Maintainable**
+- Custom logic can be modified as needed
+- No vendor lock-in
+- Consistent with instructor app architecture
+
+### 4. **Security**
+- Direct control over security policies
+- Custom session management
+- Integration with existing user database
 
 ## Testing Checklist
 
 - [ ] Home page loads without authentication
-- [ ] Sign up flow creates new account
+- [ ] Registration flow creates new account
 - [ ] Sign in flow authenticates existing users
 - [ ] Protected routes redirect to sign-in when not authenticated
-- [ ] User button shows correct user info
-- [ ] Sign out returns user to home page
+- [ ] User profile shows correct user info in dashboard
+- [ ] Sign out clears user state and returns to home page
 - [ ] Navigation updates based on auth state
+- [ ] User state persists across page refreshes
 
 ## Next Steps
 
-1. **Customize Branding**: Update logos and brand colors
-2. **Add User Profile**: Create a profile page for users to manage their info
-3. **Role-Based Access**: Implement student vs instructor roles if needed
-4. **Social Login**: Enable Google/GitHub login in Clerk dashboard
-5. **Email Verification**: Configure email verification in Clerk settings
+1. **Profile Management**: Enhance user profile editing capabilities
+2. **Password Reset**: Implement forgot password functionality
+3. **Email Verification**: Add email verification if needed
+4. **Role-Based Access**: Implement student-specific permissions
+5. **Social Login**: Add OAuth integration if required
 
 ## Deployment Notes
 
-When deploying to Vercel:
-1. Add all Clerk environment variables
-2. Ensure middleware.ts is at the root of the app directory
-3. Test authentication flow in preview deployments
-4. Monitor Clerk dashboard for usage and errors
+When deploying:
+1. Ensure all environment variables are configured
+2. Verify backend API endpoints are accessible
+3. Test authentication flow in staging environment
+4. Monitor backend logs for authentication errors
+5. Ensure CORS is properly configured for the student app domain

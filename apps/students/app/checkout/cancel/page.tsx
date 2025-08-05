@@ -3,7 +3,7 @@
 import React, { Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { XCircleIcon, ArrowLeftIcon, CreditCardIcon } from '@heroicons/react/24/outline';
-import { LoadingButton } from '@/app/components/navigation/LoadingButton';
+import { LoadingButton } from '@/components/navigation/LoadingButton';
 
 function CheckoutCancelContent() {
   const router = useRouter();

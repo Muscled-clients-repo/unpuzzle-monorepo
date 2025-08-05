@@ -1,9 +1,13 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { createApi } from '@reduxjs/toolkit/query/react';
+import { createApiClientBaseQuery } from './baseQuery';
+
+// Use centralized API client with automatic token handling
+const baseQuery = createApiClientBaseQuery();
 
 // Define a service using a base URL and expected endpoints
 export const permissionApi = createApi({
   reducerPath: 'permissionApi',
-  baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:3001/api/' }),
+  baseQuery: baseQuery,
   endpoints: (builder) => ({
     // Create Permission
     createPermission: builder.mutation<void, { name: string }>({

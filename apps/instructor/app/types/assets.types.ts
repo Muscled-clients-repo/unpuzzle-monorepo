@@ -5,7 +5,6 @@ export interface Asset {
     duration: string | null;
     src: string;
     icon: string;
-    title?: string;
   }
   
 export  interface RootState {

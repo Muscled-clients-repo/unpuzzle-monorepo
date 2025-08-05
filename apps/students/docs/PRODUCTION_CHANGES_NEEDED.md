@@ -45,8 +45,6 @@ NEXT_PUBLIC_INSTRUCTOR_APP_URL=https://unpuzzle-mono-repo-frontend-v9qa-mceveraj
 NEXT_PUBLIC_STUDENT_APP_URL=https://unpuzzle-mono-repo-frontend.vercel.app
 
 # Clerk authentication (if used in student app)
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_aG9wZWZ1bC1za2luay0xNy5jbGVyay5hY2NvdW50cy5kZXYk
-CLERK_SECRET_KEY=sk_test_gAzXahOCkEUgdHPOewgALZ7vCtJ8DkyKNxc1zrveva
 ```
 
 ## 🔧 Quick Fix Script

@@ -1,15 +1,13 @@
+import { useUser, useAuth } from '@clerk/nextjs';
+
 export function useClerkUser() {
-  // Return mock data since we're removing Clerk authentication
+  const { user, isLoaded: userLoaded, isSignedIn } = useUser();
+  const { getToken, isLoaded: authLoaded } = useAuth();
+
   return {
-    user: {
-      id: 'mock-user-id',
-      firstName: 'Instructor',
-      lastName: 'User',
-      emailAddresses: [{ emailAddress: 'instructor@example.com' }],
-      imageUrl: '/assets/default-avatar.png',
-    },
-    isLoaded: true,
-    isSignedIn: true,
-    getToken: async () => null,
+    user,
+    isLoaded: userLoaded && authLoaded,
+    isSignedIn,
+    getToken,
   };
 } 

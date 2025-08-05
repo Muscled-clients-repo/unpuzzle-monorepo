@@ -22,9 +22,10 @@ const navigation = {
     student:[
         { name: 'Home', href: '/', icon: HomeIcon },
         { name: 'Courses', href: '/courses', icon: BookOpenIcon },
-        { name: 'My Courses', href: '/my-courses', icon: AcademicCapIcon },
-        { name: 'Puzzle Content', href: '/puzzle-content', icon: PuzzlePieceIcon },
-        { name: 'Settings', href: '/settings', icon: Cog6ToothIcon },
+        { name: 'About', href: '/about', icon: AcademicCapIcon },
+        { name: 'Contact Us', href: '/contact', icon: Cog6ToothIcon },
+        { name: 'Demo', href: '/demo', icon: VideoCameraIcon },
+        { name: 'Instructors', href: '/instructors', icon: PuzzlePieceIcon },
     ]
 };
 
@@ -37,6 +38,7 @@ interface HeaderProps {
 export function Header({ variant = "student" }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [notificationCount, setNotificationCount] = useState(0); // Track notification count
   const pathname = usePathname();
   const router = useRouter();
 
@@ -89,7 +91,7 @@ export function Header({ variant = "student" }: HeaderProps) {
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
+          <nav className="desktop-nav flex items-center space-x-8">
             {navigation[variant].map((item) => {
               const isActive = pathname === item.href || 
                 (item.href !== '/' && pathname.startsWith(item.href));
@@ -105,7 +107,7 @@ export function Header({ variant = "student" }: HeaderProps) {
                       setTimeout(() => router.push(item.href), 50);
                     }
                   }}
-                  className={`flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                     isActive
                       ? 'text-blue-600 bg-blue-50'
                       : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
@@ -134,10 +136,27 @@ export function Header({ variant = "student" }: HeaderProps) {
 
           {/* Right side - User Actions */}
           <div className="flex items-center space-x-4">
+            {/* Dashboard Button */}
+            <Link
+              href="/dashboard"
+              onClick={(e) => {
+                if (pathname !== '/dashboard') {
+                  e.preventDefault();
+                  triggerLoadingState();
+                  setTimeout(() => router.push('/dashboard'), 50);
+                }
+              }}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+            >
+              Dashboard
+            </Link>
+
             {/* Notifications */}
             <button className="relative p-2 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-full">
               <BellIcon className="h-6 w-6" />
-              <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-400 ring-2 ring-white" />
+              {notificationCount > 0 && (
+                <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-400 ring-2 ring-white" />
+              )}
             </button>
 
             {/* User Menu - Placeholder */}
@@ -146,7 +165,7 @@ export function Header({ variant = "student" }: HeaderProps) {
             {/* Mobile menu button */}
             <button
               type="button"
-              className="md:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="mobile-menu-btn p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
               {mobileMenuOpen ? (

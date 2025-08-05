@@ -1,8 +1,9 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import type { Metadata } from "next";
-import { ClientProviders } from "./providers/ClientProviders";
+import { ClientProviders } from "../providers/ClientProviders";
 import { ComponentErrorBoundary, Header, Footer } from "@unpuzzle/ui";
-import "./styles/loading-overlay.css";
+import "../styles/loading-overlay.css";
+import ConditionalLayout from "../components/ConditionalLayout";
 
 const geistSans = Geist({
   subsets: ["latin"],
@@ -32,18 +33,15 @@ export default function RootLayout({
     >
       <head>
         <link rel="stylesheet" href="/tailwind.css" />
+        <link rel="stylesheet" href="/header-responsive.css" />
       </head>
       <body className="antialiased light" suppressHydrationWarning>
         <ClientProviders>
-          <Header variant="student" />
-          <main>
-            <div className="min-h-screen bg-gray-50">
-              <ComponentErrorBoundary>
-                {children}
-              </ComponentErrorBoundary>
-            </div>
-          </main>
-          <Footer />
+          <ConditionalLayout>
+            <ComponentErrorBoundary>
+              {children}
+            </ComponentErrorBoundary>
+          </ConditionalLayout>
         </ClientProviders>
       </body>
     </html>

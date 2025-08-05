@@ -50,9 +50,6 @@ export interface CustomDropdownProps {
       url?: any,
       duration: number; // Add other audio-specific properties if needed
     };
-    totalChapters?: number;
-    totalScreenshot?: number;
-    totalCaption?: number;
   }
 
 // Clips type

@@ -32,13 +32,22 @@ const PaidTierContent: React.FC<{ selected: boolean; onSelect: () => void }> = (
       </div>
       <ul className="mb-2 space-y-2 pt-4 border-t border-[#DDE1E7]">
         <li className="flex items-center gap-2 text-sm text-gray-800">
-          <TickIcon /> Lorem ipsum dolor sit amet
+          <TickIcon /> 1000 credits per month
         </li>
         <li className="flex items-center gap-2 text-sm text-gray-800">
-          <TickIcon /> Lorem ipsum dolor sit amet
+          <TickIcon /> Unlimited PuzzleHints
         </li>
         <li className="flex items-center gap-2 text-sm text-gray-800">
-          <TickIcon /> Lorem ipsum dolor sit amet
+          <TickIcon /> Unlimited PuzzleChecks
+        </li>
+        <li className="flex items-center gap-2 text-sm text-gray-800">
+          <TickIcon /> Unlimited PuzzleReflects
+        </li>
+        <li className="flex items-center gap-2 text-sm text-gray-800">
+          <TickIcon /> Priority support
+        </li>
+        <li className="flex items-center gap-2 text-sm text-gray-800">
+          <TickIcon /> Advanced analytics
         </li>
       </ul>
     </div>

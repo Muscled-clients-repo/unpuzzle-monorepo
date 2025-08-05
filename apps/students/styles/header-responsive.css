@@ -1,0 +1,10 @@
+/* Custom responsive styles for header navigation */
+.desktop-nav {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .desktop-nav {
+    display: flex;
+  }
+}

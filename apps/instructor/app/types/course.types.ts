@@ -1,6 +1,3 @@
-import { Asset } from './assets.types';
-import { AiFile } from './videoeditor.types';
-
 export interface EnrolledCourse {
   id: string;
   title: string;
@@ -10,8 +7,11 @@ export interface EnrolledCourse {
   authorId: string;
   createdAt: string;
   updatedAt: string;
-  category?: string; // Assuming category is optional since it’s not in the given structure
+  category?: string; // Assuming category is optional since it's not in the given structure
   duration: string;
+  chapters_count?: number; // Count of chapters in this course
+  videos_count?: number; // Count of videos in this course
+  created_at?: string; // API might return created_at instead of createdAt
 }
 
 export interface EnrolledCoursesData {
@@ -42,13 +42,6 @@ export interface Video {
   end_time?: number;
   created_at?: string;
   updated_at?: string;
-  instructor?: {
-    name?: string;
-    avatar?: string;
-    bio?: string;
-  };
-  assets?: Asset[];
-  aiFiles?: AiFile[];
 }
 
 export interface Chapter {
@@ -69,26 +62,28 @@ export interface Course {
   price: number;
   visibility: "public" | "private";
   chapters: Chapter[];
+  chapters_count?: number; // Count of chapters in this course
+  videos_count?: number; // Count of videos in this course
   created_at?: string;
   updated_at?: string;
   thumbnail?: string;
   duration?: string;
-  videos?: Video[];
-  enrolled?: boolean;
-  courseImage?: string;
-  courseAuthor?: string;
-  authorId?: string;
-  category?: string;
 }
 
 export interface CoursesData {
   data: EnrolledCourse[];
 }
 
+export interface CoursesApiResponse {
+  data: EnrolledCourse[];
+  count: number;
+  totalPages: number;
+}
+
 export interface CourseCardProps {
   layout: "grid-1" | "grid-4" | "list";
   index: number;
-  course: Course | EnrolledCourse;
+  course: Course;
 }
 
 export interface UserState {

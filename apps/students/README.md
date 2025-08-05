@@ -54,7 +54,7 @@ Unpuzzle AI is a comprehensive educational technology platform that combines vid
 
 - **Framework**: Next.js 15 with App Router
 - **Language**: TypeScript
-- **Authentication**: Clerk
+- **Authentication**: Custom Auth (@unpuzzle/auth)
 - **State Management**: Redux Toolkit (RTK)
 - **Styling**: Tailwind CSS v4
 - **Payment**: Stripe
@@ -69,7 +69,6 @@ Unpuzzle AI is a comprehensive educational technology platform that combines vid
 - npm, yarn, or pnpm package manager
 - Git
 - Backend API server running (see Environment Setup)
-- Clerk account for authentication
 - Stripe account for payments (optional)
 
 ## 🔧 Environment Setup
@@ -83,10 +82,6 @@ Unpuzzle AI is a comprehensive educational technology platform that combines vid
    ```env
    # API Configuration
    NEXT_PUBLIC_API_URL=your_backend_api_url
-   
-   # Clerk Authentication (Required)
-   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
-   CLERK_SECRET_KEY=your_clerk_secret_key
    
    # Stripe Payment (Optional)
    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=your_stripe_publishable_key
@@ -232,9 +227,9 @@ Types: feat, fix, docs, style, refactor, test, chore
    - Check for CORS configuration
 
 2. **Authentication Issues**
-   - Verify Clerk keys are properly configured
+   - Verify authentication service is properly configured
    - Clear browser cache and cookies
-   - Check Clerk dashboard for proper domain configuration
+   - Check backend API authentication endpoints
 
 3. **Video Upload Problems**
    - Verify file size limits (default: 100MB)
@@ -282,7 +277,7 @@ This project is proprietary software. All rights reserved.
 
 - Built with [Next.js](https://nextjs.org/)
 - UI components from [Radix UI](https://www.radix-ui.com/)
-- Authentication by [Clerk](https://clerk.dev/)
+- Custom authentication system (@unpuzzle/auth)
 - Payments powered by [Stripe](https://stripe.com/)
 
 ---

@@ -1,15 +1,23 @@
 'use client'
 import Image from "next/image";
-import { NavigationLink } from "../components/content/NavigationLink";
+import Link from "next/link";
 import Tiers from "../tiers/Tiers";
 import React, { useState } from "react";
+import {
+  OptionalSignedIn,
+  OptionalSignedOut,
+  OptionalUserButton,
+  OptionalSignInButton,
+  OptionalSignUpButton,
+} from "../components/OptionalClerkComponents";
+import CreditBalance from "../components/CreditBalance";
 
 export default function Header() {
   const [modalOpen, setModalOpen] = useState(false);
   return (
     <header className="border-b border-gray-200">
       <nav className="flex justify-between items-center container mx-auto px-4 py-4">
-        <NavigationLink href="/" className="text-gray-800">
+        <Link href="/" className="text-gray-800">
           <div className="flex items-center gap-2">
             <Image
               src="/img/logo.png"
@@ -20,12 +28,33 @@ export default function Header() {
             />
             <h1 className="text-2xl font-bold">Unpuzzle</h1>
           </div>
-        </NavigationLink>
-        {/* User profile area */}
+        </Link>
+        {/* clerk header */}
         <div className=" ml-auto mr-[17px] flex items-center">
-          <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center">
-            <span className="text-sm font-medium">IU</span>
-          </div>
+
+            <OptionalSignedOut>
+  <div className="flex gap-4">
+    {/* Sign In */}
+    <OptionalSignInButton>
+      <button className="bg-white text-[#6c47ff] border border-[#6c47ff] hover:bg-[#f3f0ff] transition-colors duration-200 rounded-full font-medium text-sm sm:text-base h-10 sm:h-12 px-5 shadow-md">
+        Sign In
+      </button>
+    </OptionalSignInButton>
+
+    {/* Sign Up */}
+    <OptionalSignUpButton>
+      <button className="bg-[#6c47ff] text-white hover:bg-[#5a39d9] transition-colors duration-200 rounded-full font-medium text-sm sm:text-base h-10 sm:h-12 px-5 shadow-md">
+        Sign Up
+      </button>
+    </OptionalSignUpButton>
+  </div>
+</OptionalSignedOut>
+
+            <OptionalSignedIn>
+              <CreditBalance />
+              <OptionalUserButton />
+            </OptionalSignedIn>
+
         </div>
 
         <button
