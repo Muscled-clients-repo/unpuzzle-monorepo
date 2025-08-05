@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useAuth } from '@unpuzzle/auth';
 import {
   HomeIcon,
@@ -16,6 +17,7 @@ import {
   XMarkIcon,
   AcademicCapIcon,
   ChartPieIcon,
+  
 } from '@heroicons/react/24/outline';
 
 // TODO: Replace with your actual authentication check
@@ -33,6 +35,7 @@ interface SidebarItem {
 const navigation: SidebarItem[] = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
   { name: 'My Learning', href: '/dashboard/my-learning', icon: BookOpenIcon },
+  { name: 'Courses', href: '/dashboard/courses', icon: AcademicCapIcon },
   { name: 'Progress', href: '/dashboard/progress', icon: ChartBarIcon },
   { name: 'Orders', href: '/dashboard/orders', icon: ShoppingBagIcon },
   { name: 'Analytics', href: '/dashboard/analytics', icon: ChartPieIcon },
@@ -87,10 +90,16 @@ function SidebarContent({ currentPath, onClose }: SidebarContentProps) {
     <div className="flex h-full flex-col bg-white">
       {/* Header */}
       <div className="flex h-16 shrink-0 items-center justify-between px-6">
-        <div className="flex items-center">
-          <AcademicCapIcon className="h-8 w-8 text-blue-600" />
+        <Link href="/" className="flex items-center">
+          <Image
+            src="/assets/logo.svg"
+            alt="Unpuzzle"
+            width={32}
+            height={32}
+            className="h-8 w-8"
+          />
           <span className="ml-2 text-xl font-bold text-gray-900">Unpuzzle</span>
-        </div>
+        </Link>
         {onClose && (
           <button
             type="button"
@@ -118,11 +127,7 @@ function SidebarContent({ currentPath, onClose }: SidebarContentProps) {
           </div>
           <div className="min-w-0 flex-1" style={{ marginLeft: '16px' }}>
             <p className="text-sm font-semibold text-gray-900">
-              {isLoading ? 'Loading...' : (
-                user?.first_name && user?.last_name 
-                  ? `${user.first_name} ${user.last_name}`
-                  : user?.first_name || 'Student'
-              )}
+              {isLoading ? 'Loading...' : (user?.first_name || 'Student')}
             </p>
             <p className="text-xs text-gray-500 truncate">
               {isLoading ? '...' : (user?.email || 'No email provided')}
@@ -252,6 +257,13 @@ export default function DashboardLayout({
         {/* Page content */}
         <div className="py-8 px-4 sm:px-6 lg:px-8">
           {children}
+        </div>
+        
+        {/* Copyright Footer */}
+        <div className="border-t border-gray-200 py-4 px-4 sm:px-6 lg:px-8">
+          <p className="text-xs text-gray-500 text-center">
+            © {new Date().getFullYear()} Unpuzzle. All rights reserved.
+          </p>
         </div>
       </div>
     </div>
