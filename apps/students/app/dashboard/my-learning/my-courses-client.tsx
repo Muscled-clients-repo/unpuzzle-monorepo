@@ -114,59 +114,6 @@ export default function MyCoursesClient() {
   
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header Section */}
-      <section className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-12">
-        <div className="container mx-auto px-4">
-          <h1 className="text-4xl font-bold mb-4">My Learning Journey</h1>
-          <p className="text-xl mb-8 text-blue-100">Continue where you left off</p>
-          
-          {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6">
-              <div className="flex items-center gap-4">
-                <AcademicCapIcon className="w-12 h-12 text-blue-200" />
-                <div>
-                  <p className="text-blue-100">Total Courses</p>
-                  <p className="text-3xl font-bold">{stats.total}</p>
-                </div>
-              </div>
-            </div>
-            
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6">
-              <div className="flex items-center gap-4">
-                <ClockIcon className="w-12 h-12 text-blue-200" />
-                <div>
-                  <p className="text-blue-100">In Progress</p>
-                  <p className="text-3xl font-bold">{stats.inProgress}</p>
-                </div>
-              </div>
-            </div>
-            
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6">
-              <div className="flex items-center gap-4">
-                <CheckCircleIcon className="w-12 h-12 text-green-300" />
-                <div>
-                  <p className="text-blue-100">Completed</p>
-                  <p className="text-3xl font-bold">{stats.completed}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          {/* Search Bar */}
-          <div className="max-w-2xl mx-auto relative">
-            <input
-              type="text"
-              placeholder="Search your courses..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full px-6 py-4 pr-12 rounded-full text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-4 focus:ring-white/30"
-            />
-            <MagnifyingGlassIcon className="absolute right-4 top-1/2 transform -translate-y-1/2 w-6 h-6 text-gray-400" />
-          </div>
-        </div>
-      </section>
-      
       {/* Main Content */}
       <section className="container mx-auto px-4 py-12">
         <div className="flex flex-col lg:flex-row gap-8">
