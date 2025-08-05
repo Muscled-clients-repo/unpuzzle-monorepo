@@ -1,0 +1,286 @@
+/* Settings page custom styles */
+
+/* Theme support */
+:root {
+  --font-size-base: 16px;
+  --animation-duration: 0.3s;
+  --transition-duration: 0.2s;
+}
+
+/* Compact mode */
+.compact-mode {
+  --space-base: 0.75rem;
+  --padding-base: 0.75rem;
+}
+
+.compact-mode .p-6 {
+  padding: var(--padding-base);
+}
+
+.compact-mode .space-y-6 > * + * {
+  margin-top: var(--space-base);
+}
+
+/* High contrast mode */
+.high-contrast {
+  --border-color: #000000;
+  --text-color: #000000;
+  --bg-color: #ffffff;
+}
+
+.high-contrast .border-gray-300 {
+  border-color: var(--border-color) !important;
+}
+
+.high-contrast .text-gray-700 {
+  color: var(--text-color) !important;
+}
+
+/* Large text mode */
+.large-text {
+  font-size: 1.125rem;
+}
+
+.large-text .text-sm {
+  font-size: 1rem;
+}
+
+.large-text .text-xs {
+  font-size: 0.875rem;
+}
+
+/* Enhanced focus indicators */
+.enhanced-focus *:focus {
+  outline: 3px solid #3b82f6 !important;
+  outline-offset: 2px !important;
+}
+
+/* Color blind support */
+.colorblind-protanopia {
+  filter: url('#protanopia-filter');
+}
+
+.colorblind-deuteranopia {
+  filter: url('#deuteranopia-filter');
+}
+
+.colorblind-tritanopia {
+  filter: url('#tritanopia-filter');
+}
+
+/* Keyboard navigation enhancements */
+.keyboard-navigation {
+  --focus-ring-width: 2px;
+  --focus-ring-color: #3b82f6;
+}
+
+.keyboard-navigation button:focus,
+.keyboard-navigation input:focus,
+.keyboard-navigation select:focus,
+.keyboard-navigation textarea:focus {
+  box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color);
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Dark theme overrides */
+.dark {
+  --bg-gray-50: #0f172a;
+  --bg-white: #1e293b;
+  --text-gray-900: #f1f5f9;
+  --text-gray-700: #cbd5e1;
+  --text-gray-500: #94a3b8;
+  --border-gray-200: #334155;
+  --border-gray-300: #475569;
+}
+
+.dark .bg-gray-50 {
+  background-color: var(--bg-gray-50);
+}
+
+.dark .bg-white {
+  background-color: var(--bg-white);
+}
+
+.dark .text-gray-900 {
+  color: var(--text-gray-900);
+}
+
+.dark .text-gray-700 {
+  color: var(--text-gray-700);
+}
+
+.dark .text-gray-500 {
+  color: var(--text-gray-500);
+}
+
+.dark .border-gray-200 {
+  border-color: var(--border-gray-200);
+}
+
+.dark .border-gray-300 {
+  border-color: var(--border-gray-300);
+}
+
+/* Settings specific animations */
+.settings-fade-in {
+  animation: fadeIn var(--animation-duration) ease-in-out;
+}
+
+.settings-slide-in {
+  animation: slideIn var(--animation-duration) ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(-10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Tab animations */
+.tab-content-enter {
+  opacity: 0;
+  transform: translateX(10px);
+}
+
+.tab-content-enter-active {
+  opacity: 1;
+  transform: translateX(0);
+  transition: opacity var(--transition-duration), transform var(--transition-duration);
+}
+
+/* Clean Switch Enhancement for Settings Page */
+.settings-page button[role="switch"] {
+  /* Override default styling for better visibility */
+  background-color: #d1d5db !important;
+  border: 1px solid #9ca3af !important;
+  width: 44px !important;
+  height: 24px !important;
+}
+
+.settings-page button[role="switch"][data-state="checked"] {
+  background-color: #3b82f6 !important;
+  border-color: #2563eb !important;
+}
+
+.settings-page button[role="switch"]:hover {
+  opacity: 0.9;
+  transform: scale(1.02);
+  transition: all 0.2s ease;
+}
+
+.settings-page button[role="switch"]:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Switch thumb styling */
+.settings-page button[role="switch"] span {
+  background-color: #ffffff !important;
+  border: 1px solid #d1d5db !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06) !important;
+  width: 20px !important;
+  height: 20px !important;
+}
+
+.settings-page button[role="switch"][data-state="checked"] span {
+  border-color: #e5e7eb !important;
+}
+
+/* Form field enhancements */
+.form-field-enhanced {
+  position: relative;
+}
+
+.form-field-enhanced:focus-within label {
+  color: #3b82f6;
+}
+
+.form-field-enhanced input:focus,
+.form-field-enhanced select:focus,
+.form-field-enhanced textarea:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 1px #3b82f6;
+}
+
+/* Color blind filter definitions */
+.colorblind-filters {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+
+/* Loading states */
+.settings-loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.settings-loading * {
+  cursor: wait !important;
+}
+
+/* Success/Error states */
+.settings-success {
+  border-left: 4px solid #10b981;
+  background-color: #ecfdf5;
+}
+
+.settings-error {
+  border-left: 4px solid #ef4444;
+  background-color: #fef2f2;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+  .settings-mobile-stack .grid-cols-2 {
+    grid-template-columns: 1fr;
+  }
+  
+  .settings-mobile-stack .grid-cols-3 {
+    grid-template-columns: 1fr;
+  }
+  
+  .settings-mobile-full .w-full {
+    width: 100% !important;
+  }
+}
+
+/* Print styles for settings export */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .settings-page {
+    background: white !important;
+    color: black !important;
+  }
+  
+  .settings-page * {
+    background: white !important;
+    color: black !important;
+    border-color: #000 !important;
+  }
+}
