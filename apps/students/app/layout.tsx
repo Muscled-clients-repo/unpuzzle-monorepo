@@ -1,8 +1,8 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import type { Metadata } from "next";
-import { ClientProviders } from "./providers/ClientProviders";
+import { ClientProviders } from "../providers/ClientProviders";
 import { ComponentErrorBoundary, Header, Footer } from "@unpuzzle/ui";
-import "./styles/loading-overlay.css";
+import "../styles/loading-overlay.css";
 
 const geistSans = Geist({
   subsets: ["latin"],

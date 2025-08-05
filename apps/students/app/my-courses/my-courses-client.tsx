@@ -12,9 +12,9 @@ import {
   StarIcon
 } from "@heroicons/react/24/outline";
 import { CheckCircleIcon } from "@heroicons/react/24/solid";
-import { useMyCourses } from "@/app/hooks/useCourses";
+import { useMyCourses } from "@/hooks/useCourses";
 import { CourseListSkeleton } from "@unpuzzle/ui";
-import { Course } from "@/app/types/course.types";
+import { Course } from "@/types/course.types";
 
 const categories = [
   "All Categories",

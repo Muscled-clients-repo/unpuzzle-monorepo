@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
-import { LoadingOverlay } from '../components/LoadingOverlay';
+import { LoadingOverlay } from '@unpuzzle/ui';
 
 interface NavigationLoadingContextType {
   isNavigating: boolean;

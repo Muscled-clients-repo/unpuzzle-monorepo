@@ -1,4 +1,4 @@
-import { LoadingSpinner } from './components/LoadingSpinner';
+import { LoadingSpinner } from '@unpuzzle/ui';
 
 export default function Loading() {
   return (

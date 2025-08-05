@@ -4,10 +4,10 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { notFound } from "next/navigation";
-import { LoadingLink } from "@/app/components/navigation/LoadingLink";
-import { LoadingButton } from "@/app/components/navigation/LoadingButton";
-import { useNavigationLoading } from "@/app/context/NavigationLoadingContext";
-import { useCourseDetails, useCourses } from "@/app/hooks/useCourses";
+import { LoadingLink } from "@/components/navigation/LoadingLink";
+import { LoadingButton } from "@/components/navigation/LoadingButton";
+import { useNavigationLoading } from "@/context/NavigationLoadingContext";
+import { useCourseDetails, useCourses } from "@/hooks/useCourses";
 import { 
   CheckCircleIcon, 
   ClockIcon, 

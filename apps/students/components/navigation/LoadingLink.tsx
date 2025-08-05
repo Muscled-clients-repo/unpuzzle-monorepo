@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { useNavigationLoading } from '@/app/context/NavigationLoadingContext';
+import { useNavigationLoading } from '@/context/NavigationLoadingContext';
 
 interface LoadingLinkProps extends React.ComponentProps<typeof Link> {
   children: React.ReactNode;

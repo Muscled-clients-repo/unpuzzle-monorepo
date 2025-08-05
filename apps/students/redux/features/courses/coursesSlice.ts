@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Course, Chapter } from '@/app/types/course.types';
+import { Course, Chapter } from '@/types/course.types';
 
 // Helper function to validate IDs
 const isValidId = (id: any): id is string => {

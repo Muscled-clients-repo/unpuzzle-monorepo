@@ -4,15 +4,15 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { notFound } from "next/navigation";
-import { LoadingLink } from "@/app/components/navigation/LoadingLink";
-import { LoadingButton } from "@/app/components/navigation/LoadingButton";
-import { useNavigationLoading } from "@/app/context/NavigationLoadingContext";
-import { useCourseDetails } from "@/app/hooks/useCourses";
-import { useCreateEnrollMutation } from "@/app/redux/services/enroll.services";
-// import { useOrders } from "@/app/hooks/useOrder"; // Temporarily disabled until API issue is resolved
+import { LoadingLink } from "@/components/navigation/LoadingLink";
+import { LoadingButton } from "@/components/navigation/LoadingButton";
+import { useNavigationLoading } from "@/context/NavigationLoadingContext";
+import { useCourseDetails } from "@/hooks/useCourses";
+import { useCreateEnrollMutation } from "@/redux/services/enroll.services";
+// import { useOrders } from "@/hooks/useOrder"; // Temporarily disabled until API issue is resolved
 import { CustomCheckout, useStripeCheckout } from "@unpuzzle/stripe-integration";
-import { useBaseApi } from "@/app/hooks/useBaseApi";
-import { API_ENDPOINTS } from "@/app/config/api.config";
+import { useBaseApi } from "@/hooks/useBaseApi";
+import { API_ENDPOINTS } from "@/config/api.config";
 import { 
   CheckCircleIcon, 
   ClockIcon, 

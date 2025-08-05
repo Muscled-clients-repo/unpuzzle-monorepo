@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useBaseApi } from './useBaseApi';
-import { Order, OrderItem, OrderResponse, OrderListResponse } from '@/app/types/order.types';
+import { Order, OrderItem, OrderResponse, OrderListResponse } from '@/types/order.types';
 
 export const useOrder = (orderId?: string) => {
   const api = useBaseApi();

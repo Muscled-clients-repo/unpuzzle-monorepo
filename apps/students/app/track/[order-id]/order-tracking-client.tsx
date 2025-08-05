@@ -2,11 +2,11 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useOrder } from '@/app/hooks/useOrder';
-import { useCourseDetails } from '@/app/hooks/useCourses';
-import OrderStatusIndicator from '@/app/components/OrderStatusIndicator';
-import { LoadingButton } from '@/app/components/navigation/LoadingButton';
-import { LoadingLink } from '@/app/components/navigation/LoadingLink';
+import { useOrder } from '@/hooks/useOrder';
+import { useCourseDetails } from '@/hooks/useCourses';
+import { OrderStatusIndicator } from '@unpuzzle/ui';
+import { LoadingButton } from '@/components/navigation/LoadingButton';
+import { LoadingLink } from '@/components/navigation/LoadingLink';
 import Image from 'next/image';
 import { 
   ArrowPathIcon, 
@@ -32,7 +32,7 @@ export default function OrderTrackingClient({ orderId }: OrderTrackingClientProp
     // TODO: Implement socket connection for real-time order updates
     // When socket.io is implemented, replace polling with:
     // 
-    // import { useSocket } from '@/app/services/socket.service';
+    // import { useSocket } from '@/services/socket.service';
     // const { subscribeToOrder, unsubscribeFromOrder } = useSocket({
     //   onOrderUpdate: (updatedOrder) => {
     //     setOrder(updatedOrder);

@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { headers } from "next/headers";
-import { getCourseById } from "../../services/course.service";
+import { getCourseById } from "../../../services/course.service";
 import { generateSEOMetadata, generateCourseSchema } from "@unpuzzle/ui";
 import { SEOStructuredData } from "@unpuzzle/ui";
 import CourseDetailClient from "./course-detail-client";

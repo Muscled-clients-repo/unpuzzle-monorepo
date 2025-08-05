@@ -1,7 +1,7 @@
 "use client";
 import React, { createContext, useState, useCallback, ReactNode } from "react";
 import useApi from "../hooks/useApi";
-import { Course } from "@/app/types/course.types";
+import { Course } from "@/types/course.types";
 
 interface CourseContextType {
   course:Course | undefined,

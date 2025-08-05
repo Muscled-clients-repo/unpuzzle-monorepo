@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import { ContentCard, CardHeader, CardTitle } from "../shared/ui/content-card";
 import { useRouter, usePathname } from "next/navigation";
 import { RootState } from "../../redux/store";
-import { useNavigationLoading } from "@/app/context/NavigationLoadingContext";
+import { useNavigationLoading } from "@/context/NavigationLoadingContext";
 import {
   CourseCardProps,
 } from "../../types/course.types";

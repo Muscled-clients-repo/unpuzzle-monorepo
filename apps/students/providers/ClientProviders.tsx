@@ -7,7 +7,6 @@ import { VideoTimeProvider } from "../context/VideoTimeContext";
 import { NavigationLoadingProvider } from "../context/NavigationLoadingContext";
 import { AuthProvider } from "@unpuzzle/auth";
 import { ToastContainer } from 'react-toastify';
-import { TestLoadingButton } from "../components/TestLoadingButton";
 import { NavigationWrapper } from "../components/navigation/NavigationWrapper";
 
 export function ClientProviders({ children }: { children: React.ReactNode }) {
@@ -20,7 +19,6 @@ export function ClientProviders({ children }: { children: React.ReactNode }) {
             <NavigationWrapper>
               <VideoTimeProvider>
                 {children}
-                <TestLoadingButton />
               </VideoTimeProvider>
             </NavigationWrapper>
           </NavigationLoadingProvider>

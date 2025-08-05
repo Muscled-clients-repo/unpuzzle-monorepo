@@ -3,8 +3,8 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Course } from "@/app/types/course.types";
-import { useCourses, usePopularCourses } from "@/app/hooks/useCourses";
+import { Course } from "@/types/course.types";
+import { useCourses, usePopularCourses } from "@/hooks/useCourses";
 import { MagnifyingGlassIcon, FunnelIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
 import { StarIcon, ClockIcon, UsersIcon, PhotoIcon } from "@heroicons/react/24/solid";
 import { CourseListSkeleton, CourseCardSkeleton } from "@unpuzzle/ui";

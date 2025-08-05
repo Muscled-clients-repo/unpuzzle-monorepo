@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useBaseApi } from './useBaseApi';
-import { RootState } from '@/app/redux/store';
+import { RootState } from '@/redux/store';
 import {
   fetchCoursesStart,
   fetchCoursesSuccess,
@@ -18,8 +18,8 @@ import {
   updateChapterInCourse,
   deleteChapterFromCourse,
   CourseFilters,
-} from '@/app/redux/features/courses/coursesSlice';
-import { Course, Chapter } from '@/app/types/course.types';
+} from '@/redux/features/courses/coursesSlice';
+import { Course, Chapter } from '@/types/course.types';
 
 export const useCourses = () => {
   const dispatch = useDispatch();

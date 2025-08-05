@@ -1,5 +1,5 @@
-import { Course } from "@/app/types/course.types";
-import { API_ENDPOINTS } from "@/app/config/api.config";
+import { Course } from "@/types/course.types";
+import { API_ENDPOINTS } from "@/config/api.config";
 
 export async function getCourseById(courseId: string, customHeaders?: HeadersInit): Promise<Course | null> {
   // Validate courseId

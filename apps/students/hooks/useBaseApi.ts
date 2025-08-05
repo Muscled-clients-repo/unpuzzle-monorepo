@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { API_ENDPOINTS } from '@/app/config/api.config';
+import { API_ENDPOINTS } from '@/config/api.config';
 
 export interface ApiResponse<T> {
   data?: T;

@@ -20,7 +20,7 @@ import {
   ExclamationCircleIcon
 } from "@heroicons/react/24/outline";
 // Using simplified inline components instead of deleted UI components
-import { useSettings } from "@/app/hooks/useSettings";
+import { useSettings } from "@/hooks/useSettings";
 
 // Simple inline UI components to replace deleted ones
 const TabsContext = React.createContext<{ activeTab: string; setActiveTab: (tab: string) => void } | null>(null);

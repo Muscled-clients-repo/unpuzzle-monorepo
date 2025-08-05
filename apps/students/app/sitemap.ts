@@ -1,6 +1,6 @@
 import { MetadataRoute } from 'next';
-import { getAllCourses } from './services/course.service';
-import { Course } from './types/course.types';
+import { getAllCourses } from '../services/course.service';
+import { Course } from '../types/course.types';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_CORE_SERVER_URL || 'https://core.nazmulcodes.org';

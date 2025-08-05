@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { useNavigationLoading } from '@/app/context/NavigationLoadingContext';
+import { useNavigationLoading } from '@/context/NavigationLoadingContext';
 
 export function NavigationWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
