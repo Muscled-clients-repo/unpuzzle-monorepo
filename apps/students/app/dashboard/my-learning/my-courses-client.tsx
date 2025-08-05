@@ -51,7 +51,7 @@ export default function MyCoursesClient() {
     }, 300);
     
     return () => clearTimeout(timeoutId);
-  }, [filters, fetchMyLearning]);
+  }, [filters.search, filters.category, filters.status, filters.sortBy]); // Remove fetchMyLearning from deps
 
   // API handles filtering and sorting, so we use courses directly
   const sortedCourses = enrolledCourses;
@@ -67,7 +67,34 @@ export default function MyCoursesClient() {
   if (error) {
     return (
       <div className="text-center py-12">
-        <p className="text-red-600">Error loading courses. Please try again later.</p>
+        <div className="max-w-md mx-auto">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+            <h3 className="text-lg font-medium text-red-800 mb-2">Connection Error</h3>
+            <p className="text-red-600 mb-4">{error}</p>
+            <div className="flex gap-3">
+              <button 
+                onClick={() => window.location.reload()} 
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              >
+                Retry
+              </button>
+              <button 
+                onClick={() => fetchMyLearning()}
+                className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300"
+              >
+                Try Again
+              </button>
+            </div>
+            {error.includes('connect to server') && (
+              <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded">
+                <p className="text-sm text-yellow-800">
+                  💡 <strong>Development Note:</strong> Make sure the core server is running at{' '}
+                  <code className="bg-yellow-100 px-1 rounded">https://dev1.nazmulcodes.org</code>
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     );
   }

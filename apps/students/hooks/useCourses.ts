@@ -434,8 +434,8 @@ export const useMyLearning = (options?: {
     setError(null);
     
     const params: Record<string, any> = {
-      page: fetchOptions?.page || options?.page || 1,
-      limit: fetchOptions?.limit || options?.limit || 15,
+      page: fetchOptions?.page || 1,
+      limit: fetchOptions?.limit || 15,
       ...(fetchOptions?.search && { search: fetchOptions.search }),
       ...(fetchOptions?.category && fetchOptions.category !== "all" && { category: fetchOptions.category }),
       ...(fetchOptions?.status && fetchOptions.status !== "all" && { status: fetchOptions.status }),
@@ -466,13 +466,23 @@ export const useMyLearning = (options?: {
       } else {
         setError(response.error || 'Failed to fetch enrolled courses');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch enrolled courses:', error);
-      setError('Failed to fetch enrolled courses');
+      
+      // Provide more specific error messages
+      if (error?.message?.includes('Failed to fetch')) {
+        setError('Unable to connect to server. Please check your internet connection.');
+      } else if (error?.status === 401 || error?.status === 403) {
+        setError('Authentication required. Please log in again.');
+      } else if (error?.status === 500) {
+        setError('Server error. Please try again later.');
+      } else {
+        setError(`Failed to fetch enrolled courses: ${error?.message || 'Unknown error'}`);
+      }
     } finally {
       setLoading(false);
     }
-  }, [api, options]);
+  }, [api]);
 
   // Auto-fetch on mount only once
   useEffect(() => {
@@ -480,7 +490,7 @@ export const useMyLearning = (options?: {
       setHasInitialized(true);
       fetchMyLearning();
     }
-  }, [hasInitialized, fetchMyLearning]);
+  }, [hasInitialized]); // Remove fetchMyLearning from deps to prevent infinite loop
   
   return {
     myLearning,
