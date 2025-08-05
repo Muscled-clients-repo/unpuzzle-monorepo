@@ -1,321 +1,360 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect } from "react";
+import { useEnrolledCourses } from "@/hooks/useCourses";
+import { LoadingSpinner } from "@unpuzzle/ui";
 import Link from "next/link";
 import Image from "next/image";
 import { 
-  MagnifyingGlassIcon, 
-  FunnelIcon, 
+  MagnifyingGlassIcon,
+  FunnelIcon,
+  EyeIcon,
   AcademicCapIcon,
   ClockIcon,
-  ChartBarIcon,
-  StarIcon
-} from "@heroicons/react/24/outline";
-import { CheckCircleIcon } from "@heroicons/react/24/solid";
-import { useMyCourses } from "@/hooks/useCourses";
-import { CourseListSkeleton } from "@unpuzzle/ui";
-import { Course } from "@/types/course.types";
+  CheckCircleIcon
+} from '@heroicons/react/24/outline';
 
-const categories = [
-  "All Categories",
-  "Web Development",
-  "Data Science",
-  "Mobile Development",
-  "Machine Learning",
-  "Cloud Computing",
-  "DevOps",
-  "UI/UX Design",
-  "Cybersecurity",
-];
-
-const sortOptions = [
-  { value: "recent", label: "Recently Accessed" },
-  { value: "progress", label: "In Progress" },
-  { value: "completed", label: "Completed" },
-  { value: "alphabetical", label: "A to Z" },
-];
+interface FilterState {
+  search: string;
+  status: string;
+  sortBy: string;
+  category: string;
+}
 
 export default function MyCoursesClient() {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("All Categories");
-  const [sortBy, setSortBy] = useState("recent");
+  const { enrolledCourses = [], loading, error } = useEnrolledCourses();
+  
+  const [filters, setFilters] = useState<FilterState>({
+    search: "",
+    status: "all",
+    sortBy: "recent",
+    category: "all"
+  });
+  
   const [showFilters, setShowFilters] = useState(false);
-  
-  const {
-    myCourses,
-    myCoursesLoading,
-    myCoursesError,
-    totalMyCoursesPages,
-    totalMyCourses,
-    fetchMyCourses,
-  } = useMyCourses(currentPage, 12);
-  
-  // Debounced search - only for search query, let the hook handle other params
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      if (searchQuery.trim()) {
-        fetchMyCourses({
-          searchQuery,
-          category: selectedCategory === "All Categories" ? undefined : selectedCategory,
-          sortBy,
-          page: 1 // Reset to first page on search
-        });
-        setCurrentPage(1);
-      }
-    }, 300);
+
+  // Filter courses based on current filters
+  const filteredCourses = enrolledCourses.filter(course => {
+    // Search filter
+    if (filters.search && !course.title.toLowerCase().includes(filters.search.toLowerCase())) {
+      return false;
+    }
     
-    return () => clearTimeout(timeoutId);
-  }, [searchQuery]); // Only depend on searchQuery
-  
-  // Handle filter changes
-  useEffect(() => {
-    fetchMyCourses({
-      searchQuery,
-      category: selectedCategory === "All Categories" ? undefined : selectedCategory,
-      sortBy,
-      page: 1 // Reset to first page on filter change
-    });
-    setCurrentPage(1);
-  }, [selectedCategory, sortBy]); // Only depend on filters
-  
-  const handlePageChange = useCallback((page: number) => {
-    setCurrentPage(page);
-    fetchMyCourses({
-      searchQuery,
-      category: selectedCategory === "All Categories" ? undefined : selectedCategory,
-      sortBy,
-      page
-    });
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [searchQuery, selectedCategory, sortBy, fetchMyCourses]);
-  
-  const stats = useMemo(() => ({
-    total: totalMyCourses,
-    inProgress: myCourses.filter(c => c.enrolled && !(c as any).completed).length,
-    completed: myCourses.filter(c => (c as any).completed).length,
-  }), [myCourses, totalMyCourses]);
-  
-  if (myCoursesError) {
+    // Status filter
+    if (filters.status === "in-progress" && course.progress >= 100) return false;
+    if (filters.status === "completed" && course.progress < 100) return false;
+    
+    // Category filter - implement based on your category structure
+    if (filters.category !== "all" && course.category !== filters.category) {
+      return false;
+    }
+    
+    return true;
+  });
+
+  // Sort courses
+  const sortedCourses = [...filteredCourses].sort((a, b) => {
+    switch (filters.sortBy) {
+      case "recent":
+        return new Date(b.enrolledAt || b.createdAt).getTime() - new Date(a.enrolledAt || a.createdAt).getTime();
+      case "alphabetical":
+        return a.title.localeCompare(b.title);
+      case "progress":
+        return (b.progress || 0) - (a.progress || 0);
+      default:
+        return 0;
+    }
+  });
+
+  if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-red-600 mb-4">Error loading courses: {myCoursesError}</p>
-          <button 
-            onClick={() => window.location.reload()}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-          >
-            Retry
-          </button>
-        </div>
+      <div className="flex items-center justify-center min-h-[400px]">
+        <LoadingSpinner size="lg" />
       </div>
     );
   }
-  
+
+  if (error) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-red-600">Error loading courses. Please try again later.</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Main Content */}
-      <section className="container mx-auto px-4 py-12">
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* Filters Sidebar */}
-          <aside className={`lg:w-64 ${showFilters ? 'block' : 'hidden lg:block'}`}>
-            <div className="bg-white rounded-xl shadow-sm p-6 sticky top-6">
-              <h3 className="font-bold text-lg mb-6">Filters</h3>
-              
-              {/* Sort Options */}
-              <div className="mb-6">
-                <h4 className="font-semibold mb-3">Sort By</h4>
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  {sortOptions.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              
-              {/* Categories */}
-              <div className="mb-6">
-                <h4 className="font-semibold mb-3">Category</h4>
-                <div className="space-y-2">
-                  {categories.map((category) => (
-                    <label key={category} className="flex items-center cursor-pointer">
-                      <input
-                        type="radio"
-                        name="category"
-                        value={category}
-                        checked={selectedCategory === category}
-                        onChange={(e) => setSelectedCategory(e.target.value)}
-                        className="mr-3 text-blue-600"
-                      />
-                      <span className="text-gray-700">{category}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-              
-              <button 
-                onClick={() => {
-                  setSelectedCategory("All Categories");
-                  setSortBy("recent");
-                  setSearchQuery("");
-                }}
-                className="w-full py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-all"
-              >
-                Clear All Filters
-              </button>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">My Learning</h1>
+          <p className="text-gray-600 mt-1">Track and continue your enrolled courses</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-gray-600">{sortedCourses.length} courses</span>
+        </div>
+      </div>
+
+      {/* Filters Bar - Shopify Style */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        {/* Main Filter Bar */}
+        <div className="p-4 border-b border-gray-200">
+          <div className="flex flex-col sm:flex-row gap-4">
+            {/* Search */}
+            <div className="flex-1 relative">
+              <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search courses..."
+                value={filters.search}
+                onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+                className="pl-10 pr-3 py-2 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
             </div>
-          </aside>
-          
-          {/* Course Grid */}
-          <div className="flex-1">
-            {/* Mobile Filter Toggle */}
-            <div className="lg:hidden mb-6">
+
+            {/* Filter Buttons */}
+            <div className="flex gap-2">
+              {/* Status Filter */}
+              <select
+                value={filters.status}
+                onChange={(e) => setFilters({ ...filters, status: e.target.value })}
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="all">All Status</option>
+                <option value="in-progress">In Progress</option>
+                <option value="completed">Completed</option>
+              </select>
+
+              {/* Sort By */}
+              <select
+                value={filters.sortBy}
+                onChange={(e) => setFilters({ ...filters, sortBy: e.target.value })}
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="recent">Most Recent</option>
+                <option value="alphabetical">Alphabetical</option>
+                <option value="progress">Progress</option>
+              </select>
+
+              {/* More Filters Toggle */}
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className="flex items-center gap-2 px-4 py-2 bg-white rounded-lg shadow-sm hover:shadow-md transition-all"
+                className={`px-4 py-2 border rounded-lg transition-colors flex items-center gap-2 ${
+                  showFilters ? 'bg-blue-50 border-blue-300 text-blue-700' : 'border-gray-300 hover:bg-gray-50'
+                }`}
               >
-                <FunnelIcon className="w-5 h-5" />
-                Filters
+                <FunnelIcon className="h-5 w-5" />
+                <span>More filters</span>
               </button>
             </div>
-            
-            {/* Loading State */}
-            {myCoursesLoading && myCourses.length === 0 ? (
-              <CourseListSkeleton count={6} />
-            ) : myCourses.length > 0 ? (
-              <>
-                {/* Course Grid */}
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {myCourses.map((course) => (
-                    <MyCourseCard key={course.id} course={course} />
-                  ))}
-                </div>
-                
-                {/* Pagination */}
-                {totalMyCoursesPages > 1 && (
-                  <div className="mt-8 flex justify-center">
-                    <nav className="flex gap-2">
-                      <button
-                        onClick={() => handlePageChange(currentPage - 1)}
-                        disabled={currentPage === 1}
-                        className="px-4 py-2 rounded-lg bg-white shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        Previous
-                      </button>
-                      
-                      {[...Array(totalMyCoursesPages)].map((_, i) => (
-                        <button
-                          key={i + 1}
-                          onClick={() => handlePageChange(i + 1)}
-                          className={`px-4 py-2 rounded-lg ${
-                            currentPage === i + 1
-                              ? 'bg-blue-600 text-white'
-                              : 'bg-white shadow-sm hover:shadow-md'
-                          }`}
-                        >
-                          {i + 1}
-                        </button>
-                      ))}
-                      
-                      <button
-                        onClick={() => handlePageChange(currentPage + 1)}
-                        disabled={currentPage === totalMyCoursesPages}
-                        className="px-4 py-2 rounded-lg bg-white shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        Next
-                      </button>
-                    </nav>
-                  </div>
-                )}
-              </>
-            ) : (
-              <div className="text-center py-12">
-                <AcademicCapIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600 text-lg mb-4">No courses found</p>
-                <Link
-                  href="/courses"
-                  className="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all"
-                >
-                  Browse Courses
-                </Link>
-              </div>
-            )}
           </div>
         </div>
-      </section>
-    </div>
-  );
-}
 
-function MyCourseCard({ course }: { course: Course }) {
-  const progress = (course as any).progress || Math.floor(Math.random() * 100);
-  const lastAccessed = (course as any).lastAccessed || "2 days ago";
-  
-  return (
-    <Link 
-      href={`/courses/${course.id}`}
-      className="group bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden"
-    >
-      <div className="relative aspect-video bg-gray-100">
-        {course.thumbnail ? (
-          <Image
-            src={course.thumbnail}
-            alt={course.title}
-            fill
-            className="object-cover group-hover:scale-105 transition-transform duration-300"
-          />
-        ) : (
-          <div className="flex items-center justify-center h-full bg-gradient-to-br from-blue-400 to-indigo-500">
-            <AcademicCapIcon className="w-16 h-16 text-white opacity-50" />
+        {/* Extended Filters (when showFilters is true) */}
+        {showFilters && (
+          <div className="p-4 bg-gray-50 border-b border-gray-200">
+            <div className="flex flex-wrap gap-4">
+              <select
+                value={filters.category}
+                onChange={(e) => setFilters({ ...filters, category: e.target.value })}
+                className="px-4 py-2 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="all">All Categories</option>
+                <option value="programming">Programming</option>
+                <option value="design">Design</option>
+                <option value="business">Business</option>
+              </select>
+            </div>
           </div>
         )}
-        
-        {/* Progress Overlay */}
-        <div className="absolute bottom-0 left-0 right-0 bg-black/70 p-2">
-          <div className="flex justify-between items-center mb-1">
-            <span className="text-xs text-white">Progress</span>
-            <span className="text-xs text-white font-semibold">{progress}%</span>
+
+        {/* Active Filters Display */}
+        {(filters.search || filters.status !== "all" || filters.category !== "all") && (
+          <div className="p-4 bg-blue-50 flex items-center justify-between">
+            <div className="flex flex-wrap gap-2">
+              <span className="text-sm text-gray-700">Active filters:</span>
+              {filters.search && (
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-white border border-gray-300">
+                  Search: {filters.search}
+                  <button
+                    onClick={() => setFilters({ ...filters, search: "" })}
+                    className="ml-2 text-gray-400 hover:text-gray-600"
+                  >
+                    ×
+                  </button>
+                </span>
+              )}
+              {filters.status !== "all" && (
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-white border border-gray-300">
+                  Status: {filters.status}
+                  <button
+                    onClick={() => setFilters({ ...filters, status: "all" })}
+                    className="ml-2 text-gray-400 hover:text-gray-600"
+                  >
+                    ×
+                  </button>
+                </span>
+              )}
+            </div>
+            <button
+              onClick={() => setFilters({ search: "", status: "all", sortBy: "recent", category: "all" })}
+              className="text-sm text-blue-600 hover:text-blue-700"
+            >
+              Clear all
+            </button>
           </div>
-          <div className="w-full bg-gray-700 rounded-full h-2">
-            <div 
-              className="bg-blue-500 h-2 rounded-full transition-all duration-300"
-              style={{ width: `${progress}%` }}
-            />
+        )}
+      </div>
+
+      {/* Courses Table */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        {sortedCourses.length === 0 ? (
+          <div className="text-center py-12">
+            <AcademicCapIcon className="mx-auto h-12 w-12 text-gray-400" />
+            <h3 className="mt-2 text-sm font-medium text-gray-900">No courses found</h3>
+            <p className="mt-1 text-sm text-gray-500">
+              {filters.search || filters.status !== "all" 
+                ? "Try adjusting your filters"
+                : "Start by enrolling in a course"}
+            </p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Course
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Instructor
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Progress
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Last Accessed
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Duration
+                  </th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {sortedCourses.map((course) => {
+                  const progress = course.progress || 0;
+                  const isCompleted = progress >= 100;
+                  
+                  return (
+                    <tr key={course.id} className="hover:bg-gray-50 transition-colors">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <div className="h-12 w-16 flex-shrink-0 relative rounded overflow-hidden">
+                            <Image
+                              src={course.thumbnail || "/assets/courseThumbnail.svg"}
+                              alt={course.title}
+                              fill
+                              className="object-cover"
+                            />
+                          </div>
+                          <div className="ml-4">
+                            <div className="text-sm font-medium text-gray-900">
+                              {course.title}
+                            </div>
+                            <div className="text-sm text-gray-500">
+                              {course.category || "General"}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">{course.instructor || "Unpuzzle"}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <div className="flex-1">
+                            <div className="flex items-center">
+                              <div className="w-32 bg-gray-200 rounded-full h-2 mr-3">
+                                <div
+                                  className={`h-2 rounded-full ${
+                                    isCompleted ? 'bg-green-600' : 'bg-blue-600'
+                                  }`}
+                                  style={{ width: `${progress}%` }}
+                                />
+                              </div>
+                              <span className="text-sm text-gray-600">{progress}%</span>
+                            </div>
+                          </div>
+                          {isCompleted && (
+                            <CheckCircleIcon className="ml-2 h-5 w-5 text-green-500" />
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {course.lastAccessed 
+                          ? new Date(course.lastAccessed).toLocaleDateString()
+                          : "Never"
+                        }
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center text-sm text-gray-500">
+                          <ClockIcon className="h-4 w-4 mr-1" />
+                          {course.duration || "N/A"}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <Link
+                          href={`/courses/${course.id}`}
+                          className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 transition-colors"
+                        >
+                          <EyeIcon className="h-4 w-4 mr-1" />
+                          {isCompleted ? "Review" : "Continue"}
+                        </Link>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* Pagination (if needed) */}
+      {sortedCourses.length > 10 && (
+        <div className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6 rounded-b-lg">
+          <div className="flex flex-1 justify-between sm:hidden">
+            <button className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+              Previous
+            </button>
+            <button className="relative ml-3 inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+              Next
+            </button>
+          </div>
+          <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+            <div>
+              <p className="text-sm text-gray-700">
+                Showing <span className="font-medium">1</span> to{" "}
+                <span className="font-medium">{Math.min(10, sortedCourses.length)}</span> of{" "}
+                <span className="font-medium">{sortedCourses.length}</span> results
+              </p>
+            </div>
+            <div>
+              <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+                <button className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+                  Previous
+                </button>
+                <button className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+                  Next
+                </button>
+              </nav>
+            </div>
           </div>
         </div>
-      </div>
-      
-      <div className="p-6">
-        <h3 className="font-semibold text-lg mb-2 group-hover:text-blue-600 transition-colors line-clamp-2">
-          {course.title}
-        </h3>
-        
-        <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-          {course.description || "Continue your learning journey"}
-        </p>
-        
-        <div className="flex items-center justify-between text-sm text-gray-500">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-1">
-              <ClockIcon className="w-4 h-4" />
-              <span>{lastAccessed}</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <StarIcon className="w-4 h-4 text-yellow-400" />
-              <span>{(course as any).rating || 4.8}</span>
-            </div>
-          </div>
-          
-          <button className="px-3 py-1 bg-blue-600 text-white text-sm font-medium rounded-full hover:bg-blue-700 transition-colors">
-            Continue
-          </button>
-        </div>
-      </div>
-    </Link>
+      )}
+    </div>
   );
 }

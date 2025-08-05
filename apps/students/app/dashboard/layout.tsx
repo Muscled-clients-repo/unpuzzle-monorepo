@@ -68,7 +68,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, currentPath }: SidebarProps) {
       )}
 
       {/* Desktop sidebar */}
-      <div className="relative flex h-screen w-full flex-col bg-white border-r border-gray-200">
+      <div className="w-64 flex-shrink-0 bg-white border-r border-gray-200">
         <SidebarContent currentPath={currentPath} />
       </div>
     </>
@@ -84,9 +84,9 @@ function SidebarContent({ currentPath, onClose }: SidebarContentProps) {
   const { user, isLoading } = useAuth();
   
   return (
-    <div className="flex h-screen grow flex-col gap-y-5 overflow-y-auto bg-white px-6 pb-4">
+    <div className="flex h-full flex-col bg-white">
       {/* Header */}
-      <div className="flex h-16 shrink-0 items-center justify-between">
+      <div className="flex h-16 shrink-0 items-center justify-between px-6">
         <div className="flex items-center">
           <AcademicCapIcon className="h-8 w-8 text-blue-600" />
           <span className="ml-2 text-xl font-bold text-gray-900">Unpuzzle</span>
@@ -103,34 +103,36 @@ function SidebarContent({ currentPath, onClose }: SidebarContentProps) {
       </div>
 
       {/* User info */}
-      <div className="flex items-center p-4 bg-gray-50 rounded-lg">
-        <div className="h-12 w-12 rounded-full overflow-hidden bg-gray-200 flex-shrink-0">
-          <img 
-            src={user?.image_url || "/assets/profileUser.svg"} 
-            alt="Profile" 
-            className="h-full w-full object-cover"
-            onError={(e) => {
-              e.currentTarget.src = '/assets/userAvatar.svg';
-              e.currentTarget.onerror = null;
-            }}
-          />
-        </div>
-        <div className="min-w-0 flex-1" style={{ marginLeft: '16px' }}>
-          <p className="text-sm font-semibold text-gray-900">
-            {isLoading ? 'Loading...' : (
-              user?.first_name && user?.last_name 
-                ? `${user.first_name} ${user.last_name}`
-                : user?.first_name || 'Student'
-            )}
-          </p>
-          <p className="text-xs text-gray-500 truncate">
-            {isLoading ? '...' : (user?.email || 'No email provided')}
-          </p>
+      <div className="px-6 pb-4">
+        <div className="flex items-center p-4 bg-gray-50 rounded-lg">
+          <div className="h-12 w-12 rounded-full overflow-hidden bg-gray-200 flex-shrink-0">
+            <img 
+              src={user?.image_url || "/assets/profileUser.svg"} 
+              alt="Profile" 
+              className="h-full w-full object-cover"
+              onError={(e) => {
+                e.currentTarget.src = '/assets/userAvatar.svg';
+                e.currentTarget.onerror = null;
+              }}
+            />
+          </div>
+          <div className="min-w-0 flex-1" style={{ marginLeft: '16px' }}>
+            <p className="text-sm font-semibold text-gray-900">
+              {isLoading ? 'Loading...' : (
+                user?.first_name && user?.last_name 
+                  ? `${user.first_name} ${user.last_name}`
+                  : user?.first_name || 'Student'
+              )}
+            </p>
+            <p className="text-xs text-gray-500 truncate">
+              {isLoading ? '...' : (user?.email || 'No email provided')}
+            </p>
+          </div>
         </div>
       </div>
 
       {/* Navigation */}
-      <nav className="flex flex-1 flex-col">
+      <nav className="flex-1 flex flex-col px-6 pb-6 overflow-y-auto">
         <ul role="list" className="flex flex-1 flex-col gap-y-7">
           <li>
             <ul role="list" className="-mx-2 space-y-1">
@@ -226,26 +228,31 @@ export default function DashboardLayout({
   // }
 
   return (
-    <div className="h-screen bg-gray-50 flex">
+    <div className="flex max-h-[100vh] bg-gray-50">
       {/* Sidebar */}
-      <div className="flex-shrink-0">
-        <div className="flex h-screen w-64">
-          <Sidebar 
-            sidebarOpen={sidebarOpen} 
-            setSidebarOpen={setSidebarOpen} 
-            currentPath={pathname || '/dashboard'} 
-          />
-        </div>
-      </div>
+      <Sidebar 
+        sidebarOpen={sidebarOpen} 
+        setSidebarOpen={setSidebarOpen} 
+        currentPath={pathname || '/dashboard'} 
+      />
 
-      {/* Main content */}
-      <div className="flex-1 flex flex-col h-screen overflow-y-auto">
+      {/* Main content - scrollable */}
+      <div className="flex-1 max-h-screen overflow-y-auto">
+        {/* Mobile header */}
+        <div className="lg:hidden sticky top-0 z-10 bg-white border-b border-gray-200 px-4 py-3">
+          <button
+            type="button"
+            className="-ml-0.5 -mt-0.5 inline-flex h-12 w-12 items-center justify-center rounded-md text-gray-500 hover:text-gray-900"
+            onClick={() => setSidebarOpen(true)}
+          >
+            <Bars3Icon className="h-6 w-6" />
+          </button>
+        </div>
+
         {/* Page content */}
-        <main className="flex-1 py-8">
-          <div className="px-4 sm:px-6 lg:px-8">
-            {children}
-          </div>
-        </main>
+        <div className="py-8 px-4 sm:px-6 lg:px-8">
+          {children}
+        </div>
       </div>
     </div>
   );
