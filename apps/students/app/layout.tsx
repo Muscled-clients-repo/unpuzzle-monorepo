@@ -33,6 +33,7 @@ export default function RootLayout({
     >
       <head>
         <link rel="stylesheet" href="/tailwind.css" />
+        <link rel="stylesheet" href="/header-responsive.css" />
       </head>
       <body className="antialiased light" suppressHydrationWarning>
         <ClientProviders>

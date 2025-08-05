@@ -237,7 +237,7 @@ export default function DashboardLayout({
       />
 
       {/* Main content - scrollable */}
-      <div className="flex-1 max-h-screen overflow-y-auto">
+      <div className="flex-1 max-h-screen h-screen overflow-y-auto">
         {/* Mobile header */}
         <div className="lg:hidden sticky top-0 z-10 bg-white border-b border-gray-200 px-4 py-3">
           <button

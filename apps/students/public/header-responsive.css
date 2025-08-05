@@ -1,0 +1,21 @@
+/* Custom responsive styles for header navigation */
+.desktop-nav {
+  display: none;
+  gap: 2rem; /* 32px gap between nav items */
+}
+
+/* Gap handled by Tailwind space-x-2 class */
+
+.mobile-menu-btn {
+  display: block;
+}
+
+@media (min-width: 768px) {
+  .desktop-nav {
+    display: flex;
+  }
+  
+  .mobile-menu-btn {
+    display: none;
+  }
+}
