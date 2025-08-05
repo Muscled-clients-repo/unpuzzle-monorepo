@@ -19,7 +19,10 @@ class MyLearningController extends BaseController {
     const { page = 1, limit = 15, search, category, status, sort = "recent" } = req.query;
     
     if (!userId) {
-      return this.sendError(res, "User not authenticated", 401);
+      return res.status(401).json({
+        success: false,
+        message: "User not authenticated"
+      });
     }
 
     try {
@@ -115,7 +118,7 @@ class MyLearningController extends BaseController {
 
     } catch (error) {
       logger.error('Error in getMyEnrolledCourses:', error);
-      return this.sendError(res, "Unable to fetch enrolled courses. Please try again later.", 500);
+      return this.handleError(res, error, "Unable to fetch enrolled courses. Please try again later.");
     }
   });
 }
